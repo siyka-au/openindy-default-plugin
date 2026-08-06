@@ -2,7 +2,7 @@
 #define P_OIEXCHANGEASCII_H
 
 #include <exception>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QVariantList>
 
 #include "exchangesimpleascii.h"
@@ -45,7 +45,7 @@ private:
     //helper methods
     //##############
 
-    QRegExp getDelimiter(const QString &delimiterName) const;
+    QRegularExpression getDelimiter(const QString &delimiterName) const;
 
 };
 

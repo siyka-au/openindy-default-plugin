@@ -243,15 +243,15 @@ QList<ExchangeSimpleAscii::ColumnType> OiExchangeAscii::getPossibleColumns(const
  * \param delimiterName
  * \return
  */
-QRegExp OiExchangeAscii::getDelimiter(const QString &delimiterName) const{
+QRegularExpression OiExchangeAscii::getDelimiter(const QString &delimiterName) const{
 
     if(delimiterName.compare("whitespace [ ]") == 0){
-        return QRegExp("\\s+");
+        return QRegularExpression("\\s+");
     }else if(delimiterName.compare("semicolon [;]") == 0){
-        return QRegExp("[;]");
+        return QRegularExpression("[;]");
     }
 
-    return QRegExp(".*");
+    return QRegularExpression(".*");
 
 }
 

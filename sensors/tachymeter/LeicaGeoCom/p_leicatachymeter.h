@@ -6,7 +6,6 @@
 #include <QObject>
 #include <QDebug>
 #include <QtSerialPort/QSerialPort>
-#include <QRegExp>
 #include <QThread>
 #include <QStringList>
 #include <QVariantMap>

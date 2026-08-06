@@ -1,5 +1,7 @@
 #include "simplepolarmeasurement.h"
 
+#include <algorithm>
+
 /*!
  * \brief SimplePolarMeasurement::init
  */
@@ -875,7 +877,7 @@ void SimplePolarMeasurement::checkDistribution(UncertaintyData &d)
 
     QList<double> tmpList = d.values;
     double n = tmpList.size();
-    qSort(tmpList);
+    std::sort(tmpList.begin(), tmpList.end());
 
 
     double classification = (d.maxValue-d.minValue)/10;

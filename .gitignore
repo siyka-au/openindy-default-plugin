@@ -17,6 +17,7 @@
 bin/
 test/**/release
 test/**/debug
+/build/
 # Qt-es
 
 *.pro.user

@@ -1,6 +1,7 @@
 #ifndef TREEUTIL_H
 #define TREEUTIL_H
 
+#include <QObject>
 #include <QString>
 #include <QList>
 #include <QPointer>

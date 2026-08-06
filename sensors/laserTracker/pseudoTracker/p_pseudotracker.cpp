@@ -105,7 +105,7 @@ bool PseudoTracker::doSelfDefinedAction(const QString &action){
         emit this->sensorMessage("try to stop / finish measurement", eInformationMessage, eConsoleMessage);
     } else if(action == "toggle return readings") {
         this->returnReading = !this->returnReading; // toggle
-        emit this->sensorMessage(QString("return readings: %1").arg(this->returnReading), eInformationMessage, eConsoleMessage);
+        emit this->sensorMessage(QString("return readings: %1").arg(this->returnReading.load() ? "true" : "false"), eInformationMessage, eConsoleMessage);
     }
     return true;
 }
