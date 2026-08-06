@@ -39,13 +39,7 @@ LoadPluginTest::LoadPluginTest()
  */
 void LoadPluginTest::testLoadPlugin(){
 
-    QDir dir;
-
-#ifdef QT_DEBUG
-    QString pluginPath = dir.absoluteFilePath("../../bin/debug/p_defaultPlugind1.dll");
-#else
-    QString pluginPath = dir.absoluteFilePath("../../bin/release/p_defaultPlugin1.dll");
-#endif
+    QString pluginPath = PLUGIN_PATH;
 
     QVERIFY2(QFile::exists(pluginPath), pluginPath.toLatin1().data());
     QPluginLoader pluginLoader(pluginPath);
@@ -62,13 +56,7 @@ void LoadPluginTest::testLoadPlugin(){
 }
 void LoadPluginTest::testPseudoTracker_eCartesianReading(){
 
-    QDir dir;
-
-#ifdef QT_DEBUG
-    QString pluginPath = dir.absoluteFilePath("../../bin/debug/p_defaultPlugind1.dll");
-#else
-    QString pluginPath = dir.absoluteFilePath("../../bin/release/p_defaultPlugin1.dll");
-#endif
+    QString pluginPath = PLUGIN_PATH;
 
     QVERIFY2(QFile::exists(pluginPath), pluginPath.toLatin1().data());
     QPluginLoader pluginLoader(pluginPath);
