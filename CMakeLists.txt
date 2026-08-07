@@ -236,10 +236,6 @@ target_compile_definitions(tst_loadplugin PRIVATE
 add_test(NAME loadplugin COMMAND tst_loadplugin)
 add_dependencies(tst_loadplugin OpenIndyDefaultPlugin)
 
-add_executable(bench_pluginload test/benchmark/bench_pluginload.cpp)
-target_link_libraries(bench_pluginload PRIVATE Qt6::Core OpenIndyCore)
-add_dependencies(bench_pluginload OpenIndyDefaultPlugin)
-
 add_executable(tst_oiexchangeascii test/oiexchangeascii/tst_oiexchangeascii.cpp exchange/p_oiexchangeascii.cpp)
 target_include_directories(tst_oiexchangeascii PRIVATE test/include exchange)
 target_link_libraries(tst_oiexchangeascii PRIVATE Qt6::Test OpenIndyCore)
