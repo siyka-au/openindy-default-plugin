@@ -197,17 +197,10 @@ target_link_libraries(OpenIndyDefaultPlugin
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
-if(WIN32)
-    set(OI_APP_EXE_NAME "openIndy.exe")
-else()
-    set(OI_APP_EXE_NAME "openIndy")
-endif()
-
 add_custom_command(TARGET OpenIndyDefaultPlugin POST_BUILD
     COMMAND ${CMAKE_COMMAND}
         -DPLUGIN_SO=$<TARGET_FILE:OpenIndyDefaultPlugin>
         -DAPP_DIR=${OI_APP_LOCAL_DIR}/build/bin
-        -DOPENINDY_EXE=${OI_APP_LOCAL_DIR}/build/bin/${OI_APP_EXE_NAME}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/DeployToApp.cmake
     VERBATIM
 )
@@ -242,6 +235,10 @@ target_compile_definitions(tst_loadplugin PRIVATE
     PLUGIN_PATH="$<TARGET_FILE:OpenIndyDefaultPlugin>")
 add_test(NAME loadplugin COMMAND tst_loadplugin)
 add_dependencies(tst_loadplugin OpenIndyDefaultPlugin)
+
+add_executable(bench_pluginload test/benchmark/bench_pluginload.cpp)
+target_link_libraries(bench_pluginload PRIVATE Qt6::Core OpenIndyCore)
+add_dependencies(bench_pluginload OpenIndyDefaultPlugin)
 
 add_executable(tst_oiexchangeascii test/oiexchangeascii/tst_oiexchangeascii.cpp exchange/p_oiexchangeascii.cpp)
 target_include_directories(tst_oiexchangeascii PRIVATE test/include exchange)
