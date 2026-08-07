@@ -23,6 +23,7 @@ void PointBetweenTwoPoints::init(){
     param2.description = "Select second point.";
     param2.infinite = false;
     param2.typeOfElement = ePointElement;
+    this->neededElements.append(param1);
     this->neededElements.append(param2);
 
     //set spplicable for

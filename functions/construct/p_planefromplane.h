@@ -1,21 +1,19 @@
-#ifndef P_BESTFITPLANE_KERN_H
-#define P_BESTFITPLANE_KERN_H
+#ifndef P_PLANEFROMPLANE_H
+#define P_PLANEFROMPLANE_H
 
 #include <QObject>
 #include <QPointer>
-#include <QtMath>
 
-#include "fitfunction.h"
+#include "constructfunction.h"
 #include "oivec.h"
 #include "oimat.h"
-#include "cfitting_plane.h"
 
 using namespace oi;
 
 /*!
- * \brief The BestFitPlane_kern class
+ * \brief The PlaneFromPlane class
  */
-class BestFitPlane_kern : public FitFunction
+class PlaneFromPlane : public ConstructFunction
 {
     Q_OBJECT
 
@@ -35,6 +33,14 @@ protected:
 
     bool exec(Plane &plane);
 
+private:
+
+    //##############
+    //helper methods
+    //##############
+
+    bool setUpResult(Plane &plane);
+
 };
 
-#endif // P_BESTFITPLANE_KERN_H
+#endif // P_PLANEFROMPLANE_H

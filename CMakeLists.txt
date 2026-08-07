@@ -29,6 +29,9 @@ else()
 endif()
 FetchContent_MakeAvailable(OpenIndyCore)
 
+set(OI_APP_LOCAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../openindy" CACHE PATH
+    "Local OpenIndy app checkout to auto-deploy this plugin into after each build")
+
 # --- plugin metadata ---
 # mirrors the compiler/OS strings OiMetaData::getCompiler()/getOperatingSys()
 # (openindy/controller/oimetadata.cpp) report, since PluginCopier::checkPluginMetaData
@@ -70,10 +73,12 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/construct/p_intersectlineplane.cpp
     functions/construct/p_intersectplaneplane.cpp
     functions/construct/p_linefrompoints.cpp
+    functions/construct/p_planefromplane.cpp
     functions/construct/p_planefrompoints.cpp
     functions/construct/p_pointbetweentwopoints.cpp
     functions/construct/p_pointfrompoints.cpp
     functions/construct/p_spherefrompoints.cpp
+    functions/fit/p_bestfitcircle.cpp
     functions/fit/p_bestfitline.cpp
     functions/fit/p_bestfitplane.cpp
     functions/fit/p_bestfitpoint.cpp
@@ -88,6 +93,8 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/objectTransformation/p_rectifytopoint.cpp
     functions/objectTransformation/p_rectifytovector.cpp
     functions/objectTransformation/p_shift.cpp
+    functions/systemTransformation/p_helmert7Param.cpp
+    functions/systemTransformation/p_helmert6param.cpp
     exchange/p_oiexchangeascii.cpp
     sensors/laserTracker/pseudoTracker/p_pseudotracker.cpp
     sensors/tachymeter/LeicaGeoCom/p_leicatachymeter.cpp
@@ -108,10 +115,12 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/construct/p_intersectlineplane.h
     functions/construct/p_intersectplaneplane.h
     functions/construct/p_linefrompoints.h
+    functions/construct/p_planefromplane.h
     functions/construct/p_planefrompoints.h
     functions/construct/p_pointbetweentwopoints.h
     functions/construct/p_pointfrompoints.h
     functions/construct/p_spherefrompoints.h
+    functions/fit/p_bestfitcircle.h
     functions/fit/p_bestfitline.h
     functions/fit/p_bestfitplane.h
     functions/fit/p_bestfitpoint.h
@@ -126,6 +135,8 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/objectTransformation/p_rectifytopoint.h
     functions/objectTransformation/p_rectifytovector.h
     functions/objectTransformation/p_shift.h
+    functions/systemTransformation/p_helmert7Param.h
+    functions/systemTransformation/p_helmert6param.h
     exchange/p_oiexchangeascii.h
     sensors/laserTracker/pseudoTracker/p_pseudotracker.h
     sensors/tachymeter/LeicaGeoCom/p_leicatachymeter.h
@@ -162,6 +173,7 @@ target_include_directories(OpenIndyDefaultPlugin
         functions/construct
         functions/fit
         functions/objectTransformation
+        functions/systemTransformation
         exchange
         cf
 )
@@ -173,6 +185,31 @@ target_link_libraries(OpenIndyDefaultPlugin
         Qt6::Xml
         Qt6::SerialPort
         OpenIndyCore
+)
+
+# --- deploy into a sibling openIndy app build, and tests ---
+# Both only make sense when this repo is the top-level build. When pulled in
+# as a dependency (e.g. openindy's own CMakeLists FetchContent-ing this repo
+# so the plugin is always built alongside the app), the app's own CMakeLists
+# does the packaging step itself once it - not this plugin target - has
+# actually finished linking, and building this repo's standalone test suite
+# as a side effect of building the app would just be unwanted noise.
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+
+if(WIN32)
+    set(OI_APP_EXE_NAME "openIndy.exe")
+else()
+    set(OI_APP_EXE_NAME "openIndy")
+endif()
+
+add_custom_command(TARGET OpenIndyDefaultPlugin POST_BUILD
+    COMMAND ${CMAKE_COMMAND}
+        -DPLUGIN_SO=$<TARGET_FILE:OpenIndyDefaultPlugin>
+        -DAPP_DIR=${OI_APP_LOCAL_DIR}/build/bin
+        -DOPENINDY_EXE=${OI_APP_LOCAL_DIR}/build/bin/${OI_APP_EXE_NAME}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/DeployToApp.cmake
+    VERBATIM
 )
 
 # --- tests ---
@@ -191,6 +228,7 @@ target_include_directories(tst_function PRIVATE
     functions/construct
     functions/fit
     functions/objectTransformation
+    functions/systemTransformation
     exchange
     cf
 )
@@ -209,3 +247,5 @@ add_executable(tst_oiexchangeascii test/oiexchangeascii/tst_oiexchangeascii.cpp 
 target_include_directories(tst_oiexchangeascii PRIVATE test/include exchange)
 target_link_libraries(tst_oiexchangeascii PRIVATE Qt6::Test OpenIndyCore)
 add_test(NAME oiexchangeascii COMMAND tst_oiexchangeascii)
+
+endif()

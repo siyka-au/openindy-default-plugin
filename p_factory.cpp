@@ -3,9 +3,6 @@
 
 using namespace oi;
 
-//int    gDebugLevel=0;
-//TReal  gConvergence=1e-9;
-
 OiTemplatePlugin::OiTemplatePlugin(QObject *parent) : QObject(parent){
 
 }
@@ -35,11 +32,12 @@ QList<QPointer<Function> > OiTemplatePlugin::createFunctions(){
     resultSet.append(new BestFitPoint());
     resultSet.append(new BestFitLine());
     resultSet.append(new BestFitPlane());
-    //resultSet.append(new BestFitPlane_kern());
-    //resultSet.append(new BestFitSphere_kern());
+    resultSet.append(new BestFitCircle());
     resultSet.append(new PointFromPoints());
     resultSet.append(new LineFromPoints());
     resultSet.append(new PlaneFromPoints());
+    resultSet.append(new PlaneFromPlane());
+    resultSet.append(new PointBetweenTwoPoints());
     resultSet.append(new IntersectLineLine());
     resultSet.append(new IntersectLinePlane());
     resultSet.append(new IntersectPlanePlane());
@@ -59,6 +57,8 @@ QList<QPointer<Function> > OiTemplatePlugin::createFunctions(){
     resultSet.append(new BestFitCylinderFromPoints());
     resultSet.append(new BestFitCylinderFromPointsAppxDirection());
     resultSet.append(new BestFitCylinderFromPointsAppxDummyPoint());
+    resultSet.append(new Helmert7Param());
+    resultSet.append(new Helmert6Param());
 
     FunctionConfigParser parser;
     foreach(ConfiguredFunctionConfig config, parser.readConfigFromJson()) {
@@ -150,16 +150,16 @@ QPointer<Function> OiTemplatePlugin::createFunction(const QString &name){
         result = new BestFitLine();
     }else if(name.compare("BestFitPlane") == 0){
         result = new BestFitPlane();
-    }/*else if(name.compare("BestFitPlane_kern") == 0){
-        result = new BestFitPlane_kern();
-    }else if(name.compare("BestFitSphere_kern") == 0){
-        result = new BestFitSphere_kern();
-    }*/else if(name.compare("PointFromPoints") == 0){
+    }else if(name.compare("PointFromPoints") == 0){
         result = new PointFromPoints();
     }else if(name.compare("LineFromPoints") == 0){
         result = new LineFromPoints();
     }else if(name.compare("PlaneFromPoints") == 0){
         result = new PlaneFromPoints();
+    }else if(name.compare("PlaneFromPlane") == 0){
+        result = new PlaneFromPlane();
+    }else if(name.compare("PointBetweenTwoPoints") == 0){
+        result = new PointBetweenTwoPoints();
     }else if(name.compare("IntersectLineLine") == 0){
         result = new IntersectLineLine();
     }else if(name.compare("IntersectLinePlane") == 0){
@@ -174,17 +174,17 @@ QPointer<Function> OiTemplatePlugin::createFunction(const QString &name){
         result = new TranslateByValue();
     }else if(name.compare("Register") == 0){
         result = new Register();
-    /*}else if(name.compare("HelmertTransformation") == 0){
-        result = new Helmert7Param();*/
-    }/*else if(name.compare("BestFitCircle") == 0){
+    }else if(name.compare("HelmertTransformation") == 0){
+        result = new Helmert7Param();
+    }else if(name.compare("Helmert6Param") == 0){
+        result = new Helmert6Param();
+    }else if(name.compare("BestFitCircle") == 0){
         result = new BestFitCircle();
-    }*/else if(name.compare("BestFitCircleInPlane") == 0){
+    }else if(name.compare("BestFitCircleInPlane") == 0){
         result = new BestFitCircleInPlane();
     } else if(name.compare("BestFitCircleInPlaneFromPoints") == 0){
         result = new BestFitCircleInPlaneFromPoints();
-    }/*else if(name.compare("9ParameterHelmertTransformation") == 0){
-        result = new ExtendedTemperatureCompensation();
-    }*/else if(name.compare("BestFitSphere") == 0){
+    }else if(name.compare("BestFitSphere") == 0){
         result = new BestFitSphere();
     }else if(name.compare("RectifyToPoint") == 0){
         result = new RectifyToPoint();

@@ -1,16 +1,17 @@
 #ifndef P_HELMERT6PARAM_H
 #define P_HELMERT6PARAM_H
 
-#include "systemtransformation.h"
+#include "p_helmert7Param.h"
 
 using namespace oi;
-using namespace std;
 
 /*!
- * \brief The Helmert6Param class is a helmert 6 parameter transformation without scale.
- * Angles and Translation are approximated with Drixler algorithm.
+ * \brief The Helmert6Param class is a helmert transformation without scale
+ * (scale fixed to 1). Reuses Helmert7Param's math by restricting its
+ * "calculate scale" parameter to "no", which routes Helmert7Param::exec()
+ * to its existing unscaled 6-parameter (calc_6p) path.
  */
-class Helmert6Param : public SystemTransformation
+class Helmert6Param : public Helmert7Param
 {
     Q_OBJECT
 
@@ -22,41 +23,6 @@ public:
 
     void init();
 
-protected:
-
-    //############
-    //exec methods
-    //############
-
-    bool exec(TrafoParam &trafoParam);
-
-private:
-    bool svdError;
-    QList<OiVec> locSystem;
-    QList<OiVec> refSystem;
-    QStringList protocol;
-    OiVec translation;
-    OiVec rotation;
-
-    void initPoints();
-    vector<OiVec> calcCentroidCoord();
-    vector<OiVec> centroidReducedCoord(QList<OiVec> input, OiVec centroid);
-    vector<OiMat> modelMatrix(vector<OiVec> locC, vector<OiVec> refC);
-    OiMat normalEquationMatrix(vector<OiMat> vecA);
-    OiVec quaternion(OiMat n);
-    OiMat rotationMatrix(OiVec q);
-    bool adjust(TrafoParam &tp);
-    OiMat fillAMatrix(OiVec x0);
-    OiVec fillLVector();
-    OiVec fillL0Vector(OiVec x0);
-    void preliminaryTransformation();
-    OiVec approxRotation();
-    OiVec approxTranslation(OiVec rot);
-
-    OiMat getRotationMatrix(OiVec rot);
-    OiVec getRotationAngles(OiMat r);
-    OiMat getTranslationMatrix(OiVec trans);
-    OiMat getScaleMatrix(OiVec s);
 };
 
 #endif // P_HELMERT6PARAM_H
