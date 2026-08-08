@@ -22,6 +22,9 @@ void PseudoTracker::init(){
     this->supportedReadingTypes.append(eLevelReading);
 
     //set supported sensor actions
+    this->supportedSensorActions.append(eConnect);
+    this->supportedSensorActions.append(eDisconnect);
+    this->supportedSensorActions.append(eMeasure);
     this->supportedSensorActions.append(eHome);
     this->supportedSensorActions.append(eInitialize);
     this->supportedSensorActions.append(eMoveAngle);
@@ -30,6 +33,9 @@ void PseudoTracker::init(){
     this->supportedSensorActions.append(eCompensation);
     this->supportedSensorActions.append(eMotorState);
     this->supportedSensorActions.append(eSearch);
+
+    //this simulator only fabricates readings on demand; there is no live stream
+    this->supportedAcquisitionModes.append(AcquisitionMode::eDiscrete);
 
     //set supported connection types
     this->supportedConnectionTypes.append(eNetworkConnection);

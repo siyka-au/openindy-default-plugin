@@ -19,8 +19,15 @@ void LeicaTachymeter::init(){
     this->supportedReadingTypes.append(eCartesianReading);
 
     //set supported sensor actions
+    this->supportedSensorActions.append(eConnect);
+    this->supportedSensorActions.append(eDisconnect);
+    this->supportedSensorActions.append(eMeasure);
     this->supportedSensorActions.append(eMoveAngle);
+    this->supportedSensorActions.append(eMoveXYZ);
     this->supportedSensorActions.append(eToggleSight);
+
+    //GeoCom measurement is request/response; tracking/streaming is not driven here yet
+    this->supportedAcquisitionModes.append(AcquisitionMode::eDiscrete);
 
     //set supported connection types
     this->supportedConnectionTypes.append(eSerialConnection);
