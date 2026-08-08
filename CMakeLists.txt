@@ -252,4 +252,13 @@ target_include_directories(tst_trackererrormodel PRIVATE test/include sensors/co
 target_link_libraries(tst_trackererrormodel PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME trackererrormodel COMMAND tst_trackererrormodel)
 
+add_executable(tst_simulatedscene
+    test/trackererrormodel/tst_simulatedscene.cpp
+    sensors/common/trackererrormodel.cpp
+    functions/fit/p_bestfitplane.cpp
+)
+target_include_directories(tst_simulatedscene PRIVATE test/include sensors/common functions/fit)
+target_link_libraries(tst_simulatedscene PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
+add_test(NAME simulatedscene COMMAND tst_simulatedscene)
+
 endif()
