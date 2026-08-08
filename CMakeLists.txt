@@ -96,6 +96,7 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/systemTransformation/p_helmert7Param.cpp
     functions/systemTransformation/p_helmert6param.cpp
     exchange/p_oiexchangeascii.cpp
+    sensors/common/trackererrormodel.cpp
     sensors/laserTracker/pseudoTracker/p_pseudotracker.cpp
     sensors/tachymeter/LeicaGeoCom/p_leicatachymeter.cpp
     simulations/simplePolarMeasurement/simplepolarmeasurement.cpp
@@ -168,6 +169,7 @@ target_include_directories(OpenIndyDefaultPlugin
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         simulations/simplePolarMeasurement
+        sensors/common
         sensors/laserTracker/pseudoTracker
         sensors/tachymeter/LeicaGeoCom
         functions/construct
@@ -216,6 +218,7 @@ target_include_directories(tst_function PRIVATE
     test/include
     ${CMAKE_CURRENT_SOURCE_DIR}
     simulations/simplePolarMeasurement
+    sensors/common
     sensors/laserTracker/pseudoTracker
     sensors/tachymeter/LeicaGeoCom
     functions/construct
@@ -230,7 +233,7 @@ add_test(NAME function COMMAND tst_function)
 
 add_executable(tst_loadplugin test/loadplugin/tst_loadplugin.cpp)
 target_include_directories(tst_loadplugin PRIVATE test/include)
-target_link_libraries(tst_loadplugin PRIVATE Qt6::Test OpenIndyCore)
+target_link_libraries(tst_loadplugin PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 target_compile_definitions(tst_loadplugin PRIVATE
     PLUGIN_PATH="$<TARGET_FILE:OpenIndyDefaultPlugin>")
 add_test(NAME loadplugin COMMAND tst_loadplugin)
@@ -240,5 +243,13 @@ add_executable(tst_oiexchangeascii test/oiexchangeascii/tst_oiexchangeascii.cpp 
 target_include_directories(tst_oiexchangeascii PRIVATE test/include exchange)
 target_link_libraries(tst_oiexchangeascii PRIVATE Qt6::Test OpenIndyCore)
 add_test(NAME oiexchangeascii COMMAND tst_oiexchangeascii)
+
+add_executable(tst_trackererrormodel
+    test/trackererrormodel/tst_trackererrormodel.cpp
+    sensors/common/trackererrormodel.cpp
+)
+target_include_directories(tst_trackererrormodel PRIVATE test/include sensors/common)
+target_link_libraries(tst_trackererrormodel PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
+add_test(NAME trackererrormodel COMMAND tst_trackererrormodel)
 
 endif()

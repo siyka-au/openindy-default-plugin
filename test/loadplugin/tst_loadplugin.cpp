@@ -3,6 +3,7 @@
 #include <QPointer>
 #include <QList>
 #include "plugin.h"
+#include "chooselalib.h"
 
 using namespace oi;
 
@@ -14,6 +15,7 @@ public:
     LoadPluginTest();
 
 private Q_SLOTS:
+    void initTestCase();
     void testPseudoTracker_eCartesianReading();
     void testLoadPlugin();
 
@@ -23,6 +25,14 @@ private:
 
 LoadPluginTest::LoadPluginTest()
 {
+}
+
+void LoadPluginTest::initTestCase(){
+    // PseudoTracker's simulated readings go through OiMat rotation math
+    // (TrackerErrorModel); without a backend selected here, that
+    // dereferences a null linear-algebra pointer and crashes (main.cpp
+    // does this same call at real app startup)
+    ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
 }
 
 /*

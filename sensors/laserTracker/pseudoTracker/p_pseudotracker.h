@@ -14,6 +14,7 @@
 
 #include "lasertracker.h"
 #include "oimat.h"
+#include "trackererrormodel.h"
 
 using namespace oi;
 
@@ -94,12 +95,11 @@ private:
     QList<QPointer<Reading> > measureCartesian(const MeasurementConfig &mConfig);
     QList<QPointer<Reading> > measureLevel(const MeasurementConfig &mConfig);
 
-    //methodes to generate random value
-    double randomX(int d, double m, double s);
-    double randomNorm();
-    double randomTriangular(double c, double a,double b);
-
-    void noisyPolarReading(ReadingPolar &r);
+    //! the true (noise-free) aim as a noisy polar draw, using this
+    //! instance's configured error terms - sigmaAzimuth/sigmaZenith/
+    //! sigmaDistance on the result are this model's own estimate of the
+    //! noise it just applied, not a static default
+    ReadingPolar simulateAim() const;
 
     //################
     //helper variables
