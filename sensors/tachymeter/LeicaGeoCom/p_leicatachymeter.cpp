@@ -72,7 +72,7 @@ void LeicaTachymeter::init(){
     }
 
     //set supported connection types
-    this->supportedConnectionTypes.append(eSerialConnection);
+    this->supportedConnectionTypes.append(ConnectionKind::serial());
 
     //set string parameter
     this->stringParameters.insert("reflector", "reflectorless");

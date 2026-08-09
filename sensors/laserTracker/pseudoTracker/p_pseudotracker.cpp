@@ -92,8 +92,8 @@ void PseudoTracker::init(){
     }
 
     //set supported connection types
-    this->supportedConnectionTypes.append(eNetworkConnection);
-    this->supportedConnectionTypes.append(eSerialConnection);
+    this->supportedConnectionTypes.append(ConnectionKind::network());
+    this->supportedConnectionTypes.append(ConnectionKind::serial());
 
     //set double parameter
     this->doubleParameters.insert("lambda [mm]",0.000403);
