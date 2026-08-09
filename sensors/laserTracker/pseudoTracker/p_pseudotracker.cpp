@@ -37,6 +37,60 @@ void PseudoTracker::init(){
     //this simulator only fabricates readings on demand; there is no live stream
     this->supportedAcquisitionModes.append(AcquisitionMode::eDiscrete);
 
+    //publish this driver's own config catalog - PluginRepository tags each
+    //with this sensor's type when it scans the plugin, so a config selected
+    //for a different sensor type is filtered/rejected rather than silently
+    //accepted (see MeasurementConfigurationProxyModel, Controller::_startMeasurement)
+    {
+        MeasurementConfig fastPoint;
+        fastPoint.setName("FastPoint");
+        fastPoint.setMaxObservations(1);
+        fastPoint.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
+        fastPoint.setMeasurementMode(MeasurementModes::eFast_MeasurementMode);
+        fastPoint.setMeasureTwoSides(false);
+        fastPoint.makeStandardConfig();
+        this->supportedMeasurementConfigs.append(fastPoint);
+
+        MeasurementConfig stdPoint;
+        stdPoint.setName("StdPoint");
+        stdPoint.setMaxObservations(1);
+        stdPoint.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
+        stdPoint.setMeasurementMode(MeasurementModes::eStandard_MeasurementMode);
+        stdPoint.setMeasureTwoSides(false);
+        stdPoint.makeStandardConfig();
+        this->supportedMeasurementConfigs.append(stdPoint);
+
+        MeasurementConfig precisePoint;
+        precisePoint.setName("PrecisePoint");
+        precisePoint.setMaxObservations(1);
+        precisePoint.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
+        precisePoint.setMeasurementMode(MeasurementModes::ePrecise_MeasurementMode);
+        precisePoint.setMeasureTwoSides(false);
+        precisePoint.makeStandardConfig();
+        this->supportedMeasurementConfigs.append(precisePoint);
+
+        MeasurementConfig stdTwoSide;
+        stdTwoSide.setName("StdTwoSide");
+        stdTwoSide.setMaxObservations(1);
+        stdTwoSide.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
+        stdTwoSide.setMeasurementMode(MeasurementModes::eStandard_MeasurementMode);
+        stdTwoSide.setMeasureTwoSides(true);
+        stdTwoSide.makeStandardConfig();
+        this->supportedMeasurementConfigs.append(stdTwoSide);
+
+        //level readings are declared in supportedReadingTypes above and
+        //implemented (measureLevel) - LeicaTachymeter doesn't support this
+        //reading type at all, so it correctly doesn't publish this config
+        MeasurementConfig level;
+        level.setName("level"); /* lower case */
+        level.setMaxObservations(1);
+        level.setMeasurementType(MeasurementTypes::eLevel_MeasurementType);
+        level.setMeasurementMode(MeasurementModes::eFast_MeasurementMode);
+        level.setMeasureTwoSides(false);
+        level.makeStandardConfig();
+        this->supportedMeasurementConfigs.append(level);
+    }
+
     //set supported connection types
     this->supportedConnectionTypes.append(eNetworkConnection);
     this->supportedConnectionTypes.append(eSerialConnection);

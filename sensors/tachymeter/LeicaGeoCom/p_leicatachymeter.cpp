@@ -29,6 +29,48 @@ void LeicaTachymeter::init(){
     //GeoCom measurement is request/response; tracking/streaming is not driven here yet
     this->supportedAcquisitionModes.append(AcquisitionMode::eDiscrete);
 
+    //publish this driver's own config catalog - PluginRepository tags each
+    //with this sensor's type when it scans the plugin, so a config selected
+    //for a different sensor type is filtered/rejected rather than silently
+    //accepted (see MeasurementConfigurationProxyModel, Controller::_startMeasurement)
+    {
+        MeasurementConfig fastPoint;
+        fastPoint.setName("FastPoint");
+        fastPoint.setMaxObservations(1);
+        fastPoint.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
+        fastPoint.setMeasurementMode(MeasurementModes::eFast_MeasurementMode);
+        fastPoint.setMeasureTwoSides(false);
+        fastPoint.makeStandardConfig();
+        this->supportedMeasurementConfigs.append(fastPoint);
+
+        MeasurementConfig stdPoint;
+        stdPoint.setName("StdPoint");
+        stdPoint.setMaxObservations(1);
+        stdPoint.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
+        stdPoint.setMeasurementMode(MeasurementModes::eStandard_MeasurementMode);
+        stdPoint.setMeasureTwoSides(false);
+        stdPoint.makeStandardConfig();
+        this->supportedMeasurementConfigs.append(stdPoint);
+
+        MeasurementConfig precisePoint;
+        precisePoint.setName("PrecisePoint");
+        precisePoint.setMaxObservations(1);
+        precisePoint.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
+        precisePoint.setMeasurementMode(MeasurementModes::ePrecise_MeasurementMode);
+        precisePoint.setMeasureTwoSides(false);
+        precisePoint.makeStandardConfig();
+        this->supportedMeasurementConfigs.append(precisePoint);
+
+        MeasurementConfig stdTwoSide;
+        stdTwoSide.setName("StdTwoSide");
+        stdTwoSide.setMaxObservations(1);
+        stdTwoSide.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
+        stdTwoSide.setMeasurementMode(MeasurementModes::eStandard_MeasurementMode);
+        stdTwoSide.setMeasureTwoSides(true);
+        stdTwoSide.makeStandardConfig();
+        this->supportedMeasurementConfigs.append(stdTwoSide);
+    }
+
     //set supported connection types
     this->supportedConnectionTypes.append(eSerialConnection);
 
