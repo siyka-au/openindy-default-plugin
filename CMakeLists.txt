@@ -74,6 +74,8 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/construct/p_intersectplaneplane.cpp
     functions/construct/p_linefrompoints.cpp
     functions/construct/p_planefromplane.cpp
+    functions/construct/p_linefromplanenormal.cpp
+    functions/construct/p_pointfromplaneorigin.cpp
     functions/construct/p_planefrompoints.cpp
     functions/construct/p_planefrompointcollection.cpp
     functions/construct/p_pointbetweentwopoints.cpp
@@ -117,6 +119,8 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/construct/p_intersectplaneplane.h
     functions/construct/p_linefrompoints.h
     functions/construct/p_planefromplane.h
+    functions/construct/p_linefromplanenormal.h
+    functions/construct/p_pointfromplaneorigin.h
     functions/construct/p_planefrompoints.h
     functions/construct/p_planefrompointcollection.h
     functions/construct/p_pointbetweentwopoints.h
@@ -277,5 +281,14 @@ add_executable(tst_collectionbinding
 target_include_directories(tst_collectionbinding PRIVATE test/include functions/construct functions/fit)
 target_link_libraries(tst_collectionbinding PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME collectionbinding COMMAND tst_collectionbinding)
+
+add_executable(tst_derivedfeatures
+    test/derivedfeatures/tst_derivedfeatures.cpp
+    functions/construct/p_linefromplanenormal.cpp
+    functions/construct/p_pointfromplaneorigin.cpp
+)
+target_include_directories(tst_derivedfeatures PRIVATE test/include functions/construct)
+target_link_libraries(tst_derivedfeatures PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
+add_test(NAME derivedfeatures COMMAND tst_derivedfeatures)
 
 endif()

@@ -36,6 +36,8 @@
 #include "p_planefrompoints.h"
 #include "p_planefrompointcollection.h"
 #include "p_planefromplane.h"
+#include "p_linefromplanenormal.h"
+#include "p_pointfromplaneorigin.h"
 #include "p_pointbetweentwopoints.h"
 #include "p_intersectlineline.h"
 #include "p_intersectlineplane.h"
