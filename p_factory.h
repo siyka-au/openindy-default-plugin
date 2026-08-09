@@ -52,7 +52,6 @@
 #include "p_helmert6param.h"
 
 #include "p_pseudotracker.h"
-#include "p_leicatachymeter.h"
 
 #include "simulationmodel.h"
 

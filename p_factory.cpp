@@ -14,9 +14,7 @@ OiTemplatePlugin::OiTemplatePlugin(QObject *parent) : QObject(parent){
 QList<QPointer<Sensor> > OiTemplatePlugin::createSensors(){
     QList<QPointer<Sensor> > resultSet;
     QPointer<Sensor> pTracker = new PseudoTracker();
-    QPointer<Sensor> LeicaTachy = new LeicaTachymeter();
     resultSet.append(pTracker);
-    resultSet.append(LeicaTachy);
     return resultSet;
 }
 
@@ -129,8 +127,6 @@ QPointer<Sensor> OiTemplatePlugin::createSensor(const QString &name){
     QPointer<Sensor> result(NULL);
     if(name.compare("PseudoTracker") == 0){
         result = new PseudoTracker();
-    }else if(name.compare("LeicaTachymeter") == 0){
-        result = new LeicaTachymeter();
     }
     return result;
 }

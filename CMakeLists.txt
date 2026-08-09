@@ -10,7 +10,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Xml SerialPort)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Xml)
 
 # --- Core dependency ---
 
@@ -98,7 +98,6 @@ add_library(OpenIndyDefaultPlugin SHARED
     exchange/p_oiexchangeascii.cpp
     sensors/common/trackererrormodel.cpp
     sensors/laserTracker/pseudoTracker/p_pseudotracker.cpp
-    sensors/tachymeter/LeicaGeoCom/p_leicatachymeter.cpp
     simulations/simplePolarMeasurement/simplepolarmeasurement.cpp
     cf/cfutil.cpp
     cf/cffunctiondata.cpp
@@ -140,7 +139,6 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/systemTransformation/p_helmert6param.h
     exchange/p_oiexchangeascii.h
     sensors/laserTracker/pseudoTracker/p_pseudotracker.h
-    sensors/tachymeter/LeicaGeoCom/p_leicatachymeter.h
     simulations/simplePolarMeasurement/simplepolarmeasurement.h
     cf/cfutil.h
     cf/cffunctiondata.h
@@ -171,7 +169,6 @@ target_include_directories(OpenIndyDefaultPlugin
         simulations/simplePolarMeasurement
         sensors/common
         sensors/laserTracker/pseudoTracker
-        sensors/tachymeter/LeicaGeoCom
         functions/construct
         functions/fit
         functions/objectTransformation
@@ -185,7 +182,6 @@ target_link_libraries(OpenIndyDefaultPlugin
         Qt6::Core
         Qt6::Widgets
         Qt6::Xml
-        Qt6::SerialPort
         OpenIndyCore
 )
 
@@ -220,7 +216,6 @@ target_include_directories(tst_function PRIVATE
     simulations/simplePolarMeasurement
     sensors/common
     sensors/laserTracker/pseudoTracker
-    sensors/tachymeter/LeicaGeoCom
     functions/construct
     functions/fit
     functions/objectTransformation
