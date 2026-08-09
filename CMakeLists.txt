@@ -75,6 +75,7 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/construct/p_linefrompoints.cpp
     functions/construct/p_planefromplane.cpp
     functions/construct/p_planefrompoints.cpp
+    functions/construct/p_planefrompointcollection.cpp
     functions/construct/p_pointbetweentwopoints.cpp
     functions/construct/p_pointfrompoints.cpp
     functions/construct/p_spherefrompoints.cpp
@@ -117,6 +118,7 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/construct/p_linefrompoints.h
     functions/construct/p_planefromplane.h
     functions/construct/p_planefrompoints.h
+    functions/construct/p_planefrompointcollection.h
     functions/construct/p_pointbetweentwopoints.h
     functions/construct/p_pointfrompoints.h
     functions/construct/p_spherefrompoints.h
@@ -267,5 +269,13 @@ target_include_directories(tst_calibratedconstellation PRIVATE
 )
 target_link_libraries(tst_calibratedconstellation PRIVATE Qt6::Test OpenIndyDefaultPlugin OpenIndyCore OpenIndyMath)
 add_test(NAME calibratedconstellation COMMAND tst_calibratedconstellation)
+
+add_executable(tst_collectionbinding
+    test/pointcollection/tst_collectionbinding.cpp
+    functions/construct/p_planefrompointcollection.cpp
+)
+target_include_directories(tst_collectionbinding PRIVATE test/include functions/construct functions/fit)
+target_link_libraries(tst_collectionbinding PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
+add_test(NAME collectionbinding COMMAND tst_collectionbinding)
 
 endif()

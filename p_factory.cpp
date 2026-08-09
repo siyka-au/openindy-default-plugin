@@ -33,6 +33,7 @@ QList<QPointer<Function> > OiTemplatePlugin::createFunctions(){
     resultSet.append(new PointFromPoints());
     resultSet.append(new LineFromPoints());
     resultSet.append(new PlaneFromPoints());
+    resultSet.append(new PlaneFromPointCollection());
     resultSet.append(new PlaneFromPlane());
     resultSet.append(new PointBetweenTwoPoints());
     resultSet.append(new IntersectLineLine());
@@ -151,6 +152,8 @@ QPointer<Function> OiTemplatePlugin::createFunction(const QString &name){
         result = new LineFromPoints();
     }else if(name.compare("PlaneFromPoints") == 0){
         result = new PlaneFromPoints();
+    }else if(name.compare("PlaneFromPointCollection") == 0){
+        result = new PlaneFromPointCollection();
     }else if(name.compare("PlaneFromPlane") == 0){
         result = new PlaneFromPlane();
     }else if(name.compare("PointBetweenTwoPoints") == 0){
