@@ -261,4 +261,16 @@ target_include_directories(tst_simulatedscene PRIVATE test/include sensors/commo
 target_link_libraries(tst_simulatedscene PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME simulatedscene COMMAND tst_simulatedscene)
 
+add_executable(tst_calibratedconstellation
+    test/calibratedconstellation/tst_calibratedconstellation.cpp
+    sensors/common/trackererrormodel.cpp
+)
+target_include_directories(tst_calibratedconstellation PRIVATE
+    test/include
+    sensors/common
+    functions/systemTransformation
+)
+target_link_libraries(tst_calibratedconstellation PRIVATE Qt6::Test OpenIndyDefaultPlugin OpenIndyCore OpenIndyMath)
+add_test(NAME calibratedconstellation COMMAND tst_calibratedconstellation)
+
 endif()
