@@ -29,6 +29,15 @@ else()
 endif()
 FetchContent_MakeAvailable(OpenIndyCore)
 
+# OpenIndyCore publishes this from include/plugin/pluginabi.h. A core too old
+# to define it cannot be checked for ABI compatibility at all, so fail loudly
+# here rather than shipping a plugin whose metadata claims nothing.
+if(NOT DEFINED OI_PLUGIN_ABI_VERSION OR OI_PLUGIN_ABI_VERSION STREQUAL "")
+    message(FATAL_ERROR
+        "OpenIndyCore did not publish OI_PLUGIN_ABI_VERSION. "
+        "Update openindy-core to a revision that declares it in include/plugin/pluginabi.h.")
+endif()
+
 set(OI_APP_LOCAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../openindy" CACHE PATH
     "Local OpenIndy app checkout to auto-deploy this plugin into after each build")
 
