@@ -8,15 +8,18 @@ void BestFitLine::init(){
     this->metaData.author = "bra";
     this->metaData.description = QString("%1 %2")
             .arg("This function calculates an adjusted line.")
-            .arg("You can input as many observations as you want which are then used to find the best fit 3D line.");
+            .arg("You can input as many points as you want which are then used to find the best fit 3D line.");
     this->metaData.iid = FitFunction_iidd;
 
-    //set needed elements
+    //D12/Stage 7c-ii: consolidates BestFitLine (raw Observations) and
+    //LineFromPoints (Points, not tag-resolved) into one tag-resolved,
+    //Point-consuming declaration - see p_bestfitplane.cpp for the pattern.
     this->neededElements.clear();
     NeededElement param1;
-    param1.description = "Select at least two observations to calculate the best fit line.";
+    param1.description = "Select at least two points to calculate the best fit line.";
     param1.infinite = true;
-    param1.typeOfElement = eObservationElement;
+    param1.typeOfElement = ePointElement;
+    param1.roleName = "default";
     this->neededElements.append(param1);
 
     //set spplicable for
@@ -41,33 +44,43 @@ bool BestFitLine::exec(Line &line){
  */
 bool BestFitLine::setUpResult(Line &line){
 
-    //get and check input observations
-    if(!this->inputElements.contains(0) || this->inputElements[0].size() < 2){
-        emit this->sendMessage(QString("Not enough valid observations to fit the line %1").arg(line.getFeatureName()), eWarningMessage);
+    if(!this->inputElements.contains(0) || this->inputElements[0].isEmpty()){
+        emit this->sendMessage(QString("No points tagged for line %1").arg(line.getFeatureName()), eWarningMessage);
         return false;
     }
-    QList<QPointer<Observation> > allUsableObservations;
-    QList<QPointer<Observation> > inputObservations;
-    filterObservations(allUsableObservations, inputObservations);
-    if(inputObservations.size() < 2){
-        emit this->sendMessage(QString("Not enough valid observations to fit the line %1").arg(line.getFeatureName()), eWarningMessage);
+
+    QList<QPointer<Point> > allUsablePoints;
+    QList<QPointer<Point> > inputPoints;
+    foreach(const InputElement &element, this->inputElements[0]){
+        if(element.point.isNull() || !element.point->getIsSolved()){
+            this->setIsUsed(0, element.id, false);
+            continue;
+        }
+        allUsablePoints.append(element.point);
+        this->setIsUsed(0, element.id, element.shouldBeUsed);
+        if(element.shouldBeUsed){
+            inputPoints.append(element.point);
+        }
+    }
+    if(inputPoints.size() < 2){
+        emit this->sendMessage(QString("Not enough valid points to fit the line %1").arg(line.getFeatureName()), eWarningMessage);
         return false;
     }
 
     //centroid
-    OiVec centroid(4);
-    foreach(const QPointer<Observation> &obs, inputObservations){
-        centroid = centroid + obs->getXYZ();
+    OiVec centroid(3);
+    foreach(const QPointer<Point> &point, inputPoints){
+        centroid = centroid + point->getPosition().getVector();
     }
-    centroid = centroid * (1.0/inputObservations.size());
-    centroid.removeLast();
+    centroid = centroid * (1.0/inputPoints.size());
 
     //principle component analysis
-    OiMat a(inputObservations.size(), 3);
-    for(int i = 0; i < inputObservations.size(); i++){
-        a.setAt(i, 0, inputObservations.at(i)->getXYZ().getAt(0) - centroid.getAt(0));
-        a.setAt(i, 1, inputObservations.at(i)->getXYZ().getAt(1) - centroid.getAt(1));
-        a.setAt(i, 2, inputObservations.at(i)->getXYZ().getAt(2) - centroid.getAt(2));
+    OiMat a(inputPoints.size(), 3);
+    for(int i = 0; i < inputPoints.size(); i++){
+        const OiVec pos = inputPoints.at(i)->getPosition().getVector();
+        a.setAt(i, 0, pos.getAt(0) - centroid.getAt(0));
+        a.setAt(i, 1, pos.getAt(1) - centroid.getAt(1));
+        a.setAt(i, 2, pos.getAt(2) - centroid.getAt(2));
     }
     OiMat ata = a.t() * a;
     OiMat u(3,3);
@@ -91,35 +104,34 @@ bool BestFitLine::setUpResult(Line &line){
     u.getCol(r, eigenIndex);
     r.normalize();
 
-    //check that the orientation of the line is from first to second observation
-    OiVec pos1 = inputObservations.at(0)->getXYZ();
-    pos1.removeLast();
-    OiVec pos2 = inputObservations.at(1)->getXYZ();
-    pos2.removeLast();
+    //check that the orientation of the line is from first to second point
+    OiVec pos1 = inputPoints.at(0)->getPosition().getVector();
+    OiVec pos2 = inputPoints.at(1)->getPosition().getVector();
     OiVec direction = pos2 - pos1;
     direction.normalize();
     rectifyNormalToDirection(r, direction);
 
-    //calculate display residuals for each observation
-    foreach(const QPointer<Observation> &observation, allUsableObservations){
+    //calculate display residuals for each usable point
+    foreach(const QPointer<Point> &point, allUsablePoints){
         double distance = 0.0;
         OiVec v_line(3);
+        const OiVec pos = point->getPosition().getVector();
         //calculate perpendicular
-        v_line.setAt(0, observation->getXYZ().getAt(0) - centroid.getAt(0));
-        v_line.setAt(1, observation->getXYZ().getAt(1) - centroid.getAt(1));
-        v_line.setAt(2, observation->getXYZ().getAt(2) - centroid.getAt(2));
+        v_line.setAt(0, pos.getAt(0) - centroid.getAt(0));
+        v_line.setAt(1, pos.getAt(1) - centroid.getAt(1));
+        v_line.setAt(2, pos.getAt(2) - centroid.getAt(2));
         OiVec::dot(distance, r, v_line);
         v_line = centroid + distance * r;
 
         //calculate residual vector
-        v_line.setAt(0, observation->getXYZ().getAt(0) - v_line.getAt(0));
-        v_line.setAt(1, observation->getXYZ().getAt(1) - v_line.getAt(1));
-        v_line.setAt(2, observation->getXYZ().getAt(2) - v_line.getAt(2));
+        v_line.setAt(0, pos.getAt(0) - v_line.getAt(0));
+        v_line.setAt(1, pos.getAt(1) - v_line.getAt(1));
+        v_line.setAt(2, pos.getAt(2) - v_line.getAt(2));
 
         //set up display residual
         double dot;
         OiVec::dot(dot, v_line, v_line);
-        addDisplayResidual(observation->getId(), v_line.getAt(0), v_line.getAt(1), v_line.getAt(2), qSqrt(dot));
+        addDisplayResidual(point->getId(), v_line.getAt(0), v_line.getAt(1), v_line.getAt(2), qSqrt(dot));
 
     }
 
@@ -132,7 +144,7 @@ bool BestFitLine::setUpResult(Line &line){
 
     //set statistic
     this->statistic.setIsValid(true);
-    this->statistic.setStdev(qSqrt(vtv/(inputObservations.size()-2.0)));
+    this->statistic.setStdev(qSqrt(vtv/(inputPoints.size()-2.0)));
     line.setStatistic(this->statistic);
 
     return true;

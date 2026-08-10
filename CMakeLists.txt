@@ -82,24 +82,18 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/construct/p_intersectlineline.cpp
     functions/construct/p_intersectlineplane.cpp
     functions/construct/p_intersectplaneplane.cpp
-    functions/construct/p_linefrompoints.cpp
     functions/construct/p_planefromplane.cpp
     functions/construct/p_linefromplanenormal.cpp
     functions/construct/p_pointfromplaneorigin.cpp
     functions/construct/p_averagefrompoints.cpp
-    functions/construct/p_planefrompoints.cpp
-    functions/construct/p_planefrompointcollection.cpp
     functions/construct/p_pointbetweentwopoints.cpp
     functions/construct/p_pointfrompoints.cpp
-    functions/construct/p_spherefrompoints.cpp
     functions/fit/p_bestfitcircle.cpp
     functions/fit/p_bestfitline.cpp
     functions/fit/p_bestfitplane.cpp
     functions/fit/p_bestfitpoint.cpp
     functions/fit/p_bestfitcylinder.cpp
-    functions/fit/p_bestfitcylinderfrompoints.cpp
     functions/fit/p_bestfitcircleinplane.cpp
-    functions/fit/p_bestfitcircleinplanefrompoints.cpp
     functions/fit/p_bestfitsphere.cpp
     functions/objectTransformation/p_changeradius.cpp
     functions/objectTransformation/p_register.cpp
@@ -129,24 +123,18 @@ add_library(OpenIndyDefaultPlugin SHARED
     functions/construct/p_intersectlineline.h
     functions/construct/p_intersectlineplane.h
     functions/construct/p_intersectplaneplane.h
-    functions/construct/p_linefrompoints.h
     functions/construct/p_planefromplane.h
     functions/construct/p_linefromplanenormal.h
     functions/construct/p_pointfromplaneorigin.h
     functions/construct/p_averagefrompoints.h
-    functions/construct/p_planefrompoints.h
-    functions/construct/p_planefrompointcollection.h
     functions/construct/p_pointbetweentwopoints.h
     functions/construct/p_pointfrompoints.h
-    functions/construct/p_spherefrompoints.h
     functions/fit/p_bestfitcircle.h
     functions/fit/p_bestfitline.h
     functions/fit/p_bestfitplane.h
     functions/fit/p_bestfitpoint.h
     functions/fit/p_bestfitcylinder.h
-    functions/fit/p_bestfitcylinderfrompoints.h
     functions/fit/p_bestfitcircleinplane.h
-    functions/fit/p_bestfitcircleinplanefrompoints.h
     functions/fit/p_bestfitsphere.h
     functions/objectTransformation/p_changeradius.h
     functions/objectTransformation/p_register.h
@@ -291,7 +279,7 @@ add_test(NAME calibratedconstellation COMMAND tst_calibratedconstellation)
 
 add_executable(tst_collectionbinding
     test/pointcollection/tst_collectionbinding.cpp
-    functions/construct/p_planefrompointcollection.cpp
+    functions/fit/p_bestfitplane.cpp
     functions/construct/p_averagefrompoints.cpp
 )
 target_include_directories(tst_collectionbinding PRIVATE test/include functions/construct functions/fit)
@@ -307,5 +295,14 @@ add_executable(tst_derivedfeatures
 target_include_directories(tst_derivedfeatures PRIVATE test/include functions/construct)
 target_link_libraries(tst_derivedfeatures PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME derivedfeatures COMMAND tst_derivedfeatures)
+
+add_executable(tst_measuredfit
+    test/measuredfit/tst_measuredfit.cpp
+    functions/fit/p_bestfitplane.cpp
+    functions/fit/p_bestfitcylinder.cpp
+)
+target_include_directories(tst_measuredfit PRIVATE test/include functions/fit)
+target_link_libraries(tst_measuredfit PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
+add_test(NAME measuredfit COMMAND tst_measuredfit)
 
 endif()

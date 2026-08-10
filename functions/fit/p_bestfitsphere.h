@@ -40,8 +40,8 @@ private:
     //helper methods
     //##############
 
-    bool approximate(Sphere &sphere, const QList<QPointer<Observation> > &inputObservations);
-    bool fit(Sphere &sphere, const QList<QPointer<Observation> > &inputObservations, const QList<QPointer<Observation> > &allUsableObservations);
+    bool approximate(Sphere &sphere, const QList<QPointer<Point> > &inputPoints);
+    bool fit(Sphere &sphere, const QList<QPointer<Point> > &inputPoints, const QList<QPointer<Point> > &allUsablePoints);
 
 };
 

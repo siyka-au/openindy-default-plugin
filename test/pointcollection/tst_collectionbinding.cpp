@@ -2,7 +2,7 @@
 #include <cmath>
 
 #include "chooselalib.h"
-#include "p_planefrompointcollection.h"
+#include "p_bestfitplane.h"
 #include "p_averagefrompoints.h"
 #include "featurewrapper.h"
 #include "geometry/plane.h"
@@ -49,13 +49,18 @@ double planeNormalAngleTo(const QPointer<Plane> &plane, double i, double j, doub
 
 /*!
  * Originally Stage 7a-ii's acceptance criteria for binding a whole
- * PointCollection as a single function input. Stage 7f retires
+ * PointCollection as a single function input. Stage 7f retired
  * PointCollection as a fit-input mechanism (domain-model.md S5) in favour
  * of tag resolution (D12): a fit's point input resolves to a query over
  * MeasurementIntent tags, not a stored membership list, so its declared
  * shape (NeededElement count) still never grows regardless of point count
  * - the same guarantee PointCollection binding used to provide, delivered
- * differently.
+ * differently. Stage 7f prototyped this shape as a separate class,
+ * PlaneFromPointCollection; Stage 7c-ii folded it into BestFitPlane itself
+ * (the observation-consuming original and the points-consuming
+ * PlaneFromPoints twin both collapsed into one tag-resolved,
+ * Point-consuming function - domain-model.md S2/S9.4), so this file now
+ * exercises BestFitPlane directly.
  *
  * Reviewed rather than deleted, per the Stage 7f scope: the two properties
  * that must survive the mechanism change are still asserted here -
@@ -88,7 +93,7 @@ void CollectionBindingTest::initTestCase(){
 
 void CollectionBindingTest::pointsAddedAfterInitialResolutionArePickedUp(){
 
-    QPointer<Function> function = new PlaneFromPointCollection();
+    QPointer<Function> function = new BestFitPlane();
     function->init();
 
     //three points: enough to solve, all on z = 0
@@ -119,12 +124,15 @@ void CollectionBindingTest::pointsAddedAfterInitialResolutionArePickedUp(){
 
 void CollectionBindingTest::declaredShapeNeverGrowsWithPointCount(){
 
-    QPointer<Function> function = new PlaneFromPointCollection();
+    QPointer<Function> function = new BestFitPlane();
     function->init();
 
-    //D12: one declared NeededElement regardless of how many points end up
-    //tagged for it - this is what "cannot grow by construction" now means
-    QCOMPARE(function->getNeededElements().size(), 1);
+    //D12: BestFitPlane declares two roles - "default" (the fitted points)
+    //and "dummyPoint" (an optional orientation hint) - and neither grows
+    //regardless of how many points end up tagged for either one. This is
+    //what "cannot grow by construction" means: the *declaration* stays
+    //fixed-size; only the resolved InputElement list per role grows.
+    QCOMPARE(function->getNeededElements().size(), 2);
 
     //the TS15-grid case in miniature: a large automated acquisition
     for(int i = 0; i < 500; ++i){
@@ -137,13 +145,13 @@ void CollectionBindingTest::declaredShapeNeverGrowsWithPointCount(){
     QCOMPARE(function->getInputElements().value(0).size(), 500);
 
     //what must not have changed is the function's own declared shape
-    QCOMPARE(function->getNeededElements().size(), 1);
+    QCOMPARE(function->getNeededElements().size(), 2);
 
 }
 
 void CollectionBindingTest::tooFewPointsFailsCleanly(){
 
-    QPointer<Function> function = new PlaneFromPointCollection();
+    QPointer<Function> function = new BestFitPlane();
     function->init();
 
     addInputPoint(function, makePoint(0.0, 0.0, 0.0, 1));
@@ -159,7 +167,7 @@ void CollectionBindingTest::tooFewPointsFailsCleanly(){
 
 void CollectionBindingTest::collinearPointsAreRejectedByTheFitNotTheCount(){
 
-    QPointer<Function> function = new PlaneFromPointCollection();
+    QPointer<Function> function = new BestFitPlane();
     function->init();
 
     //three points satisfies the declared minimum, and they still cannot
@@ -223,7 +231,7 @@ void CollectionBindingTest::planeFitsIdenticallyFromPointsAveragedByAverageFromP
     }
 
     //the plane fits from the four derived points
-    QPointer<Function> plane1Function = new PlaneFromPointCollection();
+    QPointer<Function> plane1Function = new BestFitPlane();
     plane1Function->init();
     foreach(const QPointer<Point> &derived, derivedPoints){
         addInputPoint(plane1Function, derived);
@@ -234,7 +242,7 @@ void CollectionBindingTest::planeFitsIdenticallyFromPointsAveragedByAverageFromP
     QVERIFY2(plane1Function->exec(planeFromAveragedFeature), "plane should solve from four averaged points");
 
     //and identically from the four true, un-repeated positions
-    QPointer<Function> plane2Function = new PlaneFromPointCollection();
+    QPointer<Function> plane2Function = new BestFitPlane();
     plane2Function->init();
     int trueId = 5000;
     foreach(const Nest &nest, nests){

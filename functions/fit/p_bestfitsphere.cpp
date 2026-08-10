@@ -11,15 +11,19 @@ void BestFitSphere::init(){
     this->metaData.author = "bra";
     this->metaData.description = QString("%1 %2")
             .arg("This function calculates an adjusted sphere.")
-            .arg("You can input as many observations as you want which are then used to find the best fit sphere.");
+            .arg("You can input as many points as you want which are then used to find the best fit sphere.");
     this->metaData.iid = FitFunction_iidd;
 
-    //set needed elements
+    //D12/Stage 7c-ii: consolidates BestFitSphere (raw Observations) and
+    //SphereFromPoints (Points, not tag-resolved, and missing the
+    //iterative refinement step below - see the fit() call) into one
+    //tag-resolved, Point-consuming declaration.
     this->neededElements.clear();
     NeededElement param1;
-    param1.description = "Select at least four observations to calculate the best fit sphere.";
+    param1.description = "Select at least four points to calculate the best fit sphere.";
     param1.infinite = true;
-    param1.typeOfElement = eObservationElement;
+    param1.typeOfElement = ePointElement;
+    param1.roleName = "default";
     this->neededElements.append(param1);
 
     //set spplicable for
@@ -36,18 +40,32 @@ bool BestFitSphere::exec(Sphere &sphere){
 
     this->statistic.reset();
 
-    //get and check input observations
-    QList<QPointer<Observation> > allUsableObservations;
-    QList<QPointer<Observation> > inputObservations;
-    filterObservations(allUsableObservations, inputObservations);
-    if(inputObservations.size() < 4){
-        emit this->sendMessage(QString("Not enough valid observations to fit the sphere %1").arg(sphere.getFeatureName()), eWarningMessage);
+    if(!this->inputElements.contains(0) || this->inputElements[0].isEmpty()){
+        emit this->sendMessage(QString("No points tagged for sphere %1").arg(sphere.getFeatureName()), eWarningMessage);
+        return false;
+    }
+
+    QList<QPointer<Point> > allUsablePoints;
+    QList<QPointer<Point> > inputPoints;
+    foreach(const InputElement &element, this->inputElements[0]){
+        if(element.point.isNull() || !element.point->getIsSolved()){
+            this->setIsUsed(0, element.id, false);
+            continue;
+        }
+        allUsablePoints.append(element.point);
+        this->setIsUsed(0, element.id, element.shouldBeUsed);
+        if(element.shouldBeUsed){
+            inputPoints.append(element.point);
+        }
+    }
+    if(inputPoints.size() < 4){
+        emit this->sendMessage(QString("Not enough valid points to fit the sphere %1").arg(sphere.getFeatureName()), eWarningMessage);
         return false;
     }
 
     //fit the sphere
-    if(this->approximate(sphere, inputObservations)){
-        return this->fit(sphere, inputObservations, allUsableObservations);
+    if(this->approximate(sphere, inputPoints)){
+        return this->fit(sphere, inputPoints, allUsablePoints);
     }
     return false;
 
@@ -56,30 +74,27 @@ bool BestFitSphere::exec(Sphere &sphere){
 /*!
  * \brief BestFitSphere::approximate
  * \param sphere
- * \param inputObservations
+ * \param inputPoints
  * \return
  */
-bool BestFitSphere::approximate(Sphere &sphere, const QList<QPointer<Observation> > &inputObservations){
+bool BestFitSphere::approximate(Sphere &sphere, const QList<QPointer<Point> > &inputPoints){
 
     //calculate centroid coordinates
-    OiVec centroid(4);
-    for(int i = 0; i < inputObservations.size(); i++){
-        centroid = centroid + inputObservations.at(i)->getXYZ();
+    OiVec centroid(3);
+    for(int i = 0; i < inputPoints.size(); i++){
+        centroid = centroid + inputPoints.at(i)->getPosition().getVector();
     }
-    centroid = centroid / inputObservations.size();
-    centroid.removeLast();
+    centroid = centroid / inputPoints.size();
 
     //Drixler
     OiMat N(4, 4);
     OiVec n(4);
-    for(int i = 0; i < inputObservations.size(); i++){
-        double x = 0.0;
-        double y = 0.0;
-        double z = 0.0;
+    for(int i = 0; i < inputPoints.size(); i++){
+        const OiVec pos = inputPoints.at(i)->getPosition().getVector();
 
-        x = inputObservations.at(i)->getXYZ().getAt(0) - centroid.getAt(0);
-        y = inputObservations.at(i)->getXYZ().getAt(1) - centroid.getAt(1);
-        z = inputObservations.at(i)->getXYZ().getAt(2) - centroid.getAt(2);
+        double x = pos.getAt(0) - centroid.getAt(0);
+        double y = pos.getAt(1) - centroid.getAt(1);
+        double z = pos.getAt(2) - centroid.getAt(2);
 
         double xx = x*x;
         double yy = y*y;
@@ -146,10 +161,10 @@ bool BestFitSphere::approximate(Sphere &sphere, const QList<QPointer<Observation
 /*!
  * \brief BestFitSphere::fit
  * \param sphere
- * \param inputObservations
+ * \param inputPoints
  * \return
  */
-bool BestFitSphere::fit(Sphere &sphere, const QList<QPointer<Observation> > &inputObservations, const QList<QPointer<Observation> > &allUsableObservations){
+bool BestFitSphere::fit(Sphere &sphere, const QList<QPointer<Point> > &inputPoints, const QList<QPointer<Point> > &allUsablePoints){
 
     int numIterations = 0;
 
@@ -161,16 +176,15 @@ bool BestFitSphere::fit(Sphere &sphere, const QList<QPointer<Observation> > &inp
 
     OiVec xd(4);
     double xdxd = 0.0;
-    OiVec verb(inputObservations.size()*3);
+    OiVec verb(inputPoints.size()*3);
     do{
 
-        OiMat A(inputObservations.size(), 4);
-        OiMat B(inputObservations.size(), inputObservations.size()*3);
-        OiVec w(inputObservations.size());
-        for(int i = 0; i < inputObservations.size(); i++){
+        OiMat A(inputPoints.size(), 4);
+        OiMat B(inputPoints.size(), inputPoints.size()*3);
+        OiVec w(inputPoints.size());
+        for(int i = 0; i < inputPoints.size(); i++){
 
-            OiVec x = inputObservations.at(i)->getXYZ();
-            x.removeLast();
+            const OiVec x = inputPoints.at(i)->getPosition().getVector();
 
             double r0 = qSqrt( (x.getAt(0) + verb.getAt(i*3) - xm) * (x.getAt(0) + verb.getAt(i*3) - xm)
                                + (x.getAt(1) + verb.getAt(i*3+1) - ym) * (x.getAt(1) + verb.getAt(i*3+1) - ym)
@@ -192,20 +206,20 @@ bool BestFitSphere::fit(Sphere &sphere, const QList<QPointer<Observation> > &inp
         OiMat BBT = B * B.t();
         OiMat AT = A.t();
 
-        OiMat N(inputObservations.size()+4, inputObservations.size()+4);
+        OiMat N(inputPoints.size()+4, inputPoints.size()+4);
         for(int i = 0; i < BBT.getRowCount(); i++){
             for(int j = 0; j < BBT.getColCount(); j++){
                 N.setAt(i,j, BBT.getAt(i,j));
             }
         }
-        for(int i = 0; i < inputObservations.size(); i++){
+        for(int i = 0; i < inputPoints.size(); i++){
             for(int j = 0; j < 4; j++){
-                N.setAt(i, j+inputObservations.size(), A.getAt(i,j));
+                N.setAt(i, j+inputPoints.size(), A.getAt(i,j));
             }
         }
         for(int i = 0; i < 4; i++){
-            for(int j = 0; j < inputObservations.size(); j++){
-                N.setAt(i+inputObservations.size(), j, AT.getAt(i,j));
+            for(int j = 0; j < inputPoints.size(); j++){
+                N.setAt(i+inputPoints.size(), j, AT.getAt(i,j));
             }
         }
 
@@ -213,7 +227,7 @@ bool BestFitSphere::fit(Sphere &sphere, const QList<QPointer<Observation> > &inp
             w.add(0.0);
         }
 
-        OiMat Q(inputObservations.size()+4, inputObservations.size()+4);
+        OiMat Q(inputPoints.size()+4, inputPoints.size()+4);
         try{
             Q = N.inv();
         }catch(exception &e){
@@ -223,12 +237,12 @@ bool BestFitSphere::fit(Sphere &sphere, const QList<QPointer<Observation> > &inp
 
         OiVec res = -1.0 * Q * w;
 
-        OiVec k(inputObservations.size());
-        for(int i = 0; i < inputObservations.size(); i++){
+        OiVec k(inputPoints.size());
+        for(int i = 0; i < inputPoints.size(); i++){
             k.setAt(i, res.getAt(i));
         }
         for(int i = 0; i < 4; i++){
-            xd.setAt(i, res.getAt(i+inputObservations.size()));
+            xd.setAt(i, res.getAt(i+inputPoints.size()));
         }
 
         OiVec vd = B.t() * k;
@@ -259,28 +273,10 @@ bool BestFitSphere::fit(Sphere &sphere, const QList<QPointer<Observation> > &inp
     sphere.setSphere(position, radius);
 
     //calculate display residuals for each observation
-    if(false) {
-        OiVec v_sphere(3);
-        for(int i = 0; i < inputObservations.size(); i++){
-
-            //calculate residual vector
-            v_sphere.setAt(0, verb.getAt(3*i));
-            v_sphere.setAt(1, verb.getAt(3*i+1));
-            v_sphere.setAt(2, verb.getAt(3*i+2));
-
-            //set up display residual
-            addDisplayResidual(inputObservations[i]->getId(), v_sphere.getAt(0), v_sphere.getAt(1), v_sphere.getAt(2),
-                               qSqrt(v_sphere.getAt(0) * v_sphere.getAt(0)
-                                    + v_sphere.getAt(2) * v_sphere.getAt(2)));
-
-        }
-    } else {
-        for(int i = 0; i < allUsableObservations.size(); i++){
-            OiVec xyz = allUsableObservations[i]->getXYZ();
-            xyz.removeLast();
-            OiVec dr = xyz - position.getVector();
-            this->addDisplayResidual(allUsableObservations[i]->getId(), dr.length() - r);
-        }
+    for(int i = 0; i < allUsablePoints.size(); i++){
+        OiVec xyz = allUsablePoints[i]->getPosition().getVector();
+        OiVec dr = xyz - position.getVector();
+        this->addDisplayResidual(allUsablePoints[i]->getId(), dr.length() - r);
     }
 
     //calculate standard deviation

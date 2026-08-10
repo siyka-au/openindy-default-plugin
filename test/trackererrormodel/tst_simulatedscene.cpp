@@ -6,6 +6,7 @@
 #include "p_bestfitplane.h"
 #include "featurewrapper.h"
 #include "geometry/plane.h"
+#include "geometry/point.h"
 #include "oivec.h"
 #include "reading.h"
 #include "observation.h"
@@ -81,21 +82,33 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget(){
     terms.Ae2Arcsec = 0.214; terms.Be2Arcsec = 0.179;
     const TrackerErrorModel model(terms);
 
+    //Stage 7c-ii: BestFitPlane now consumes Points, not raw Observations
+    //(domain-model.md S2 - only a Point is ever measured). Each simulated
+    //observation stands in for one acquisition's single Point, exactly as
+    //D15a describes; the observation itself still carries the noisy
+    //position and populated sigma the tracker error model produced, so
+    //this test still exercises the same error budget as before, just
+    //through the Point that would actually own that observation.
     QPointer<Function> function = new BestFitPlane();
     function->init();
 
     int id = 1;
     QList<QPointer<Observation>> observations;
     for(const OiVec &truePoint : scene){
-        QPointer<Observation> obs = simulateObservation(truePoint, pose, model, id++);
+        QPointer<Observation> obs = simulateObservation(truePoint, pose, model, id);
         observations.append(obs);
         QVERIFY2(obs->getSigmaXYZ().getAt(0) > 0.0, "sigma must be populated, not the silent zero default");
 
-        InputElement element(obs->getId());
-        element.typeOfElement = eObservationElement;
-        element.observation = obs;
+        QPointer<Point> point = new Point(id, Position(obs->getXYZ()));
+        point->setIsSolved(true);
+
+        InputElement element(id);
+        element.typeOfElement = ePointElement;
+        element.point = point;
         element.shouldBeUsed = true;
         function->addInputElement(element, 0);
+
+        id++;
     }
 
     QPointer<Plane> plane = new Plane();

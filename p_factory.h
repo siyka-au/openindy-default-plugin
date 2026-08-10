@@ -27,16 +27,11 @@
 #include "p_bestfitcircle.h"
 #include "p_bestfitsphere.h"
 #include "p_bestfitcircleinplane.h"
-#include "p_bestfitcircleinplanefrompoints.h"
 #include "p_bestfitcylinder.h"
-#include "p_bestfitcylinderfrompoints.h"
 
 #include "p_nominalpoint.h"
 
 #include "p_pointfrompoints.h"
-#include "p_linefrompoints.h"
-#include "p_planefrompoints.h"
-#include "p_planefrompointcollection.h"
 #include "p_planefromplane.h"
 #include "p_linefromplanenormal.h"
 #include "p_pointfromplaneorigin.h"
@@ -45,7 +40,6 @@
 #include "p_intersectlineline.h"
 #include "p_intersectlineplane.h"
 #include "p_intersectplaneplane.h"
-#include "p_spherefrompoints.h"
 
 #include "p_changeradius.h"
 #include "p_register.h"

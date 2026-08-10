@@ -11,15 +11,23 @@ void BestFitCylinder::init(){
     this->metaData.author = "bra";
     this->metaData.description = QString("%1 %2")
             .arg("This function calculates an adjusted cylinder.")
-            .arg("You can input as many observations as you want which are then used to find the best fit cylinder.");
+            .arg("You can input as many points as you want which are then used to find the best fit cylinder.");
     this->metaData.iid = FitFunction_iidd;
 
-    //set needed elements
+    //D12/Stage 7c-ii: cylinder is not a special case - ePointElement with
+    //a minimum of 5 (2 DOF axis direction + 2 DOF point-on-axis + 1 DOF
+    //radius), the same shape as plane's 3. Consolidates BestFitCylinder
+    //(raw Observations) and BestFitCylinderFromPoints (declared
+    //eObservationElement despite its name - setUpResult actually read
+    //element.point, so it was unreachable through ordinary binding; see
+    //domain-model.md/plan Stage 7c-ii notes) into one tag-resolved,
+    //Point-consuming declaration.
     this->neededElements.clear();
     NeededElement param1;
-    param1.description = "Select at least five observations to calculate the best fit cylinder.";
+    param1.description = "Select at least five points to calculate the best fit cylinder.";
     param1.infinite = true;
-    param1.typeOfElement = eObservationElement;
+    param1.typeOfElement = ePointElement;
+    param1.roleName = "default";
     this->neededElements.append(param1);
 
     //set spplicable for
@@ -49,28 +57,46 @@ bool BestFitCylinder::exec(Cylinder &cylinder){
  */
 bool BestFitCylinder::setUpResult(Cylinder &cylinder){
 
+    if(!this->inputElements.contains(0) || this->inputElements[0].isEmpty()){
+        emit this->sendMessage(QString("No points tagged for cylinder %1").arg(cylinder.getFeatureName()), eWarningMessage);
+        return false;
+    }
+
     QList<IdPoint> usablePoints;
     QList<IdPoint> points;
     {
-        //get and check input observations
-        QList<QPointer<Observation> > allUsableObservations;
-        QList<QPointer<Observation> > inputObservations;
-        filterObservations(allUsableObservations, inputObservations);
-        if(inputObservations.size() < 5){
-            emit this->sendMessage(QString("Not enough valid observations to fit the cylinder %1").arg(cylinder.getFeatureName()), eWarningMessage);
+        QList<QPointer<Point> > allUsablePoints;
+        QList<QPointer<Point> > inputPoints;
+        foreach(const InputElement &element, this->inputElements[0]){
+            if(element.point.isNull() || !element.point->getIsSolved()){
+                this->setIsUsed(0, element.id, false);
+                continue;
+            }
+            allUsablePoints.append(element.point);
+            this->setIsUsed(0, element.id, element.shouldBeUsed);
+            if(element.shouldBeUsed){
+                inputPoints.append(element.point);
+            }
+        }
+
+        //five is the geometric minimum (2 DOF axis direction + 2 DOF
+        //point-on-axis + 1 DOF radius) - a hint, not a gate: the real
+        //validation is whether the fit below actually converges.
+        if(inputPoints.size() < 5){
+            emit this->sendMessage(QString("Not enough valid points to fit the cylinder %1").arg(cylinder.getFeatureName()), eWarningMessage);
             return false;
         }
 
-        foreach(const QPointer<Observation> &obs, allUsableObservations) {
+        foreach(const QPointer<Point> &p, allUsablePoints) {
             IdPoint point;
-            point.id = obs->getId();
-            point.xyz = obs->getXYZ();
+            point.id = p->getId();
+            point.xyz = p->getPosition().getVectorH();
             usablePoints.append(point);
         }
-        foreach(const QPointer<Observation> &obs, inputObservations) {
+        foreach(const QPointer<Point> &p, inputPoints) {
             IdPoint point;
-            point.id = obs->getId();
-            point.xyz = obs->getXYZ();
+            point.id = p->getId();
+            point.xyz = p->getPosition().getVectorH();
             points.append(point);
         }
     }
@@ -89,16 +115,17 @@ void BestFitCylinderAppxDirection::init(){
     this->metaData.author = "esc";
     this->metaData.description = QString("%1 %2 %3")
             .arg("This function calculates an adjusted cylinder.")
-            .arg("You can input as many observations as you want which are then used to find the best fit cylinder.")
+            .arg("You can input as many points as you want which are then used to find the best fit cylinder.")
             .arg("Additionally you should input a direction for approximation, this can be done by all vector geometries");
     this->metaData.iid = FitFunction_iidd;
 
     //set needed elements
     this->neededElements.clear();
     NeededElement param1;
-    param1.description = "Select at least five observations to calculate the best fit cylinder.";
+    param1.description = "Select at least five points to calculate the best fit cylinder.";
     param1.infinite = true;
-    param1.typeOfElement = eObservationElement;
+    param1.typeOfElement = ePointElement;
+    param1.roleName = "default";
     this->neededElements.append(param1);
 
     NeededElement param2;
@@ -125,22 +152,23 @@ void BestFitCylinderAppxDummyPoint::init(){
     this->metaData.author = "esc";
     this->metaData.description = QString("%1 %2 %3")
             .arg("This function calculates an adjusted cylinder.")
-            .arg("You can input as many observations as you want which are then used to find the best fit cylinder.")
+            .arg("You can input as many points as you want which are then used to find the best fit cylinder.")
             .arg("Additionally you should input dummy points for approximation, this can be done by all point geometries");
     this->metaData.iid = FitFunction_iidd;
 
     //set needed elements
     this->neededElements.clear();
     NeededElement param1;
-    param1.description = "Select at least five observations to calculate the best fit cylinder.";
+    param1.description = "Select at least five points to calculate the best fit cylinder.";
     param1.infinite = true;
-    param1.typeOfElement = eObservationElement;
+    param1.typeOfElement = ePointElement;
+    param1.roleName = "default";
     this->neededElements.append(param1);
 
     NeededElement param3;
     param3.description = "Dummy points to indicate cylinder normal.";
     param3.infinite = true;
-    param3.typeOfElement = eObservationElement;
+    param3.typeOfElement = ePointElement;
     param3.roleName = "dummyPoint";
     this->neededElements.append(param3);
 

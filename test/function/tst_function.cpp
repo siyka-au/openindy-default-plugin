@@ -5,7 +5,6 @@
 
 #include "p_register.h"
 #include "p_bestfitcylinder.h"
-#include "p_bestfitcylinderfrompoints.h"
 #include "p_intersectlineline.h"
 #include "p_rectifytopoint.h"
 #include "p_rectifytovector.h"
@@ -15,7 +14,6 @@
 #include "p_bestfitplane.h"
 #include "p_bestfitpoint.h"
 #include "p_bestfitcircleinplane.h"
-#include "p_bestfitcircleinplanefrompoints.h"
 #include "p_bestfitline.h"
 #include "p_bestfitsphere.h"
 #include "p_pointfrompoints.h"
@@ -69,7 +67,6 @@ private Q_SLOTS:
     void testBestFitPoint_residuals();
 
     void testVRadial();
-    void testVRadial2();
     void testVRadial3();
 
     void testCircleInPlaneFromPoints();
@@ -156,7 +153,7 @@ private:
     void addInputCoordinateSystem(double x, double y, double z, double i, double j, double k, QPointer<Function> function, int id, int inputElementKey);
     void addInputCoordinateSystem(OiMat trafo, QPointer<Function> function, int id, int inputElementKey);
     void addInputPoint(double x, double y, double z, QPointer<Function> function, int id, int inputElementKey);
-    void addInputPoints(QString data, QPointer<Function> function, int id, int inputElementKey);
+    void addInputPoints(QString data, QPointer<Function> function, int id, int inputElementKey, bool shouldBeUsed);
     void addInputPlane(double x, double y, double z, double i, double j, double k, QPointer<Function> function, int id, int inputElementKey);
     void addInputCircle(double x, double y, double z, double i, double j, double k, double radius, QPointer<Function> function, int id, int inputElementKey);
 
@@ -220,7 +217,7 @@ void FunctionTest::addInputObservations(QString data, QPointer<Function> functio
      }
 }
 
-void FunctionTest::addInputPoints(QString data, QPointer<Function> function, int id = 1000, int inputElementKey = 0) {
+void FunctionTest::addInputPoints(QString data, QPointer<Function> function, int id = 1000, int inputElementKey = 0, bool shouldBeUsed = true) {
     QTextStream stream(data.toUtf8());
     while(!stream.atEnd()) {
         QStringList xyz = stream.readLine().split(" ");
@@ -236,6 +233,7 @@ void FunctionTest::addInputPoints(QString data, QPointer<Function> function, int
         element->typeOfElement = ePointElement;
         element->point = feature;
         element->geometry = feature;
+        element->shouldBeUsed = shouldBeUsed;
 
         function->addInputElement(*element, inputElementKey);
 
@@ -598,62 +596,6 @@ void FunctionTest::testVRadial()
 ");
 
 
-    addInputObservations(data, function);
-
-    ScalarInputParams scalarInputParams;
-    scalarInputParams.stringParameter.insert("approximation", "guess axis");
-    function->setScalarInputParams(scalarInputParams);
-
-    bool res = function->exec(cylinderFeature);
-    QVERIFY2(res, "exec");
-
-    DEBUG_CYLINDER(cylinder);
-
-    COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 19.16, 0.005);
-    COMPARE_DOUBLE(cylinder->getStatistic().getStdev(), 0.03, 0.01);
-
-    COMPARE_DOUBLE(function->getStatistic().getDisplayResidual(1000).corrections.value("vr", -1),   0.026, 0.001);
-    COMPARE_DOUBLE(function->getStatistic().getDisplayResidual(1001).corrections.value("vr", -1), (-0.007), 0.001);
-    COMPARE_DOUBLE(function->getStatistic().getDisplayResidual(1002).corrections.value("vr", -1), (-0.037), 0.001);
-    COMPARE_DOUBLE(function->getStatistic().getDisplayResidual(1003).corrections.value("vr", -1),   0.010, 0.001);
-    COMPARE_DOUBLE(function->getStatistic().getDisplayResidual(1004).corrections.value("vr", -1), (-0.003), 0.001);
-    COMPARE_DOUBLE(function->getStatistic().getDisplayResidual(1005).corrections.value("vr", -1), (-0.007), 0.001);
-    COMPARE_DOUBLE(function->getStatistic().getDisplayResidual(1006).corrections.value("vr", -1),   0.030, 0.001);
-    COMPARE_DOUBLE(function->getStatistic().getDisplayResidual(1007).corrections.value("vr", -1), (-0.012), 0.001);
-
-    COMPARE_DOUBLE(function->getStatistic().getFormError(), 0.067, 0.001);
-
-    delete function.data();
-}
-
-// OI-637
-void FunctionTest::testVRadial2()
-{
-
-
-    QPointer<Function> function = new BestFitCylinderFromPoints();
-    function->init();
-    QObject::connect(function.data(), &Function::sendMessage, this, &FunctionTest::printMessage, Qt::AutoConnection);
-
-    QPointer<Cylinder> cylinder = new Cylinder();
-    QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-    cylinderFeature->setCylinder(cylinder);
-
-    // colum delim: " "
-    // line ending: "\n"
-    // unit:        [mm]
-    QString data("\
--3283.654 -79.927 194.917\n\
--3271.578 -84.991 203.643\n\
--3292.599 -64.647 196.517\n\
--3308.806 -73.417 213.805\n\
--3301.555 -87.819 210.971\n\
--3289.428 -79.973 198.027\n\
--3292.505 -57.849 200.595\n\
--3303.342 -63.362 213.794\n\
-");
-
-
     addInputPoints(data, function);
 
     ScalarInputParams scalarInputParams;
@@ -681,6 +623,13 @@ void FunctionTest::testVRadial2()
 
     delete function.data();
 }
+
+//testVRadial2 (OI-637) used to independently exercise the Points-based
+//BestFitCylinderFromPoints against the same dataset as testVRadial's
+//Observation-based BestFitCylinder, to prove both paths agreed. Stage
+//7c-ii consolidated the two into a single Point-consuming BestFitCylinder,
+//so testVRadial above already covers the point-based path this used to
+//check separately - keeping both would just be the same test twice.
 void FunctionTest::testVRadial3() {
 
 
@@ -707,8 +656,8 @@ void FunctionTest::testVRadial3() {
 ");
 
 
-    addInputObservations(data, function);
-    addInputObservations("-3305.0 -65.0 15.", function, 5000, 0, false);
+    addInputPoints(data, function);
+    addInputPoints("-3305.0 -65.0 15.", function, 5000, 0, false);
 
     ScalarInputParams scalarInputParams;
     scalarInputParams.stringParameter.insert("approximation", "guess axis");
@@ -772,7 +721,7 @@ void FunctionTest::testBestFitCylinder1()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(cylinderFeature);
     QVERIFY2(res, "exec");
@@ -817,7 +766,7 @@ void FunctionTest::testBestFitCylinder1_modifyX()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(cylinderFeature);
     QVERIFY2(res, "exec");
@@ -862,7 +811,7 @@ void FunctionTest::testBestFitCylinder1_modifyZ()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(cylinderFeature);
     QVERIFY2(res, "exec");
@@ -907,7 +856,7 @@ void FunctionTest::testBestFitCylinder1_modifyY()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(cylinderFeature);
     QVERIFY2(res, "exec");
@@ -947,7 +896,7 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_3()
 259.58 1483.65 1332.64\n\
 247.51 1484.00 1345.92\n\
 ";
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     ScalarInputParams scalarInputParams;
     scalarInputParams.stringParameter.insert("approximation", "guess axis");
@@ -992,7 +941,7 @@ void FunctionTest::testBestFitCylinder2_trafo_1st_2_pts()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(cylinderFeature);
     QVERIFY2(res, "exec");
@@ -1033,7 +982,7 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_2()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     ScalarInputParams scalarInputParams;
     scalarInputParams.stringParameter.insert("approximation", "guess axis");
@@ -1079,7 +1028,7 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_1()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     ScalarInputParams scalarInputParams;
     scalarInputParams.stringParameter.insert("approximation", "guess axis");
@@ -1125,7 +1074,7 @@ void FunctionTest::testBestFitCylinder2_guess_axis()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     ScalarInputParams scalarInputParams;
     scalarInputParams.stringParameter.insert("approximation", "guess axis");
@@ -1170,7 +1119,7 @@ void FunctionTest::testBestFitCylinder2_1st_2_pts()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(cylinderFeature);
     QVERIFY2(res, "exec");
@@ -1211,7 +1160,7 @@ void FunctionTest::testBestFitCylinderAproximationDirection1()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     addInputLine(0,0,0, -0.9, 0, 0, function, 2000, 1);
 
@@ -1378,7 +1327,7 @@ void FunctionTest::testBestFitPlane()
 0.0 1.0 0.003\n\
 ");
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(planeFeature);
     QVERIFY2(res, "exec");
@@ -1416,8 +1365,8 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_up() {
 0.0 1.0 0.003\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("0.0 0.0 10\n", function, 3000, 1);
+    addInputPoints(data, function);
+    addInputPoints("0.0 0.0 10\n", function, 3000, 1);
 
     bool res = function->exec(planeFeature);
     QVERIFY2(res, "exec");
@@ -1453,8 +1402,8 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_down() {
 0.0 1.0 0.003\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("0.0 0.0 -10\n", function, 3000, 1);
+    addInputPoints(data, function);
+    addInputPoints("0.0 0.0 -10\n", function, 3000, 1);
 
     bool res = function->exec(planeFeature);
     QVERIFY2(res, "exec");
@@ -1490,8 +1439,8 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_up() {
 0.0 1.0 -0.002\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("0.0 0.0 10\n", function, 3000, 1);
+    addInputPoints(data, function);
+    addInputPoints("0.0 0.0 10\n", function, 3000, 1);
 
     bool res = function->exec(planeFeature);
     QVERIFY2(res, "exec");
@@ -1527,8 +1476,8 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_down() {
 0.0 1.0 -0.002\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("0.0 0.0 -10\n", function, 3000, 1);
+    addInputPoints(data, function);
+    addInputPoints("0.0 0.0 -10\n", function, 3000, 1);
 
     bool res = function->exec(planeFeature);
     QVERIFY2(res, "exec");
@@ -1567,7 +1516,7 @@ void FunctionTest::testBestFitCircleInPlane_left()
 0.0 1.0 0.003\n\
 ");
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(circleFeature);
     QVERIFY2(res, "exec");
@@ -1604,7 +1553,7 @@ void FunctionTest::testBestFitCircleInPlane_right()
 1.0 0.0 0.002\n\
 ");
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(circleFeature);
     QVERIFY2(res, "exec");
@@ -1640,8 +1589,8 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_positive_up()
 0.0 1.0 0.003\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("0.0 0.0 10\n", function, 3000, 1);
+    addInputPoints(data, function);
+    addInputPoints("0.0 0.0 10\n", function, 3000, 1);
 
     bool res = function->exec(circleFeature);
     QVERIFY2(res, "exec");
@@ -1678,8 +1627,8 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_up()
 0.0 1.0 -0.002\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("0.0 0.0 10\n", function, 3000, 1);
+    addInputPoints(data, function);
+    addInputPoints("0.0 0.0 10\n", function, 3000, 1);
 
     bool res = function->exec(circleFeature);
     QVERIFY2(res, "exec");
@@ -1716,8 +1665,8 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_down()
 0.0 1.0 -0.002\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("0.0 0.0 -10\n", function, 3000, 1);
+    addInputPoints(data, function);
+    addInputPoints("0.0 0.0 -10\n", function, 3000, 1);
 
     bool res = function->exec(circleFeature);
     QVERIFY2(res, "exec");
@@ -1761,8 +1710,8 @@ void FunctionTest::testBestFitCylinder1__DummyPoint1()
 ");
 
 
-    addInputObservations(data, function);
-    addInputObservations("0. 0. 0.\n2000. 10. 10.\n", function, 2000, 1);
+    addInputPoints(data, function);
+    addInputPoints("0. 0. 0.\n2000. 10. 10.\n", function, 2000, 1);
 
     bool res = function->exec(cylinderFeature);
     QVERIFY2(res, "exec");
@@ -1805,8 +1754,8 @@ void FunctionTest::testBestFitCylinder1__DummyPoint2()
 ");
 
 
-    addInputObservations(data, function);
-    addInputObservations("2000. 0. 0.\n0. 10. 10.\n", function, 2000, 1);
+    addInputPoints(data, function);
+    addInputPoints("2000. 0. 0.\n0. 10. 10.\n", function, 2000, 1);
 
     bool res = function->exec(cylinderFeature);
     QVERIFY2(res, "exec");
@@ -2546,7 +2495,7 @@ void FunctionTest::testCircleInPlaneFromPoints()
 {
 
 
-    QPointer<Function> function = new BestFitCircleInPlaneFromPoints();
+    QPointer<Function> function = new BestFitCircleInPlane();
     function->init();
     QObject::connect(function.data(), &Function::sendMessage, this, &FunctionTest::printMessage, Qt::AutoConnection);
 
@@ -2643,7 +2592,7 @@ void FunctionTest::testBestFitPlane_right()
 1499.9884 1499.9889 999.9898\n\
 ");
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(wrapper);
     QVERIFY2(res, "exec");
@@ -2677,8 +2626,8 @@ void FunctionTest::testBestFitPlane_residuals()
 1499.9884 1499.9889 999.9898\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("2000.0007 999.9968 1002.0012", function, 3000, 0, false);
+    addInputPoints(data, function);
+    addInputPoints("2000.0007 999.9968 1002.0012", function, 3000, 0, false);
 
     bool res = function->exec(wrapper);
     QVERIFY2(res, "exec");
@@ -2722,8 +2671,8 @@ void FunctionTest::testBestFitLine_residuals()
 4999.9732 4999.9797 1000.0041\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("3899.9642 4099.9690 999.9721", function, 3000, 0, false);
+    addInputPoints(data, function);
+    addInputPoints("3899.9642 4099.9690 999.9721", function, 3000, 0, false);
 
     bool res = function->exec(wrapper);
     QVERIFY2(res, "exec");
@@ -2767,10 +2716,10 @@ void FunctionTest::testBestFitCircleInPlane_residuals()
 -0.0002 999.9924 999.9938\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("1100.0093 1100.0075 1000.0071", function, 3000, 0, false);
-    addInputObservations("400. 400. 1000.1", function, 3001, 0, false);
-    addInputObservations("900. 900. 1000.1", function, 3002, 0, false);
+    addInputPoints(data, function);
+    addInputPoints("1100.0093 1100.0075 1000.0071", function, 3000, 0, false);
+    addInputPoints("400. 400. 1000.1", function, 3001, 0, false);
+    addInputPoints("900. 900. 1000.1", function, 3002, 0, false);
 
     bool res = function->exec(wrapper);
     QVERIFY2(res, "exec");
@@ -2826,7 +2775,7 @@ void FunctionTest::testBestFitCircleInPlane_residuals2()
 -0.508547 0.871306 1.0003\n\
 ");
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     bool res = function->exec(wrapper);
     QVERIFY2(res, "exec");
@@ -2911,9 +2860,9 @@ void FunctionTest::testBestFitSphere_residuals()
 -0.402384 0.492135 -0.781833\n\
 ");
 
-    addInputObservations(data, function);
-    addInputObservations("2. 2. 2.", function, 3000, 0, false);
-    addInputObservations(".5 .5 .5", function, 3001, 0, false);
+    addInputPoints(data, function);
+    addInputPoints("2. 2. 2.", function, 3000, 0, false);
+    addInputPoints(".5 .5 .5", function, 3001, 0, false);
 
     bool res = function->exec(wrapper);
     QVERIFY2(res, "exec");
@@ -3361,7 +3310,7 @@ void FunctionTest::testCircleInPlaneFromPoints_with_DummyPoint()
 {
 
 
-    QPointer<Function> function = new BestFitCircleInPlaneFromPoints();
+    QPointer<Function> function = new BestFitCircleInPlane();
     function->init();
     QObject::connect(function.data(), &Function::sendMessage, this, &FunctionTest::printMessage, Qt::AutoConnection);
 
@@ -3400,7 +3349,7 @@ void FunctionTest::testLineFromPoints()
 {
 
 
-    QPointer<Function> function = new LineFromPoints();
+    QPointer<Function> function = new BestFitLine();
     function->init();
     QObject::connect(function.data(), &Function::sendMessage, this, &FunctionTest::printMessage, Qt::AutoConnection);
 
@@ -3457,7 +3406,7 @@ void FunctionTest::testNotSolved_guessAxis()
 -3292.599 -64.647 196.517\n\
 ");
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     ScalarInputParams scalarInputParams;
     scalarInputParams.stringParameter.insert("approximation", "guess axis");
@@ -3496,7 +3445,7 @@ void FunctionTest::testNotSolved_firstTwoPoints()
 ");
 
 
-    addInputObservations(data, function);
+    addInputPoints(data, function);
 
     ScalarInputParams scalarInputParams;
     scalarInputParams.stringParameter.insert("approximation", "first two points");

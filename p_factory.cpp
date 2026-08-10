@@ -33,9 +33,6 @@ QList<QPointer<Function> > OiTemplatePlugin::createFunctions(){
     resultSet.append(new BestFitPlane());
     resultSet.append(new BestFitCircle());
     resultSet.append(new PointFromPoints());
-    resultSet.append(new LineFromPoints());
-    resultSet.append(new PlaneFromPoints());
-    resultSet.append(new PlaneFromPointCollection());
     resultSet.append(new PlaneFromPlane());
     resultSet.append(new LineFromPlaneNormal());
     resultSet.append(new PointFromPlaneOrigin());
@@ -44,22 +41,17 @@ QList<QPointer<Function> > OiTemplatePlugin::createFunctions(){
     resultSet.append(new IntersectLineLine());
     resultSet.append(new IntersectLinePlane());
     resultSet.append(new IntersectPlanePlane());
-    resultSet.append(new SphereFromPoints());
     resultSet.append(new ChangeRadius());
     resultSet.append(new TranslateByValue());
     resultSet.append(new Register());
     resultSet.append(new BestFitSphere());
     resultSet.append(new BestFitCircleInPlane());
-    resultSet.append(new BestFitCircleInPlaneFromPoints());
     resultSet.append(new RectifyToPoint());
     resultSet.append(new RectifyToVector());
     resultSet.append(new Shift());
     resultSet.append(new BestFitCylinder());
     resultSet.append(new BestFitCylinderAppxDirection());
     resultSet.append(new BestFitCylinderAppxDummyPoint());
-    resultSet.append(new BestFitCylinderFromPoints());
-    resultSet.append(new BestFitCylinderFromPointsAppxDirection());
-    resultSet.append(new BestFitCylinderFromPointsAppxDummyPoint());
     resultSet.append(new Helmert7Param());
     resultSet.append(new Helmert6Param());
 
@@ -155,12 +147,6 @@ QPointer<Function> OiTemplatePlugin::createFunction(const QString &name){
         result = new BestFitPlane();
     }else if(name.compare("PointFromPoints") == 0){
         result = new PointFromPoints();
-    }else if(name.compare("LineFromPoints") == 0){
-        result = new LineFromPoints();
-    }else if(name.compare("PlaneFromPoints") == 0){
-        result = new PlaneFromPoints();
-    }else if(name.compare("PlaneFromPointCollection") == 0){
-        result = new PlaneFromPointCollection();
     }else if(name.compare("PlaneFromPlane") == 0){
         result = new PlaneFromPlane();
     }else if(name.compare("LineFromPlaneNormal") == 0){
@@ -177,8 +163,6 @@ QPointer<Function> OiTemplatePlugin::createFunction(const QString &name){
         result = new IntersectLinePlane();
     }else if(name.compare("IntersectPlanePlane") == 0){
         result = new IntersectPlanePlane();
-    }else if(name.compare("SphereFromPoints") == 0){
-        result = new SphereFromPoints();
     }else if(name.compare("ChangeRadius") == 0){
         result = new ChangeRadius();
     }else if(name.compare("TranslateByValue") == 0){
@@ -193,8 +177,6 @@ QPointer<Function> OiTemplatePlugin::createFunction(const QString &name){
         result = new BestFitCircle();
     }else if(name.compare("BestFitCircleInPlane") == 0){
         result = new BestFitCircleInPlane();
-    } else if(name.compare("BestFitCircleInPlaneFromPoints") == 0){
-        result = new BestFitCircleInPlaneFromPoints();
     }else if(name.compare("BestFitSphere") == 0){
         result = new BestFitSphere();
     }else if(name.compare("RectifyToPoint") == 0){
@@ -209,12 +191,6 @@ QPointer<Function> OiTemplatePlugin::createFunction(const QString &name){
         return new BestFitCylinderAppxDirection();
     }else if(name.compare("BestFitCylinderAppxDummyPoint") == 0){
         return new BestFitCylinderAppxDummyPoint();
-    }else if(name.compare("BestFitCylinderFromPoints") == 0){
-        return new BestFitCylinderFromPoints();
-    }else if(name.compare("BestFitCylinderFromPointsAppxDirection") == 0){
-        return new BestFitCylinderFromPointsAppxDirection();
-    }else if(name.compare("BestFitCylinderFromPointsAppxDummyPoint") == 0){
-        return new BestFitCylinderFromPointsAppxDummyPoint();
     } else {
         return createFunctionFromConfig(name);
     }

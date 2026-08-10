@@ -11,16 +11,19 @@ void BestFitCircle::init(){
     this->metaData.author = "Michael Loesler - derletztekick.com";
     this->metaData.description = QString("%1 %2 %3")
             .arg("This function estimates a spatial circle usnig a general least squares algorithm.")
-            .arg("Insert at least three non-collinear observed points, to get the best fit circle.")
+            .arg("Insert at least three non-collinear points, to get the best fit circle.")
             .arg("The algorithm was taken from the OpenSource FormFittingToolbox (c) M.Loesler (GNU-GPL).");
     this->metaData.iid = FitFunction_iidd;
 
-    //set needed elements
+    //D12/Stage 7c-ii: plain BestFitCircle had no Points-based twin before
+    //this stage - it is converted in place to the same tag-resolved,
+    //Point-consuming shape as every other fit here.
     this->neededElements.clear();
     NeededElement param1;
-    param1.description = "Select at least three non-collinear observed points to calculate the best fit circle.";
+    param1.description = "Select at least three non-collinear points to calculate the best fit circle.";
     param1.infinite = true;
-    param1.typeOfElement = eObservationElement;
+    param1.typeOfElement = ePointElement;
+    param1.roleName = "default";
     this->neededElements.append(param1);
 
     //set spplicable for
@@ -35,26 +38,26 @@ void BestFitCircle::init(){
  */
 bool BestFitCircle::exec(Circle &circle) {
 
-    //get and check input observations
-    if(!this->inputElements.contains(0) || this->inputElements[0].size() < 3){
-        emit this->sendMessage(QString("Not enough valid observations to fit the circle %1").arg(circle.getFeatureName()), eWarningMessage);
+    //get and check input points
+    if(!this->inputElements.contains(0) || this->inputElements[0].isEmpty()){
+        emit this->sendMessage(QString("No points tagged for circle %1").arg(circle.getFeatureName()), eWarningMessage);
         return false;
     }
-    QList<QPointer<Observation> > inputObservations;
+    QList<QPointer<Point> > inputPoints;
     foreach(const InputElement &element, this->inputElements[0]){
-        if(!element.observation.isNull() && element.observation->getIsSolved() && element.observation->getIsValid()){
-            inputObservations.append(element.observation);
+        if(!element.point.isNull() && element.point->getIsSolved() && element.shouldBeUsed){
+            inputPoints.append(element.point);
             this->setIsUsed(0, element.id, true);
             continue;
         }
         this->setIsUsed(0, element.id, false);
     }
-    if(inputObservations.size() < 3){
+    if(inputPoints.size() < 3){
         emit this->sendMessage(QString("Not enough valid points to fit the point %1").arg(circle.getFeatureName()), eWarningMessage);
         return false;
     }
 
-    int obsCount = inputObservations.size();
+    int obsCount = inputPoints.size();
 
     //fill x,y,z arrays
     double *x = new double[obsCount];
@@ -65,10 +68,11 @@ bool BestFitCircle::exec(Circle &circle) {
 
     double xc = 0, yc = 0, zc = 0, rc = 0;
 
-    foreach(const QPointer<Observation> &obs, inputObservations){
-        x[k] = obs->getXYZ().getAt(0);
-        y[k] = obs->getXYZ().getAt(1);
-        z[k] = obs->getXYZ().getAt(2);
+    foreach(const QPointer<Point> &p, inputPoints){
+        const OiVec pos = p->getPosition().getVector();
+        x[k] = pos.getAt(0);
+        y[k] = pos.getAt(1);
+        z[k] = pos.getAt(2);
 
         xc += x[k];
         yc += y[k];
@@ -257,7 +261,7 @@ bool BestFitCircle::exec(Circle &circle) {
     myStats.setV(v);
     for(int i=0; i<obsCount; i++){
         Residual r;
-        r.elementId = inputObservations.at(i)->getId();
+        r.elementId = inputPoints.at(i)->getId();
         r.corrections.insert("vx", v.getAt(i*3));
         r.corrections.insert("vx", v.getAt(3*i+1));
         r.corrections.insert("vx", v.getAt(3*i+2));
