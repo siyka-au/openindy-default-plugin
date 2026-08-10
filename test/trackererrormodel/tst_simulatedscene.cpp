@@ -95,7 +95,7 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget(){
         element.typeOfElement = eObservationElement;
         element.observation = obs;
         element.shouldBeUsed = true;
-        function->addInputElement(element, InputElementKey::eDefault);
+        function->addInputElement(element, 0);
     }
 
     QPointer<Plane> plane = new Plane();

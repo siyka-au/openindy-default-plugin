@@ -29,7 +29,7 @@ void BestFitCircleInPlaneFromPoints::init(){
     param2.description = "Dummy point to indicate circle normal.";
     param2.infinite = true;
     param2.typeOfElement = ePointElement;
-    param2.key = InputElementKey::eDummyPoint;
+    param2.roleName = "dummyPoint";
     this->neededElements.append(param2);
 
     //set spplicable for

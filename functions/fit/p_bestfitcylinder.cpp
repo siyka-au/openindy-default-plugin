@@ -141,7 +141,7 @@ void BestFitCylinderAppxDummyPoint::init(){
     param3.description = "Dummy points to indicate cylinder normal.";
     param3.infinite = true;
     param3.typeOfElement = eObservationElement;
-    param3.key = InputElementKey::eDummyPoint;
+    param3.roleName = "dummyPoint";
     this->neededElements.append(param3);
 
     //set spplicable for

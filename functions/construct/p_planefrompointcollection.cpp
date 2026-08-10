@@ -14,12 +14,16 @@ void PlaneFromPointCollection::init(){
             .arg("Points added to the collection are picked up automatically - the function itself never has to be re-bound.");
     this->metaData.iid = ConstructFunction_iidd;
 
-    //exactly one collection, not N points: that is the whole point of this
-    //function, and why infinite is false here
+    //D12: one declaration, resolved to as many tagged points as exist -
+    //infinite=true is what keeps this function's own input list from
+    //growing "by construction" as points arrive, the same guarantee
+    //PointCollection binding used to provide.
+    this->neededElements.clear();
     NeededElement param1;
-    param1.description = "Select the point collection to fit the plane to.";
-    param1.infinite = false;
-    param1.typeOfElement = ePointCollectionElement;
+    param1.description = "Select at least three points to calculate the best fit plane.";
+    param1.infinite = true;
+    param1.typeOfElement = ePointElement;
+    param1.roleName = "default";
     this->neededElements.append(param1);
 
     //set applicable for
@@ -43,44 +47,40 @@ bool PlaneFromPointCollection::exec(Plane &plane){
  */
 bool PlaneFromPointCollection::setUpResult(Plane &plane){
 
-    //exactly one input element, and it must resolve to a collection
-    if(!this->inputElements.contains(0) || this->inputElements[0].size() != 1){
-        emit this->sendMessage(QString("No point collection set for plane %1").arg(plane.getFeatureName()), eWarningMessage);
+    if(!this->inputElements.contains(0) || this->inputElements[0].isEmpty()){
+        emit this->sendMessage(QString("No points tagged for plane %1").arg(plane.getFeatureName()), eWarningMessage);
         return false;
     }
 
-    const InputElement &element = this->inputElements[0].first();
-    const PointCollection *collection = element.asPointCollection();
-    if(collection == nullptr){
-        emit this->sendMessage(QString("Input of plane %1 is not a point collection").arg(plane.getFeatureName()), eWarningMessage);
-        return false;
-    }
+    //only solved points count as usable - an unsolved (e.g. not yet
+    //re-measured) point is simply not in here, same as the retired
+    //collection's own filtering did
+    QList<Position> positions;
+    QList<IdPoint> points;
+    foreach(const InputElement &element, this->inputElements[0]){
 
-    //the collection decides what counts as usable - an unsolved point or a
-    //cloud point excluded by segmentation is simply not in here
-    const QList<Position> positions = collection->collectionPoints();
+        if(element.point.isNull() || !element.point->getIsSolved() || !element.shouldBeUsed){
+            this->setIsUsed(0, element.id, false);
+            continue;
+        }
+        this->setIsUsed(0, element.id, true);
+
+        positions.append(element.point->getPosition());
+
+        IdPoint point;
+        point.id = element.id;
+        point.xyz = element.point->getPosition().getVector();
+        points.append(point);
+
+    }
 
     //three is the geometric minimum for a plane. It is not sufficient:
     //three collinear points satisfy the count and still cannot define one,
     //which is why the real check is whether the fit below actually solves.
     if(positions.size() < 3){
-        emit this->sendMessage(QString("Not enough points in the collection to fit the plane %1 (have %2, need at least 3)")
+        emit this->sendMessage(QString("Not enough points tagged for plane %1 (have %2, need at least 3)")
                                 .arg(plane.getFeatureName()).arg(positions.size()), eWarningMessage);
-        this->setIsUsed(0, element.id, false);
         return false;
-    }
-
-    this->setIsUsed(0, element.id, true);
-
-    QList<IdPoint> points;
-    for(int i = 0; i < positions.size(); ++i){
-        IdPoint point;
-        //a collection point has no feature id of its own - a cloud point
-        //never had one, and a group's points are addressed through the
-        //group rather than individually here
-        point.id = i;
-        point.xyz = positions.at(i).getVector();
-        points.append(point);
     }
 
     OiVec centroid(3);

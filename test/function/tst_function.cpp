@@ -179,7 +179,7 @@ void FunctionTest::printMessage(const QString &msg, const MessageTypes &msgType,
     qDebug() << msg;
 }
 
-void FunctionTest::addInputObservations(QString data, QPointer<Function> function, int id = 1000, int inputElementKey = InputElementKey::eDefault, bool shouldBeUsed = true) {
+void FunctionTest::addInputObservations(QString data, QPointer<Function> function, int id = 1000, int inputElementKey = 0, bool shouldBeUsed = true) {
     QTextStream stream(data.toUtf8());
     while(!stream.atEnd()) {
         QStringList xyz = stream.readLine().split(" ");
@@ -220,7 +220,7 @@ void FunctionTest::addInputObservations(QString data, QPointer<Function> functio
      }
 }
 
-void FunctionTest::addInputPoints(QString data, QPointer<Function> function, int id = 1000, int inputElementKey = InputElementKey::eDefault) {
+void FunctionTest::addInputPoints(QString data, QPointer<Function> function, int id = 1000, int inputElementKey = 0) {
     QTextStream stream(data.toUtf8());
     while(!stream.atEnd()) {
         QStringList xyz = stream.readLine().split(" ");
@@ -243,7 +243,7 @@ void FunctionTest::addInputPoints(QString data, QPointer<Function> function, int
      }
 }
 
-void FunctionTest::addInputLine(double x, double y, double z, double i, double j, double k, QPointer<Function> function, int id = 2000, int inputElementKey = InputElementKey::eDefault){
+void FunctionTest::addInputLine(double x, double y, double z, double i, double j, double k, QPointer<Function> function, int id = 2000, int inputElementKey = 0){
     OiVec * p = new OiVec(4);
     p->setAt(0, x);
     p->setAt(1, y);
@@ -270,7 +270,7 @@ void FunctionTest::addInputLine(double x, double y, double z, double i, double j
     function->addInputElement(*element, inputElementKey);
 }
 
-void FunctionTest::addInputStation(double x, double y, double z, double i, double j, double k, QPointer<Function> function, int id = 2000, int inputElementKey = InputElementKey::eDefault){
+void FunctionTest::addInputStation(double x, double y, double z, double i, double j, double k, QPointer<Function> function, int id = 2000, int inputElementKey = 0){
     OiVec * p = new OiVec(4);
     p->setAt(0, x);
     p->setAt(1, y);
@@ -296,7 +296,7 @@ void FunctionTest::addInputStation(double x, double y, double z, double i, doubl
     function->addInputElement(*element, inputElementKey);
 }
 
-void FunctionTest::addInputCoordinateSystem(double x, double y, double z, double i, double j, double k, QPointer<Function> function, int id = 2000, int inputElementKey = InputElementKey::eDefault){
+void FunctionTest::addInputCoordinateSystem(double x, double y, double z, double i, double j, double k, QPointer<Function> function, int id = 2000, int inputElementKey = 0){
     OiVec * p = new OiVec(4);
     p->setAt(0, x);
     p->setAt(1, y);
@@ -323,7 +323,7 @@ void FunctionTest::addInputCoordinateSystem(double x, double y, double z, double
     function->addInputElement(*element, inputElementKey);
 }
 
-void FunctionTest::addInputCoordinateSystem(OiMat trafo, QPointer<Function> function, int id = 2000, int inputElementKey = InputElementKey::eDefault){
+void FunctionTest::addInputCoordinateSystem(OiMat trafo, QPointer<Function> function, int id = 2000, int inputElementKey = 0){
     QPointer<CoordinateSystem> coordianteSystem = new CoordinateSystem();
     coordianteSystem->setFeatureName(QString("system_%1").arg(id));
     coordianteSystem->transformOriginAndAxis(trafo);
@@ -336,7 +336,7 @@ void FunctionTest::addInputCoordinateSystem(OiMat trafo, QPointer<Function> func
     function->addInputElement(*element, inputElementKey);
 }
 
-void FunctionTest::addInputPoint(double x, double y, double z, QPointer<Function> function, int id = 2000, int inputElementKey = InputElementKey::eDefault) {
+void FunctionTest::addInputPoint(double x, double y, double z, QPointer<Function> function, int id = 2000, int inputElementKey = 0) {
     OiVec pointPos = OiVec(3);
     pointPos.setAt(0, x);
     pointPos.setAt(1, y);
@@ -353,7 +353,7 @@ void FunctionTest::addInputPoint(double x, double y, double z, QPointer<Function
     function->addInputElement(*element, inputElementKey);
 }
 
-void FunctionTest::addInputCircle(double x, double y, double z, double i, double j, double k, double radius, QPointer<Function> function, int id = 2000, int inputElementKey = InputElementKey::eDefault){
+void FunctionTest::addInputCircle(double x, double y, double z, double i, double j, double k, double radius, QPointer<Function> function, int id = 2000, int inputElementKey = 0){
     OiVec * p = new OiVec(4);
     p->setAt(0, x);
     p->setAt(1, y);
@@ -383,7 +383,7 @@ void FunctionTest::addInputCircle(double x, double y, double z, double i, double
     function->addInputElement(*element, inputElementKey);
 }
 
-void FunctionTest::addInputPlane(double x, double y, double z, double i, double j, double k, QPointer<Function> function, int id = 2000, int inputElementKey = InputElementKey::eDefault){
+void FunctionTest::addInputPlane(double x, double y, double z, double i, double j, double k, QPointer<Function> function, int id = 2000, int inputElementKey = 0){
     OiVec * p = new OiVec(4);
     p->setAt(0, x);
     p->setAt(1, y);
@@ -708,7 +708,7 @@ void FunctionTest::testVRadial3() {
 
 
     addInputObservations(data, function);
-    addInputObservations("-3305.0 -65.0 15.", function, 5000, InputElementKey::eDefault, false);
+    addInputObservations("-3305.0 -65.0 15.", function, 5000, 0, false);
 
     ScalarInputParams scalarInputParams;
     scalarInputParams.stringParameter.insert("approximation", "guess axis");
@@ -1417,7 +1417,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_up() {
 ");
 
     addInputObservations(data, function);
-    addInputObservations("0.0 0.0 10\n", function, 3000, InputElementKey::eDummyPoint);
+    addInputObservations("0.0 0.0 10\n", function, 3000, 1);
 
     bool res = function->exec(planeFeature);
     QVERIFY2(res, "exec");
@@ -1454,7 +1454,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_down() {
 ");
 
     addInputObservations(data, function);
-    addInputObservations("0.0 0.0 -10\n", function, 3000, InputElementKey::eDummyPoint);
+    addInputObservations("0.0 0.0 -10\n", function, 3000, 1);
 
     bool res = function->exec(planeFeature);
     QVERIFY2(res, "exec");
@@ -1491,7 +1491,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_up() {
 ");
 
     addInputObservations(data, function);
-    addInputObservations("0.0 0.0 10\n", function, 3000, InputElementKey::eDummyPoint);
+    addInputObservations("0.0 0.0 10\n", function, 3000, 1);
 
     bool res = function->exec(planeFeature);
     QVERIFY2(res, "exec");
@@ -1528,7 +1528,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_down() {
 ");
 
     addInputObservations(data, function);
-    addInputObservations("0.0 0.0 -10\n", function, 3000, InputElementKey::eDummyPoint);
+    addInputObservations("0.0 0.0 -10\n", function, 3000, 1);
 
     bool res = function->exec(planeFeature);
     QVERIFY2(res, "exec");
@@ -1641,7 +1641,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_positive_up()
 ");
 
     addInputObservations(data, function);
-    addInputObservations("0.0 0.0 10\n", function, 3000, InputElementKey::eDummyPoint);
+    addInputObservations("0.0 0.0 10\n", function, 3000, 1);
 
     bool res = function->exec(circleFeature);
     QVERIFY2(res, "exec");
@@ -1679,7 +1679,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_up()
 ");
 
     addInputObservations(data, function);
-    addInputObservations("0.0 0.0 10\n", function, 3000, InputElementKey::eDummyPoint);
+    addInputObservations("0.0 0.0 10\n", function, 3000, 1);
 
     bool res = function->exec(circleFeature);
     QVERIFY2(res, "exec");
@@ -1717,7 +1717,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_down()
 ");
 
     addInputObservations(data, function);
-    addInputObservations("0.0 0.0 -10\n", function, 3000, InputElementKey::eDummyPoint);
+    addInputObservations("0.0 0.0 -10\n", function, 3000, 1);
 
     bool res = function->exec(circleFeature);
     QVERIFY2(res, "exec");
@@ -1762,7 +1762,7 @@ void FunctionTest::testBestFitCylinder1__DummyPoint1()
 
 
     addInputObservations(data, function);
-    addInputObservations("0. 0. 0.\n2000. 10. 10.\n", function, 2000, InputElementKey::eDummyPoint);
+    addInputObservations("0. 0. 0.\n2000. 10. 10.\n", function, 2000, 1);
 
     bool res = function->exec(cylinderFeature);
     QVERIFY2(res, "exec");
@@ -1806,7 +1806,7 @@ void FunctionTest::testBestFitCylinder1__DummyPoint2()
 
 
     addInputObservations(data, function);
-    addInputObservations("2000. 0. 0.\n0. 10. 10.\n", function, 2000, InputElementKey::eDummyPoint);
+    addInputObservations("2000. 0. 0.\n0. 10. 10.\n", function, 2000, 1);
 
     bool res = function->exec(cylinderFeature);
     QVERIFY2(res, "exec");
@@ -2678,7 +2678,7 @@ void FunctionTest::testBestFitPlane_residuals()
 ");
 
     addInputObservations(data, function);
-    addInputObservations("2000.0007 999.9968 1002.0012", function, 3000, InputElementKey::eDefault, false);
+    addInputObservations("2000.0007 999.9968 1002.0012", function, 3000, 0, false);
 
     bool res = function->exec(wrapper);
     QVERIFY2(res, "exec");
@@ -2723,7 +2723,7 @@ void FunctionTest::testBestFitLine_residuals()
 ");
 
     addInputObservations(data, function);
-    addInputObservations("3899.9642 4099.9690 999.9721", function, 3000, InputElementKey::eDefault, false);
+    addInputObservations("3899.9642 4099.9690 999.9721", function, 3000, 0, false);
 
     bool res = function->exec(wrapper);
     QVERIFY2(res, "exec");
@@ -2768,9 +2768,9 @@ void FunctionTest::testBestFitCircleInPlane_residuals()
 ");
 
     addInputObservations(data, function);
-    addInputObservations("1100.0093 1100.0075 1000.0071", function, 3000, InputElementKey::eDefault, false);
-    addInputObservations("400. 400. 1000.1", function, 3001, InputElementKey::eDefault, false);
-    addInputObservations("900. 900. 1000.1", function, 3002, InputElementKey::eDefault, false);
+    addInputObservations("1100.0093 1100.0075 1000.0071", function, 3000, 0, false);
+    addInputObservations("400. 400. 1000.1", function, 3001, 0, false);
+    addInputObservations("900. 900. 1000.1", function, 3002, 0, false);
 
     bool res = function->exec(wrapper);
     QVERIFY2(res, "exec");
@@ -2912,8 +2912,8 @@ void FunctionTest::testBestFitSphere_residuals()
 ");
 
     addInputObservations(data, function);
-    addInputObservations("2. 2. 2.", function, 3000, InputElementKey::eDefault, false);
-    addInputObservations(".5 .5 .5", function, 3001, InputElementKey::eDefault, false);
+    addInputObservations("2. 2. 2.", function, 3000, 0, false);
+    addInputObservations(".5 .5 .5", function, 3001, 0, false);
 
     bool res = function->exec(wrapper);
     QVERIFY2(res, "exec");
@@ -3381,7 +3381,7 @@ void FunctionTest::testCircleInPlaneFromPoints_with_DummyPoint()
 
     addInputPoints(data, function);
 
-    addInputPoints("0.0 0.0 -1.0", function, 2000, InputElementKey::eDummyPoint);
+    addInputPoints("0.0 0.0 -1.0", function, 2000, 1);
 
     bool res = function->exec(circleFeature);
     QVERIFY2(res, "exec");

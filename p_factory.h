@@ -40,6 +40,7 @@
 #include "p_planefromplane.h"
 #include "p_linefromplanenormal.h"
 #include "p_pointfromplaneorigin.h"
+#include "p_averagefrompoints.h"
 #include "p_pointbetweentwopoints.h"
 #include "p_intersectlineline.h"
 #include "p_intersectlineplane.h"
