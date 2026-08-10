@@ -31,6 +31,8 @@
 #include "p_bestfitcylinder.h"
 #include "p_bestfitcylinderfrompoints.h"
 
+#include "p_nominalpoint.h"
+
 #include "p_pointfrompoints.h"
 #include "p_linefrompoints.h"
 #include "p_planefrompoints.h"

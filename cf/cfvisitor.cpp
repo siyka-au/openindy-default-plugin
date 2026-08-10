@@ -41,7 +41,7 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
             switch (ctx.global_feature->getFeatureTypeEnum()) {
             case ePointFeature: {
                 QPointer<Point> src = ctx.global_feature->getPoint();
-                QPointer<Point> dest = new Point(false, src->getPosition());
+                QPointer<Point> dest = new Point(src->getPosition());
                 copy->setPoint(dest);
                 break;
             }

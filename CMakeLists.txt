@@ -78,6 +78,7 @@ configure_file(
 # --- plugin library ---
 
 add_library(OpenIndyDefaultPlugin SHARED
+    functions/nominal/p_nominalpoint.cpp
     functions/construct/p_intersectlineline.cpp
     functions/construct/p_intersectlineplane.cpp
     functions/construct/p_intersectplaneplane.cpp
@@ -123,6 +124,7 @@ add_library(OpenIndyDefaultPlugin SHARED
     cf/cfvisitor.cpp
     p_factory.cpp
 
+    functions/nominal/p_nominalpoint.h
     functions/construct/p_intersectlineline.h
     functions/construct/p_intersectlineplane.h
     functions/construct/p_intersectplaneplane.h
@@ -184,6 +186,7 @@ target_include_directories(OpenIndyDefaultPlugin
         simulations/simplePolarMeasurement
         sensors/common
         sensors/laserTracker/pseudoTracker
+        functions/nominal
         functions/construct
         functions/fit
         functions/objectTransformation
@@ -231,6 +234,7 @@ target_include_directories(tst_function PRIVATE
     simulations/simplePolarMeasurement
     sensors/common
     sensors/laserTracker/pseudoTracker
+    functions/nominal
     functions/construct
     functions/fit
     functions/objectTransformation

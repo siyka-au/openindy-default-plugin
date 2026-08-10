@@ -26,6 +26,8 @@ QList<QPointer<Sensor> > OiTemplatePlugin::createSensors(){
 QList<QPointer<Function> > OiTemplatePlugin::createFunctions(){
     QList<QPointer<Function> > resultSet;
 
+    resultSet.append(new NominalPoint());
+
     resultSet.append(new BestFitPoint());
     resultSet.append(new BestFitLine());
     resultSet.append(new BestFitPlane());
@@ -142,7 +144,9 @@ QPointer<Sensor> OiTemplatePlugin::createSensor(const QString &name){
  */
 QPointer<Function> OiTemplatePlugin::createFunction(const QString &name){
     QPointer<Function> result(NULL);
-    if(name.compare("BestFitPoint") == 0){
+    if(name.compare("NominalPoint") == 0){
+        result = new NominalPoint();
+    }else if(name.compare("BestFitPoint") == 0){
         result = new BestFitPoint();
     }else if(name.compare("BestFitLine") == 0){
         result = new BestFitLine();

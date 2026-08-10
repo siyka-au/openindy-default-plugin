@@ -451,7 +451,7 @@ void OiExchangeAscii::importOiData(){
                 switch (this->typeOfGeometry) {
                 case ePointGeometry:
                 {
-                    QPointer<Point> myNominal = new Point(true);
+                    QPointer<Point> myNominal = new Point();
                     // I use QT property system for transportation, because "common" is not "common" of nominal point but actual point!
                     myNominal->setProperty("OI_FEATURE_COMMONSTATE",columnData.oiFeatureCommonState);
 
@@ -477,7 +477,7 @@ void OiExchangeAscii::importOiData(){
                 case ePlaneGeometry:
                 case ePlaneLevelGeometry:
                 {
-                    QPointer<Plane> plane = new Plane(true);
+                    QPointer<Plane> plane = new Plane();
                     // I use QT property system for transportation, because level is a special plane
                     plane->setProperty("OI_FEATURE_PLANE_LEVEL", this->typeOfGeometry == ePlaneLevelGeometry);
 
@@ -544,7 +544,7 @@ void OiExchangeAscii::exportOiData(){
 
             foreach (QPointer<FeatureWrapper> fw, this->currentJob->getGeometriesList()) {
 
-                if(fw->getGeometry()->getIsSolved() && (!fw->getGeometry()->getIsNominal())){
+                if(fw->getGeometry()->getIsSolved() && fw->getGeometry()->getOwnerDescription().has_value()){
 
                     //write to file
                     QString line = "";

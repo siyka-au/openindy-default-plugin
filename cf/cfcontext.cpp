@@ -38,13 +38,13 @@ QPointer<FeatureWrapper> CFContext::createApplicableFeature(FeatureTypes feature
 
        switch(featureType){
            case ePointFeature: {
-               QPointer<Point> feature = new Point(false);
+               QPointer<Point> feature = new Point();
                feature->setFeatureName("generated Point");
                featureWrapper->setPoint(feature);
                return featureWrapper;
            }
            case eScalarEntityDistanceFeature: {
-               QPointer<ScalarEntityDistance> feature = new ScalarEntityDistance(false);
+               QPointer<ScalarEntityDistance> feature = new ScalarEntityDistance();
                feature->setFeatureName("generated ScalarEntityDistance");
                featureWrapper->setScalarEntityDistance(feature);
                return featureWrapper;

@@ -15,7 +15,7 @@ using namespace oi::math;
 namespace{
 
 QPointer<FeatureWrapper> makePlane(const Position &position, const Direction &normal){
-    QPointer<Plane> plane = new Plane(false);
+    QPointer<Plane> plane = new Plane();
     Position p = position;
     Direction n = normal;
     plane->setPlane(p, n);
@@ -86,7 +86,7 @@ void DerivedFeaturesTest::lineTakesPlaneNormalAndPosition(){
     function->init();
     bindPlane(function, planeFeature);
 
-    QPointer<Line> line = new Line(false);
+    QPointer<Line> line = new Line();
     QPointer<FeatureWrapper> lineFeature = new FeatureWrapper();
     lineFeature->setLine(line);
 
@@ -106,7 +106,7 @@ void DerivedFeaturesTest::pointTakesPlaneOrigin(){
     function->init();
     bindPlane(function, planeFeature);
 
-    QPointer<Point> point = new Point(false);
+    QPointer<Point> point = new Point();
     QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
     pointFeature->setPoint(point);
 
@@ -130,11 +130,11 @@ void DerivedFeaturesTest::derivedFeaturesFollowTheirSourcePlane(){
     pointFunction->init();
     bindPlane(pointFunction, planeFeature);
 
-    QPointer<Line> line = new Line(false);
+    QPointer<Line> line = new Line();
     QPointer<FeatureWrapper> lineFeature = new FeatureWrapper();
     lineFeature->setLine(line);
 
-    QPointer<Point> point = new Point(false);
+    QPointer<Point> point = new Point();
     QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
     pointFeature->setPoint(point);
 
@@ -162,7 +162,7 @@ void DerivedFeaturesTest::unsolvedPlaneYieldsNoDerivedFeature(){
 
     //an unsolved plane has no trustworthy normal or position, so deriving
     //from it would invent geometry that was never measured
-    QPointer<Plane> plane = new Plane(false);
+    QPointer<Plane> plane = new Plane();
     plane->setIsSolved(false);
     QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
     planeFeature->setPlane(plane);
@@ -171,7 +171,7 @@ void DerivedFeaturesTest::unsolvedPlaneYieldsNoDerivedFeature(){
     function->init();
     bindPlane(function, planeFeature);
 
-    QPointer<Line> line = new Line(false);
+    QPointer<Line> line = new Line();
     QPointer<FeatureWrapper> lineFeature = new FeatureWrapper();
     lineFeature->setLine(line);
 

@@ -98,7 +98,7 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget(){
         function->addInputElement(element, InputElementKey::eDefault);
     }
 
-    QPointer<Plane> plane = new Plane(false);
+    QPointer<Plane> plane = new Plane();
     QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
     planeFeature->setPlane(plane);
 

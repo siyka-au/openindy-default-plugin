@@ -15,7 +15,7 @@ using namespace oi::math;
 namespace{
 
 QPointer<FeatureWrapper> makePoint(double x, double y, double z, int id){
-    QPointer<Point> point = new Point(id, false, Position(x, y, z));
+    QPointer<Point> point = new Point(id, Position(x, y, z));
     point->setIsSolved(true);
     QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
     wrapper->setPoint(point);
@@ -93,7 +93,7 @@ void CollectionBindingTest::pointsAddedAfterBindingArePickedUp(){
     function->init();
     bindCollection(function, groupFeature);
 
-    QPointer<Plane> plane = new Plane(false);
+    QPointer<Plane> plane = new Plane();
     QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
     planeFeature->setPlane(plane);
 
@@ -143,7 +143,7 @@ void CollectionBindingTest::functionInputListNeverGrowsWithPointCount(){
 
 void CollectionBindingTest::pointCloudBindsToTheSameFunction(){
 
-    QPointer<PointCloud> cloud = new PointCloud(false);
+    QPointer<PointCloud> cloud = new PointCloud();
     cloud->addPointCloudPoint(new Point_PC(0.0f, 0.0f, 0.0f));
     cloud->addPointCloudPoint(new Point_PC(1.0f, 0.0f, 0.0f));
     cloud->addPointCloudPoint(new Point_PC(0.0f, 1.0f, 0.0f));
@@ -156,7 +156,7 @@ void CollectionBindingTest::pointCloudBindsToTheSameFunction(){
     function->init();
     bindCollection(function, cloudFeature);
 
-    QPointer<Plane> plane = new Plane(false);
+    QPointer<Plane> plane = new Plane();
     QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
     planeFeature->setPlane(plane);
 
@@ -179,7 +179,7 @@ void CollectionBindingTest::tooFewPointsFailsCleanly(){
     function->init();
     bindCollection(function, groupFeature);
 
-    QPointer<Plane> plane = new Plane(false);
+    QPointer<Plane> plane = new Plane();
     QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
     planeFeature->setPlane(plane);
 
@@ -206,7 +206,7 @@ void CollectionBindingTest::collinearPointsAreRejectedByTheFitNotTheCount(){
     function->init();
     bindCollection(function, groupFeature);
 
-    QPointer<Plane> plane = new Plane(false);
+    QPointer<Plane> plane = new Plane();
     QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
     planeFeature->setPlane(plane);
 

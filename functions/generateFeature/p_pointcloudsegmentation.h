@@ -46,7 +46,7 @@ public slots:
         foreach(PS_PlaneSegment *p, myCloud.getDetectedPlanes()){
 
             FeatureWrapper *myFeature = new FeatureWrapper();
-            Plane *myPlane = new Plane(true);
+            Plane *myPlane = new Plane();
             myPlane->setIsSolved(true);
             myPlane->setFeatureName(QString("plane_%1").arg(i));
             OiVec xyz(3);
@@ -80,7 +80,7 @@ public slots:
         foreach(PS_SphereSegment *s, myCloud.getDetectedSpheres()){
 
             FeatureWrapper *myFeature = new FeatureWrapper();
-            Sphere *mySphere = new Sphere(true);
+            Sphere *mySphere = new Sphere();
             mySphere->setIsSolved(true);
             mySphere->setFeatureName(QString("sphere_%1").arg(i));
             OiVec xyz(3);
@@ -104,7 +104,7 @@ public slots:
         foreach(PS_CylinderSegment *c, myCloud.getDetectedCylinders()){
 
             FeatureWrapper *myFeature = new FeatureWrapper();
-            Cylinder *myCylinder = new Cylinder(true);
+            Cylinder *myCylinder = new Cylinder();
             myCylinder->setIsSolved(true);
             myCylinder->setFeatureName(QString("cylinder_%1").arg(i));
             OiVec xyz(3);
