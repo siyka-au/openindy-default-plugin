@@ -296,6 +296,15 @@ target_include_directories(tst_derivedfeatures PRIVATE test/include functions/co
 target_link_libraries(tst_derivedfeatures PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME derivedfeatures COMMAND tst_derivedfeatures)
 
+add_executable(tst_ownedplaneaccessors
+    test/ownedplaneaccessors/tst_ownedplaneaccessors.cpp
+    functions/construct/p_linefromplanenormal.cpp
+    functions/construct/p_pointfromplaneorigin.cpp
+)
+target_include_directories(tst_ownedplaneaccessors PRIVATE test/include functions/construct)
+target_link_libraries(tst_ownedplaneaccessors PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
+add_test(NAME ownedplaneaccessors COMMAND tst_ownedplaneaccessors)
+
 add_executable(tst_measuredfit
     test/measuredfit/tst_measuredfit.cpp
     functions/fit/p_bestfitplane.cpp
