@@ -314,4 +314,13 @@ target_include_directories(tst_measuredfit PRIVATE test/include functions/fit)
 target_link_libraries(tst_measuredfit PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME measuredfit COMMAND tst_measuredfit)
 
+add_executable(tst_pipelinefilter
+    test/pipelinefilter/tst_pipelinefilter.cpp
+    functions/fit/p_bestfitplane.cpp
+    functions/fit/p_bestfitpoint.cpp
+)
+target_include_directories(tst_pipelinefilter PRIVATE test/include functions/fit)
+target_link_libraries(tst_pipelinefilter PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
+add_test(NAME pipelinefilter COMMAND tst_pipelinefilter)
+
 endif()
