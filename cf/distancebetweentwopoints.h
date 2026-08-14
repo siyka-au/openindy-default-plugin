@@ -5,13 +5,13 @@
 
 using namespace oi;
 
-class DistanceBetweenTwoPoints : public ConstructFunction
+class DistanceBetweenTwoPoints : public ConstructFunction, public Producer<ScalarEntityDistance>
 {
     Q_OBJECT
 public:
     void init() override;
 
-    bool exec(ScalarEntityDistance &distance) override;
+    std::expected<ScalarEntityDistance, QString> exec() override;
 
 };
 

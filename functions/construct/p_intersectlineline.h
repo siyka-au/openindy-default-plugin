@@ -19,7 +19,7 @@ enum IntersectionTypes {
 /*!
  * \brief The IntersectLineline class
  */
-class IntersectLineLine : public ConstructFunction
+class IntersectLineLine : public ConstructFunction, public Producer<Point>
 {
     Q_OBJECT
 
@@ -31,13 +31,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Point &point);
+    std::expected<Point, QString> exec() override;
 
 private:
 

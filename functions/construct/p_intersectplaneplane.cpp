@@ -35,8 +35,12 @@ void IntersectPlanePlane::init(){
  * \param line
  * \return
  */
-bool IntersectPlanePlane::exec(Line &line){
-    return this->setUpResult(line);
+std::expected<Line, QString> IntersectPlanePlane::exec(){
+    Line line;
+    if(!this->setUpResult(line)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return line;
 }
 
 /*!

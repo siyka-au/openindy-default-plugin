@@ -31,8 +31,12 @@ void PointFromPlaneOrigin::init(){
  * \param point
  * \return
  */
-bool PointFromPlaneOrigin::exec(Point &point){
-    return this->setUpResult(point);
+std::expected<Point, QString> PointFromPlaneOrigin::exec(){
+    Point point;
+    if(!this->setUpResult(point)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return point;
 }
 
 /*!

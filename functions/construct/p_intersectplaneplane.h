@@ -13,8 +13,8 @@ using namespace oi;
 /*!
  * \brief The IntersectPlanePlane class
  */
-class IntersectPlanePlane : public ConstructFunction
-{  
+class IntersectPlanePlane : public ConstructFunction, public Producer<Line>
+{
     Q_OBJECT
 
 public:
@@ -25,13 +25,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Line &line);
+    std::expected<Line, QString> exec() override;
 
 private:
 

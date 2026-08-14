@@ -10,8 +10,8 @@
 
 using namespace oi;
 
-class TranslateByValue : public ObjectTransformation
-{  
+class TranslateByValue : public ObjectTransformation, public Transform<Point>, public Transform<Line>, public Transform<Plane>, public Transform<Sphere>
+{
     Q_OBJECT
 
 public:
@@ -22,16 +22,14 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Point &point);
-    bool exec(Line &line);
-    bool exec(Plane &plane);
-    bool exec(Sphere &sphere);
+    std::expected<Point, QString> exec(const Point &input) override;
+    std::expected<Line, QString> exec(const Line &input) override;
+    std::expected<Plane, QString> exec(const Plane &input) override;
+    std::expected<Sphere, QString> exec(const Sphere &input) override;
 
 private:
 

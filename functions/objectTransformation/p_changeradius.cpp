@@ -28,26 +28,38 @@ void ChangeRadius::init(){
  * \param sphere
  * \return
  */
-bool ChangeRadius::exec(Sphere &sphere){
-    return this->setUpResult(sphere);
+std::expected<Sphere, QString> ChangeRadius::exec(const Sphere &input){
+    Sphere sphere = input;
+    if(!this->setUpResult(sphere)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return sphere;
 }
 
 /*!
  * \brief ChangeRadius::exec
- * \param circle
+ * \param input
  * \return
  */
-bool ChangeRadius::exec(Circle &circle){
-    return this->setUpResult(circle);
+std::expected<Circle, QString> ChangeRadius::exec(const Circle &input){
+    Circle circle = input;
+    if(!this->setUpResult(circle)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return circle;
 }
 
 /*!
  * \brief ChangeRadius::exec
- * \param cylinder
+ * \param input
  * \return
  */
-bool ChangeRadius::exec(Cylinder &cylinder){
-    return this->setUpResult(cylinder);
+std::expected<Cylinder, QString> ChangeRadius::exec(const Cylinder &input){
+    Cylinder cylinder = input;
+    if(!this->setUpResult(cylinder)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return cylinder;
 }
 
 /*!

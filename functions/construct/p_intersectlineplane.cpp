@@ -35,8 +35,12 @@ void IntersectLinePlane::init(){
  * \param point
  * \return
  */
-bool IntersectLinePlane::exec(Point &point){
-    return this->setUpResult(point);
+std::expected<Point, QString> IntersectLinePlane::exec(){
+    Point point;
+    if(!this->setUpResult(point)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return point;
 }
 
 

@@ -13,8 +13,8 @@ using namespace oi;
 /*!
  * \brief The ChangeRadius class
  */
-class ChangeRadius : public ObjectTransformation
-{  
+class ChangeRadius : public ObjectTransformation, public Transform<Sphere>, public Transform<Circle>, public Transform<Cylinder>
+{
     Q_OBJECT
 
 public:
@@ -25,15 +25,13 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Sphere &sphere);
-    bool exec(Circle &circle);
-    bool exec(Cylinder &cylinder);
+    std::expected<Sphere, QString> exec(const Sphere &input) override;
+    std::expected<Circle, QString> exec(const Circle &input) override;
+    std::expected<Cylinder, QString> exec(const Cylinder &input) override;
 
 private:
 

@@ -13,7 +13,7 @@ using namespace oi;
 /*!
  * \brief The RectifyToPoint class
  */
-class RectifyToPoint : public ObjectTransformation
+class RectifyToPoint : public ObjectTransformation, public Transform<Plane>, public Transform<Circle>, public Transform<Line>, public Transform<Cylinder>
 {
     Q_OBJECT
 
@@ -25,16 +25,14 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Plane &plane);
-    bool exec(Circle &circle);
-    bool exec(Line &line);
-    bool exec(Cylinder &cylinder);
+    std::expected<Plane, QString> exec(const Plane &input) override;
+    std::expected<Circle, QString> exec(const Circle &input) override;
+    std::expected<Line, QString> exec(const Line &input) override;
+    std::expected<Cylinder, QString> exec(const Cylinder &input) override;
 
 private:
 

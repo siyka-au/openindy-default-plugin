@@ -23,7 +23,7 @@ using namespace oi;
  * deliberately out of scope here - this reads literal scalars only.
  * Tolerance is deferred too; there is nowhere to attach it yet.
  */
-class NominalPoint : public ConstructFunction
+class NominalPoint : public ConstructFunction, public Producer<Point>
 {
     Q_OBJECT
 
@@ -35,13 +35,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Point &point);
+    std::expected<Point, QString> exec() override;
 
 };
 

@@ -14,8 +14,8 @@ using namespace oi;
 /*!
  * \brief The BestFitPlane class
  */
-class BestFitPlane : public FitFunction, public BestFitPlaneUtil
-{  
+class BestFitPlane : public FitFunction, public BestFitPlaneUtil, public Producer<Plane>
+{
     Q_OBJECT
 
 public:
@@ -26,13 +26,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Plane &plane);
+    std::expected<Plane, QString> exec() override;
 
 private:
 

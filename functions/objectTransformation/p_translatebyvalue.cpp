@@ -36,35 +36,51 @@ void TranslateByValue::init(){
  * \param point
  * \return
  */
-bool TranslateByValue::exec(Point &point){
-    return this->setUpResult(point);
+std::expected<Point, QString> TranslateByValue::exec(const Point &input){
+    Point point = input;
+    if(!this->setUpResult(point)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return point;
 }
 
 /*!
  * \brief TranslateByValue::exec
- * \param line
+ * \param input
  * \return
  */
-bool TranslateByValue::exec(Line &line){
-    return this->setUpResult(line);
+std::expected<Line, QString> TranslateByValue::exec(const Line &input){
+    Line line = input;
+    if(!this->setUpResult(line)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return line;
 }
 
 /*!
  * \brief TranslateByValue::exec
- * \param plane
+ * \param input
  * \return
  */
-bool TranslateByValue::exec(Plane &plane){
-    return this->setUpResult(plane);
+std::expected<Plane, QString> TranslateByValue::exec(const Plane &input){
+    Plane plane = input;
+    if(!this->setUpResult(plane)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return plane;
 }
 
 /*!
  * \brief TranslateByValue::exec
- * \param sphere
+ * \param input
  * \return
  */
-bool TranslateByValue::exec(Sphere &sphere){
-    return this->setUpResult(sphere);
+std::expected<Sphere, QString> TranslateByValue::exec(const Sphere &input){
+    Sphere sphere = input;
+    if(!this->setUpResult(sphere)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return sphere;
 }
 
 /*!

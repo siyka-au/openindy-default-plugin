@@ -32,9 +32,13 @@ void BestFitLine::init(){
  * \param line
  * \return
  */
-bool BestFitLine::exec(Line &line){
+std::expected<Line, QString> BestFitLine::exec(){
     this->statistic.reset();
-    return this->setUpResult(line);
+    Line line;
+    if(!this->setUpResult(line)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return line;
 }
 
 /*!

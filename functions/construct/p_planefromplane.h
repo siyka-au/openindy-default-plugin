@@ -13,7 +13,7 @@ using namespace oi;
 /*!
  * \brief The PlaneFromPlane class
  */
-class PlaneFromPlane : public ConstructFunction
+class PlaneFromPlane : public ConstructFunction, public Producer<Plane>
 {
     Q_OBJECT
 
@@ -25,13 +25,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Plane &plane);
+    std::expected<Plane, QString> exec() override;
 
 private:
 

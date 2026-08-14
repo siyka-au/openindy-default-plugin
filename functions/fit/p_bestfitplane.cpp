@@ -44,12 +44,15 @@ void BestFitPlane::init(){
 
 /*!
  * \brief BestFitPlane::exec
- * \param plane
  * \return
  */
-bool BestFitPlane::exec(Plane &plane){
+std::expected<Plane, QString> BestFitPlane::exec(){
     this->statistic.reset();
-    return this->setUpResult(plane);
+    Plane plane;
+    if(!this->setUpResult(plane)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return plane;
 }
 
 /*!

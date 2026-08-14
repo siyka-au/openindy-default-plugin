@@ -13,8 +13,8 @@ using namespace oi;
 /*!
  * \brief The BestFitCylinder class
  */
-class BestFitCylinder : public FitFunction, public BestFitCylinderUtil
-{  
+class BestFitCylinder : public FitFunction, public BestFitCylinderUtil, public Producer<Cylinder>
+{
     Q_OBJECT
 
 public:
@@ -25,13 +25,11 @@ public:
 
     void init() override;
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Cylinder &cylinder) override;
+    std::expected<Cylinder, QString> exec() override;
 
 private:
 

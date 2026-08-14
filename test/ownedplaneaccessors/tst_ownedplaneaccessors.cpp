@@ -35,7 +35,7 @@ Direction dir(double i, double j, double k){
  * re-solved to a new value) without a real BestFitPlane/points setup -
  * mutable so a test can simulate re-measuring the plane between recalcs.
  */
-class SetPlaneFunction : public ConstructFunction {
+class SetPlaneFunction : public ConstructFunction, public Producer<Plane> {
     Q_OBJECT
 public:
     SetPlaneFunction(QObject *parent = 0) : ConstructFunction(parent){
@@ -44,12 +44,12 @@ public:
     }
     Position position;
     Direction direction;
-protected:
-    bool exec(Plane &plane) override {
+    std::expected<Plane, QString> exec() override {
+        Plane plane;
         Position p = position;
         Direction d = direction;
         plane.setPlane(p, d);
-        return true;
+        return plane;
     }
 };
 

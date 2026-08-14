@@ -45,9 +45,13 @@ void BestFitCylinder::init(){
  * \param cylinder
  * \return
  */
-bool BestFitCylinder::exec(Cylinder &cylinder){
+std::expected<Cylinder, QString> BestFitCylinder::exec(){
     this->statistic.reset();
-    return BestFitCylinder::setUpResult(cylinder);
+    Cylinder cylinder;
+    if(!BestFitCylinder::setUpResult(cylinder)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return cylinder;
 }
 
 /*!

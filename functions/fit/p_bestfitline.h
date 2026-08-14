@@ -15,8 +15,8 @@ using namespace std;
 /*!
  * \brief The BestFitLine class
  */
-class BestFitLine : public FitFunction, public FunctionUtil
-{ 
+class BestFitLine : public FitFunction, public FunctionUtil, public Producer<Line>
+{
     Q_OBJECT
 
 public:
@@ -27,13 +27,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Line &line);
+    std::expected<Line, QString> exec() override;
 
 private:
 

@@ -33,10 +33,22 @@ void BestFitCircle::init(){
 
 /*!
  * \brief BestFitCircle::exec
+ * \return
+ */
+std::expected<Circle, QString> BestFitCircle::exec() {
+    Circle circle;
+    if(!this->setUpResult(circle)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return circle;
+}
+
+/*!
+ * \brief BestFitCircle::setUpResult
  * \param circle
  * \return
  */
-bool BestFitCircle::exec(Circle &circle) {
+bool BestFitCircle::setUpResult(Circle &circle) {
 
     //get and check input points
     if(!this->inputElements.contains(0) || this->inputElements[0].isEmpty()){

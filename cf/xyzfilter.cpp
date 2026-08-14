@@ -9,13 +9,15 @@ void XYZFilter::init() {
 }
 
 
-bool XYZFilter::exec(Point &point) {
+std::expected<Point, QString> XYZFilter::exec(const Point &input) {
     if(this->inputElements[0].isEmpty()) {
         emit this->sendMessage("inputElements[0] is empty", MessageTypes::eWarningMessage);
-        return false;
+        return std::unexpected(QString("XYZFilter: inputElements[0] is empty"));
     }
 
     oi::math::OiVec p = this->inputElements[0].first().geometry->getPosition().getVector();
+
+    Point point = input;
 
     oi::math::OiVec v = point.getPosition().getVector();
 
@@ -27,5 +29,5 @@ bool XYZFilter::exec(Point &point) {
     position.setVector(v);
     point.setPosition(position);
 
-    return true;
+    return point;
 }

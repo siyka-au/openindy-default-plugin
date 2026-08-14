@@ -25,7 +25,7 @@ using namespace oi;
  * recalculates when the plane changes, and needs no new machinery at all.
  * That is the answer to backfilling derived geometry by hand.
  */
-class LineFromPlaneNormal : public ConstructFunction
+class LineFromPlaneNormal : public ConstructFunction, public Producer<Line>
 {
     Q_OBJECT
 
@@ -37,13 +37,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Line &line);
+    std::expected<Line, QString> exec() override;
 
 private:
 

@@ -33,10 +33,22 @@ void BestFitSphere::init(){
 
 /*!
  * \brief BestFitSphere::exec
+ * \return
+ */
+std::expected<Sphere, QString> BestFitSphere::exec(){
+    Sphere sphere;
+    if(!this->setUpResult(sphere)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return sphere;
+}
+
+/*!
+ * \brief BestFitSphere::setUpResult
  * \param sphere
  * \return
  */
-bool BestFitSphere::exec(Sphere &sphere){
+bool BestFitSphere::setUpResult(Sphere &sphere){
 
     this->statistic.reset();
 

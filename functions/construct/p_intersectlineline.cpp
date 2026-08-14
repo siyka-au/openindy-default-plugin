@@ -56,8 +56,12 @@ IntersectionTypes IntersectLineLine::getIntersectionType() {
  * \param point
  * \return
  */
-bool IntersectLineLine::exec(Point &point){
-    return this->setUpResult(point);
+std::expected<Point, QString> IntersectLineLine::exec(){
+    Point point;
+    if(!this->setUpResult(point)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return point;
 }
 
 

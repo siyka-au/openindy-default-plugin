@@ -23,7 +23,7 @@ using namespace oi;
  * that D9 means (something an instrument actually observed); nothing was
  * measured here.
  */
-class PointFromPlaneOrigin : public ConstructFunction
+class PointFromPlaneOrigin : public ConstructFunction, public Producer<Point>
 {
     Q_OBJECT
 
@@ -35,13 +35,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Point &point);
+    std::expected<Point, QString> exec() override;
 
 private:
 

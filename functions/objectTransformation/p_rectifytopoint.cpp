@@ -43,37 +43,53 @@ void RectifyToPoint::init(){
  * \param plane
  * \return
  */
-bool RectifyToPoint::exec(Plane &plane){
-    return this->setUpResult(plane);
+std::expected<Plane, QString> RectifyToPoint::exec(const Plane &input){
+    Plane plane = input;
+    if(!this->setUpResult(plane)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return plane;
 }
 
 /*!
  * \brief RectifyToPoint::exec
- * \param circle
+ * \param input
  * \return
  */
-bool RectifyToPoint::exec(Circle &circle){
-    return this->setUpResult(circle);
+std::expected<Circle, QString> RectifyToPoint::exec(const Circle &input){
+    Circle circle = input;
+    if(!this->setUpResult(circle)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return circle;
 }
 
 /*!
  * \brief RectifyToPoint::exec
- * \param line
+ * \param input
  * \return
  */
-bool RectifyToPoint::exec(Line &line)
+std::expected<Line, QString> RectifyToPoint::exec(const Line &input)
 {
-    return this->setUpResult(line);
+    Line line = input;
+    if(!this->setUpResult(line)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return line;
 }
 
 /*!
  * \brief RectifyToPoint::exec
- * \param Cylinder
+ * \param input
  * \return
  */
-bool RectifyToPoint::exec(Cylinder &cylinder)
+std::expected<Cylinder, QString> RectifyToPoint::exec(const Cylinder &input)
 {
-    return this->setUpResult(cylinder);
+    Cylinder cylinder = input;
+    if(!this->setUpResult(cylinder)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return cylinder;
 }
 
 /*!

@@ -10,7 +10,7 @@ using namespace oi;
 /*!
  * \brief The BestFitCircle class
  */
-class BestFitCircle : public FitFunction
+class BestFitCircle : public FitFunction, public Producer<Circle>
 {
     Q_OBJECT
 
@@ -22,15 +22,15 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Circle &circle);
+    std::expected<Circle, QString> exec() override;
 
 private:
+
+    bool setUpResult(Circle &circle);
 
     OiVec getApproximatedPlane(int nop, double x[], double y[], double z[], double cx, double cy, double cz);
 };

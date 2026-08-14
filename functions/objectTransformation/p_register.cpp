@@ -32,26 +32,38 @@ void Register::init(){
  * \param point
  * \return
  */
-bool Register::exec(Point &point){
-    return this->setUpResult(point);
+std::expected<Point, QString> Register::exec(const Point &input){
+    Point point = input;
+    if(!this->setUpResult(point)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return point;
 }
 
 /*!
  * \brief Register::exec
- * \param sphere
+ * \param input
  * \return
  */
-bool Register::exec(Sphere &sphere){
-    return this->setUpResult(sphere);
+std::expected<Sphere, QString> Register::exec(const Sphere &input){
+    Sphere sphere = input;
+    if(!this->setUpResult(sphere)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return sphere;
 }
 
 /*!
  * \brief Register::exec
- * \param circle
+ * \param input
  * \return
  */
-bool Register::exec(Circle &circle){
-    return this->setUpResult(circle);
+std::expected<Circle, QString> Register::exec(const Circle &input){
+    Circle circle = input;
+    if(!this->setUpResult(circle)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return circle;
 }
 
 /*!

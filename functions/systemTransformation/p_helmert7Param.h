@@ -25,8 +25,8 @@ enum ScaleTypes{
     tempScale
 };
 
-class Helmert7Param : public SystemTransformation
-{  
+class Helmert7Param : public SystemTransformation, public Producer<TrafoParam>
+{
     Q_OBJECT
 
 public:
@@ -37,15 +37,15 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(TrafoParam &trafoParam);
+    std::expected<TrafoParam, QString> exec() override;
 
 private:
+
+    bool setUpResult(TrafoParam &trafoParam);
 
     //attributes
     bool svdError;

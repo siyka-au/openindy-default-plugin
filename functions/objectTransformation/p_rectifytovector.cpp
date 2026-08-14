@@ -51,37 +51,53 @@ void RectifyToVector::init(){
  * \param plane
  * \return
  */
-bool RectifyToVector::exec(Plane &plane){
-    return this->setUpResult(plane);
+std::expected<Plane, QString> RectifyToVector::exec(const Plane &input){
+    Plane plane = input;
+    if(!this->setUpResult(plane)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return plane;
 }
 
 /*!
  * \brief RectifyToVector::exec
- * \param circle
+ * \param input
  * \return
  */
-bool RectifyToVector::exec(Circle &circle){
-    return this->setUpResult(circle);
+std::expected<Circle, QString> RectifyToVector::exec(const Circle &input){
+    Circle circle = input;
+    if(!this->setUpResult(circle)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return circle;
 }
 
 /*!
  * \brief RectifyToVector::exec
- * \param line
+ * \param input
  * \return
  */
-bool RectifyToVector::exec(Line &line)
+std::expected<Line, QString> RectifyToVector::exec(const Line &input)
 {
-    return this->setUpResult(line);
+    Line line = input;
+    if(!this->setUpResult(line)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return line;
 }
 
 /*!
  * \brief RectifyToVector::exec
- * \param cylinder
+ * \param input
  * \return
  */
-bool RectifyToVector::exec(Cylinder &cylinder)
+std::expected<Cylinder, QString> RectifyToVector::exec(const Cylinder &input)
 {
-    return this->setUpResult(cylinder);
+    Cylinder cylinder = input;
+    if(!this->setUpResult(cylinder)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return cylinder;
 }
 
 /*!

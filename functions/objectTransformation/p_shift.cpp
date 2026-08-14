@@ -27,17 +27,25 @@ void Shift::init(){
  * \param plane
  * \return
  */
-bool Shift::exec(Plane &plane){
-    return this->setUpResult(plane);
+std::expected<Plane, QString> Shift::exec(const Plane &input){
+    Plane plane = input;
+    if(!this->setUpResult(plane)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return plane;
 }
 
 /*!
  * \brief Shift::exec
- * \param circle
+ * \param input
  * \return
  */
-bool Shift::exec(Circle &circle){
-    return this->setUpResult(circle);
+std::expected<Circle, QString> Shift::exec(const Circle &input){
+    Circle circle = input;
+    if(!this->setUpResult(circle)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return circle;
 }
 
 /*!

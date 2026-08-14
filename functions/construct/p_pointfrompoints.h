@@ -15,7 +15,7 @@ using namespace std;
 /*!
  * \brief The PointFromPoints class
  */
-class PointFromPoints : public ConstructFunction
+class PointFromPoints : public ConstructFunction, public Producer<Point>
 {
     Q_OBJECT
 
@@ -27,13 +27,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Point &point);
+    std::expected<Point, QString> exec() override;
 
 private:
 

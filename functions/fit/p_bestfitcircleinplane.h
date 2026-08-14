@@ -15,8 +15,8 @@ using namespace std;
 /*!
  * \brief The BestFitCircleInPlane class
  */
-class BestFitCircleInPlane : public FitFunction, public BestFitCircleUtil
-{ 
+class BestFitCircleInPlane : public FitFunction, public BestFitCircleUtil, public Producer<Circle>
+{
     Q_OBJECT
 
 public:
@@ -27,13 +27,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Circle &circle);
+    std::expected<Circle, QString> exec() override;
 
 private:
 

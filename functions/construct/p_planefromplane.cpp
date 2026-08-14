@@ -30,8 +30,12 @@ void PlaneFromPlane::init(){
  * \param plane
  * \return
  */
-bool PlaneFromPlane::exec(Plane &plane){
-    return this->setUpResult(plane);
+std::expected<Plane, QString> PlaneFromPlane::exec(){
+    Plane plane;
+    if(!this->setUpResult(plane)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return plane;
 }
 
 /*!

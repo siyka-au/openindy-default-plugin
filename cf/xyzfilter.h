@@ -12,7 +12,7 @@ using namespace oi;
 /**
  * @brief set axis to 0 and keeps others
  */
-class XYZFilter : public ConstructFunction
+class XYZFilter : public ConstructFunction, public Transform<Point>
 {
     Q_OBJECT
 public:
@@ -20,7 +20,7 @@ public:
 
     void init() override;
 
-    bool exec(Point &point) override;
+    std::expected<Point, QString> exec(const Point &input) override;
 
 private:
 

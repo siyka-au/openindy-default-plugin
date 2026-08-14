@@ -36,9 +36,13 @@ void BestFitPoint::init(){
  * \param point
  * \return
  */
-bool BestFitPoint::exec(Point &point){
+std::expected<Point, QString> BestFitPoint::exec(){
     this->statistic.reset();
-    return this->setUpResult(point);
+    Point point;
+    if(!this->setUpResult(point)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return point;
 }
 
 /*!

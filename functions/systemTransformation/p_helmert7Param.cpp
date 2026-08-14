@@ -52,7 +52,20 @@ void Helmert7Param::init(){
  * \param trafoParam
  * \return
  */
-bool Helmert7Param::exec(TrafoParam &trafoParam){
+std::expected<TrafoParam, QString> Helmert7Param::exec(){
+    TrafoParam trafoParam;
+    if(!this->setUpResult(trafoParam)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return trafoParam;
+}
+
+/*!
+ * \brief Helmert7Param::setUpResult
+ * \param trafoParam
+ * \return
+ */
+bool Helmert7Param::setUpResult(TrafoParam &trafoParam){
     this->svdError = false;
 
     this->initPoints(); //fills the locSystem and refSystem vectors based on the given common points.

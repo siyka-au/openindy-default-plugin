@@ -17,7 +17,7 @@ void ConfiguredFunction::init() {
     this->neededElements = config.getNeededElements();
 }
 
-bool ConfiguredFunction::exec(const QPointer<FeatureWrapper> &feature) {
+std::expected<void, QString> ConfiguredFunction::execChecked(const QPointer<FeatureWrapper> &feature) {
     try {
         ListVisitor visitors;
 
@@ -45,10 +45,10 @@ bool ConfiguredFunction::exec(const QPointer<FeatureWrapper> &feature) {
 
         TreeUtil::traversal(this->config.parameter, visitors);
 
-        return true;
+        return {};
     } catch(exception &e) {
         emit sendMessage(e.what(), MessageTypes::eErrorMessage, MessageDestinations::eConsoleMessage);
-        return false;
+        return std::unexpected(QString(e.what()));
     }
 }
 

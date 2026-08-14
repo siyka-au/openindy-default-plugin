@@ -31,8 +31,12 @@ void LineFromPlaneNormal::init(){
  * \param line
  * \return
  */
-bool LineFromPlaneNormal::exec(Line &line){
-    return this->setUpResult(line);
+std::expected<Line, QString> LineFromPlaneNormal::exec(){
+    Line line;
+    if(!this->setUpResult(line)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return line;
 }
 
 /*!

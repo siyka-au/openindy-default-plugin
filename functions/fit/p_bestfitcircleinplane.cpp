@@ -46,9 +46,13 @@ void BestFitCircleInPlane::init(){
  * \param circle
  * \return
  */
-bool BestFitCircleInPlane::exec(Circle &circle){
+std::expected<Circle, QString> BestFitCircleInPlane::exec(){
     this->statistic.reset();
-    return this->setUpResult(circle);
+    Circle circle;
+    if(!this->setUpResult(circle)){
+        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    }
+    return circle;
 }
 
 /*!

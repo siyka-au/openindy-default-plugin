@@ -33,7 +33,9 @@ void NominalPoint::init(){
  * \param point
  * \return
  */
-bool NominalPoint::exec(Point &point){
+std::expected<Point, QString> NominalPoint::exec(){
+
+    Point point;
 
     //user-entered values, falling back to the declared defaults - same
     //pattern as ObjectTransformation::ChangeRadius
@@ -54,6 +56,6 @@ bool NominalPoint::exec(Point &point){
 
     //no uncertainty - this is a specification, not a measurement
     //(tolerance is deferred and has nowhere to attach yet)
-    return true;
+    return point;
 
 }

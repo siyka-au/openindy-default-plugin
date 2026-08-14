@@ -10,7 +10,7 @@
 
 using namespace oi;
 
-class Shift : public ObjectTransformation
+class Shift : public ObjectTransformation, public Transform<Plane>, public Transform<Circle>
 {
     Q_OBJECT
 
@@ -22,14 +22,12 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Plane &plane);
-    bool exec(Circle &circle);
+    std::expected<Plane, QString> exec(const Plane &input) override;
+    std::expected<Circle, QString> exec(const Circle &input) override;
 
 private:
 

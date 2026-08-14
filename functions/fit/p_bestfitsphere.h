@@ -14,7 +14,7 @@ using namespace oi;
 /*!
  * \brief The BestFitSphere class
  */
-class BestFitSphere : public FitFunction
+class BestFitSphere : public FitFunction, public Producer<Sphere>
 {
     Q_OBJECT
 
@@ -26,13 +26,11 @@ public:
 
     void init();
 
-protected:
-
     //############
     //exec methods
     //############
 
-    bool exec(Sphere &sphere);
+    std::expected<Sphere, QString> exec() override;
 
 private:
 
@@ -40,6 +38,7 @@ private:
     //helper methods
     //##############
 
+    bool setUpResult(Sphere &sphere);
     bool approximate(Sphere &sphere, const QList<QPointer<Point> > &inputPoints);
     bool fit(Sphere &sphere, const QList<QPointer<Point> > &inputPoints, const QList<QPointer<Point> > &allUsablePoints);
 

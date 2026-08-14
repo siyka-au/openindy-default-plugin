@@ -22,7 +22,18 @@ class ConfiguredFunction : public SpecialFunction {
 public:
     ConfiguredFunction(ConfiguredFunctionConfig config, QList<QPointer<Function> > functions, QObject *parent = 0);
     void init() override;
-    bool exec(const QPointer<FeatureWrapper> &feature) override;
+
+    //Stage 7d/D21: overrides execChecked(), not exec(), because
+    //Feature::recalc() calls execChecked() directly (see feature.cpp) -
+    //the inherited bool Function::exec() wrapper forwards to whichever
+    //execChecked() override is most-derived, so cfvisitor.cpp's
+    //fd.function->exec(fd.feature) (called through a base Function*) keeps
+    //working unchanged. A ConfiguredFunction manages its own sub-function
+    //traversal (CFVisitor) rather than going through
+    //Function::execByFeatureType's Producer<T>/Transform<T> dispatch -
+    //Function::canActAsProducer/canActAsTransform exempt any
+    //SpecialFunction from the mixin check for the same reason.
+    std::expected<void, QString> execChecked(const QPointer<FeatureWrapper> &feature) override;
 
     QString prettyPrint();
 
