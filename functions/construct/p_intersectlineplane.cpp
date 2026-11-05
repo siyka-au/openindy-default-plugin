@@ -1,5 +1,7 @@
 #include "p_intersectlineplane.h"
 
+#include <math.h>
+
 /*!
  * \brief IntersectLinePlane::init
  */
@@ -77,7 +79,7 @@ bool IntersectLinePlane::setUpResult(Point& point) {
   p_n.normalize();  // normalize normal vector for plane
   double d = 0.0;   // distance plane to origin
   OiVec::dot(d, p_x0, p_n);
-  double h1, h2;
+  double h1 = NAN, h2 = NAN;
   OiVec::dot(h1, l_x0, p_n);
   OiVec::dot(h2, l_v, p_n);
   double lamda = (d - h1) / (h2);

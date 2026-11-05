@@ -96,7 +96,7 @@ QMultiMap<int, InputElementMapping> FunctionConfigParser::inputElementsMapping(
   foreach (QJsonValue element, value.toArray()) {
     QJsonObject object = element.toObject();
 
-    InputElementMapping mapping;
+    InputElementMapping mapping{};
     mapping.functionIndex = -1;
     mapping.srcInputElementIndex = -1;
     mapping.dstInputElementIndex = -1;

@@ -1,5 +1,7 @@
 #include "p_intersectlineline.h"
 
+#include <math.h>
+
 /*!
  * \brief IntersectLineLine::init
  */
@@ -104,16 +106,16 @@ bool IntersectLineLine::setUpResult(Point& point) {
   OiVec::cross(n1, v, cvw);
   OiVec::cross(n2, w, cvw);
 
-  double dan1;
-  double dbn1;
-  double dwn1;
+  double dan1 = NAN;
+  double dbn1 = NAN;
+  double dwn1 = NAN;
   OiVec::dot(dan1, a, n1);
   OiVec::dot(dbn1, b, n1);
   OiVec::dot(dwn1, w, n1);
 
-  double dbn2;
-  double dan2;
-  double dvn2;
+  double dbn2 = NAN;
+  double dan2 = NAN;
+  double dvn2 = NAN;
   OiVec::dot(dbn2, b, n2);
   OiVec::dot(dan2, a, n2);
   OiVec::dot(dvn2, v, n2);
@@ -143,7 +145,7 @@ bool IntersectLineLine::setUpResult(Point& point) {
 
   //  show / log distance between fg & fh
   OiVec delta = fline1 - fline2;
-  double dot;
+  double dot = NAN;
   OiVec::dot(dot, delta, delta);
   point.setDistance(sqrt(dot));
 

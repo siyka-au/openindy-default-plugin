@@ -1,5 +1,7 @@
 #include "p_rectifytopoint.h"
 
+#include <math.h>
+
 /*!
  * \brief RectifyToPoint::init
  */
@@ -145,7 +147,7 @@ bool RectifyToPoint::setUpResult(Geometry& geometry) {
   OiVec x = geometry.getPosition().getVector();
 
   // calculate the distance of the plane from the origin
-  double d;
+  double d = NAN;
   OiVec::dot(d, x, n);
   if (d < 0.0) {
     n = -1.0 * n;
@@ -153,7 +155,7 @@ bool RectifyToPoint::setUpResult(Geometry& geometry) {
   }
 
   // calculate the distance of the point position from the plane
-  double s;
+  double s = NAN;
   OiVec::dot(s, p, n);
   s = s - d;
 

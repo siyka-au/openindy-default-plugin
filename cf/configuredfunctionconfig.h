@@ -33,7 +33,7 @@ class ConfiguredFunctionConfig {
   QList<QString> getNeededElementNames();
 
  public:
-  int version;
+  int version{};
   QString name;
   QString description;
   QList<QPair<QString, NeededElement> > neededElements;

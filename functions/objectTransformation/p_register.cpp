@@ -1,5 +1,7 @@
 #include "p_register.h"
 
+#include <math.h>
+
 /*!
  * \brief Register::init
  */
@@ -118,7 +120,7 @@ bool Register::setUpResult(Sphere& sphere) {
   OiVec x_sphere = sphere.getPosition().getVector();
 
   // calculate the distance of the plane from the origin
-  double d;
+  double d = NAN;
   OiVec::dot(d, x_plane, n_plane);
   if (d < 0.0) {
     n_plane = -1.0 * n_plane;
@@ -126,7 +128,7 @@ bool Register::setUpResult(Sphere& sphere) {
   }
 
   // calculate the distance of the sphere position from the plane
-  double s;
+  double s = NAN;
   OiVec::dot(s, x_sphere, n_plane);
   s = s - d;
 
@@ -164,7 +166,7 @@ bool Register::setUpResult(Circle& circle) {
   OiVec x_circle = circle.getPosition().getVector();
 
   // calculate the distance of the plane from the origin
-  double d;
+  double d = NAN;
   OiVec::dot(d, x_plane, n_plane);
   if (d < 0.0) {
     n_plane = -1.0 * n_plane;
@@ -172,7 +174,7 @@ bool Register::setUpResult(Circle& circle) {
   }
 
   // calculate the distance of the sphere position from the plane
-  double s;
+  double s = NAN;
   OiVec::dot(s, x_circle, n_plane);
   s = s - d;
 

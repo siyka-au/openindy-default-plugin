@@ -1,5 +1,7 @@
 #include "p_bestfitcircle.h"
 
+#include <math.h>
+
 /*!
  * \brief BestFitCircle::init
  */
@@ -254,7 +256,7 @@ bool BestFitCircle::setUpResult(Circle& circle) {
   // Statistik
   Statistic myStats;
   myStats.setS0APriori(1.0);
-  double vv;
+  double vv = NAN;
   OiVec::dot(vv, v, v);
   myStats.setS0APosteriori((obsCount - 6) > 0 ? sqrt(vv / (obsCount - 6.0))
                                               : 1.0);

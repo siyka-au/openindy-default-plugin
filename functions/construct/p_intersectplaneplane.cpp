@@ -1,5 +1,7 @@
 #include "p_intersectplaneplane.h"
 
+#include <math.h>
+
 /*!
  * \brief IntersectPlanePlane::init
  */
@@ -91,7 +93,7 @@ bool IntersectPlanePlane::setUpResult(Line& line) {
   p2_n.normalize();  // normalized normal vector for plane 2
   OiVec d(3);  // distance vector with distances origin to plane 1, 2, 3 (plane
                // 3 is normal to plane 1 and 2)
-  double h1, h2;
+  double h1 = NAN, h2 = NAN;
   OiVec::dot(h1, p1_x0, p1_n);
   OiVec::dot(h2, p2_x0, p2_n);
   d.setAt(0, h1);

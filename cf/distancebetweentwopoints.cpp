@@ -1,5 +1,7 @@
 #include "distancebetweentwopoints.h"
 
+#include <math.h>
+
 void DistanceBetweenTwoPoints::init() {
   this->metaData.name = "DistanceBetweenTwoPoints";
   this->applicableFor.append(eScalarEntityDistanceFeature);
@@ -21,7 +23,7 @@ std::expected<ScalarEntityDistance, QString> DistanceBetweenTwoPoints::exec() {
   OiVec p1 = this->inputElements[0].first().geometry->getPosition().getVector();
   OiVec p2 = this->inputElements[1].first().geometry->getPosition().getVector();
   OiVec v = p2 - p1;
-  double dot;
+  double dot = NAN;
   OiVec::dot(dot, v, v);
   ScalarEntityDistance distance;
   distance.setDistance(qSqrt(dot));

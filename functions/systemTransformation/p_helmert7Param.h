@@ -43,7 +43,7 @@ class Helmert7Param : public SystemTransformation, public Producer<TrafoParam> {
   bool setUpResult(TrafoParam& trafoParam);
 
   // attributes
-  bool svdError;
+  bool svdError{};
 
   ScaleTypes scaleType;
 

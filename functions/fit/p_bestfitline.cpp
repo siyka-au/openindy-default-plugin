@@ -1,5 +1,7 @@
 #include "p_bestfitline.h"
 
+#include <math.h>
+
 void BestFitLine::init() {
   // set plugin meta data
   this->metaData.name = "BestFitLine";
@@ -139,7 +141,7 @@ bool BestFitLine::setUpResult(Line& line) {
     v_line.setAt(2, pos.getAt(2) - v_line.getAt(2));
 
     // set up display residual
-    double dot;
+    double dot = NAN;
     OiVec::dot(dot, v_line, v_line);
     addDisplayResidual(point->getId(), v_line.getAt(0), v_line.getAt(1),
                        v_line.getAt(2), qSqrt(dot));

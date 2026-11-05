@@ -45,20 +45,20 @@ class SimplePolarMeasurement : public SimulationModel {
   // all supported distributions;
   QStringList distributions;
 
-  double variance;
-  double expectation;
+  double variance{};
+  double expectation{};
 
-  bool newIteration;
+  bool newIteration{};
 
-  double refraction;
-  double distortedRefraction;
-  double verticalDn;
-  double horizontalDn;
+  double refraction{};
+  double distortedRefraction{};
+  double verticalDn{};
+  double horizontalDn{};
 
-  double ref_coefficientOfExpansion;
-  double ref_materialTemperature;
-  double coefficientOfExpansion;
-  double materialTemperature;
+  double ref_coefficientOfExpansion{};
+  double ref_materialTemperature{};
+  double coefficientOfExpansion{};
+  double materialTemperature{};
 
   double distortComponent(UncertaintyComponent u);
 

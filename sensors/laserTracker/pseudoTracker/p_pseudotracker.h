@@ -103,21 +103,21 @@ class PseudoTracker : public LaserTracker {
   // helper variables
   // ################
 
-  double myAzimuth;
-  double myZenith;
-  double myDistance;
+  double myAzimuth{};
+  double myZenith{};
+  double myDistance{};
 
-  bool myMotor;
-  bool myInit;
-  bool myCompIt;
-  int side;
-  bool isConnected;
+  bool myMotor{};
+  bool myInit{};
+  bool myCompIt{};
+  int side{};
+  bool isConnected{};
 
   std::atomic<bool> isScanning;
 
   std::atomic<bool> returnReading;
 
-  int measureTime;  // [ms]
+  int measureTime{};  // [ms]
 };
 
 #endif  // P_PSEUDOTRACKER_H
