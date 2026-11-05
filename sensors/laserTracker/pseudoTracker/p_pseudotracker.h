@@ -97,7 +97,7 @@ class PseudoTracker : public LaserTracker {
   //! instance's configured error terms - sigmaAzimuth/sigmaZenith/
   //! sigmaDistance on the result are this model's own estimate of the
   //! noise it just applied, not a static default
-  ReadingPolar simulateAim() const;
+  [[nodiscard]] ReadingPolar simulateAim() const;
 
   // ################
   // helper variables

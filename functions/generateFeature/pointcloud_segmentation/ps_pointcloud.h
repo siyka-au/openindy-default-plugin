@@ -35,7 +35,7 @@ struct PlaneParameter {
   bool detectPlanes;       // true if planes shall be detected, false if not
   unsigned int minPoints;  // minimum number of points that a plane has to
                            // contain to be detected
-  float maxDistance;  // maximum orthogonal distance of a point from an
+  float maxDistance;       // maximum orthogonal distance of a point from an
                       // estimated plane so that the point is still associated
                       // with the plane
 };
@@ -45,7 +45,7 @@ struct SphereParameter {
   bool detectSpheres;      // true if spheres shall be detected, false if not
   unsigned int minPoints;  // minimum number of points that a sphere has to
                            // contain to be detected
-  float maxDistance;  // maximum orthogonal distance of a point from an
+  float maxDistance;       // maximum orthogonal distance of a point from an
                       // estimated sphere so that the point is still associated
                       // with the sphere
   float minRadius;  // minimum radius of detected spheres
@@ -57,11 +57,11 @@ struct CylinderParameter {
   bool detectCylinders;    // true if cylinders shall be detected, false if not
   unsigned int minPoints;  // minimum number of points that a cylinder has to
                            // contain to be detected
-  float maxDistance;  // maximum orthogonal distance of a point from an
-                      // estimated cylinder so that the point is still
-                      // associated with the cylinder
-  float minRadius;  // minimum radius of detected spheres
-  float maxRadius;  // maximum radius of detected spheres
+  float maxDistance;       // maximum orthogonal distance of a point from an
+                           // estimated cylinder so that the point is still
+                           // associated with the cylinder
+  float minRadius;         // minimum radius of detected spheres
+  float maxRadius;         // maximum radius of detected spheres
 };
 
 //! input parameter for pointcloud segmentation
@@ -69,8 +69,8 @@ struct PS_InputParameter {
   unsigned int leafSize;    // maximum number of points in one leaf-voxel
   float outlierPercentage;  // estimated percentage of outlier points in a leaf
                             // voxel (between 0.0 and 1.0)
-  float fitSampleSize;  // percentage of points of a shape used to fit it by
-                        // sample
+  float fitSampleSize;      // percentage of points of a shape used to fit it by
+                            // sample
   bool finalFit;  // true if all detected shapes shall be fit at the end using
                   // all points
   PlaneParameter planeParams;        // special plane parameter

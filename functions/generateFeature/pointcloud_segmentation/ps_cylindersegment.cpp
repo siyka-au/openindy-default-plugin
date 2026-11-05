@@ -1508,7 +1508,7 @@ void PS_CylinderSegment::mergeCylinders(
         qDebug() << "size " << mergedCylinder->getPointCount();*/
 
         if (mergedCylinder->getIsValid()  //&& mergedCylinder->getSigma() <=
-                                          //param.cylinderParams.maxDistance
+                                          // param.cylinderParams.maxDistance
             && mergedCylinder->getRadius() >= param.cylinderParams.minRadius &&
             mergedCylinder->getRadius() <= param.cylinderParams.maxRadius &&
             mergedCylinder->getPoints().size() > c1->getPoints().size() &&

@@ -533,7 +533,7 @@ void PS_PlaneSegment::mergePlanes(const QList<PS_PlaneSegment*>& detectedPlanes,
 
         // if the merged plane's standard deviation is ok
         if (mergedPlane->getIsValid()  //&& mergedPlane->getSigma() <=
-                                       //param.planeParams.maxDistance
+                                       // param.planeParams.maxDistance
             && mergedPlane->getPointCount() > p1->getPointCount() &&
             mergedPlane->getPointCount() > p2->getPointCount()) {
           // qDebug() << "deleted: " <<

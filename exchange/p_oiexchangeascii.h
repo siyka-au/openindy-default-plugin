@@ -45,7 +45,8 @@ class OiExchangeAscii : public ExchangeSimpleAscii {
   // helper methods
   // ##############
 
-  QRegularExpression getDelimiter(const QString& delimiterName) const;
+  [[nodiscard]] QRegularExpression getDelimiter(
+      const QString& delimiterName) const;
 };
 
 #endif  // P_OIEXCHANGEASCII_H

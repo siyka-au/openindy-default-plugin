@@ -58,11 +58,12 @@ class TrackerErrorModel {
 
   //! one noisy draw from a true polar observation, with sigmaAzimuth/
   //! sigmaZenith/sigmaDistance set from the model's own resampled scatter
-  ReadingPolar apply(double trueAzimuth, double trueZenith,
-                     double trueDistance) const;
+  [[nodiscard]] ReadingPolar apply(double trueAzimuth, double trueZenith,
+                                   double trueDistance) const;
 
  private:
-  ReadingPolar sampleOnce(double azimuth, double zenith, double distance) const;
+  [[nodiscard]] ReadingPolar sampleOnce(double azimuth, double zenith,
+                                        double distance) const;
 
   TrackerErrorTerms terms;
   int samples;

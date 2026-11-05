@@ -41,8 +41,8 @@ class PS_Node {
       points;  // vector with references to points in the pointcloud
 
  private:
-  bool consideredAsSeed;  // is set to true as soon as this node has been
-                          // considered as a seed region
+  bool consideredAsSeed;   // is set to true as soon as this node has been
+                           // considered as a seed region
   bool consideredInMerge;  // is set to true as soon as this node or all its
                            // subnodes were considered in merging step
 
