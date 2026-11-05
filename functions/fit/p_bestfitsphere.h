@@ -22,7 +22,7 @@ class BestFitSphere : public FitFunction, public Producer<Sphere> {
   // function initialization method
   // ##############################
 
-  void init();
+  void init() override;
 
   // ############
   // exec methods

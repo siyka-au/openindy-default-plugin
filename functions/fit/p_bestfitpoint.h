@@ -19,7 +19,7 @@ class BestFitPoint : public FitFunction, public Producer<Point> {
   Q_OBJECT
 
  public:
-  BestFitPoint(QObject* parent = 0)
+  BestFitPoint(QObject* parent = nullptr)
       : FitFunction(parent),
         key("disable all observations but last one"),
         value_no("no"),
@@ -29,7 +29,7 @@ class BestFitPoint : public FitFunction, public Producer<Point> {
   // function initialization method
   // ##############################
 
-  void init();
+  void init() override;
 
   // ############
   // exec methods

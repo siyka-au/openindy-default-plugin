@@ -18,7 +18,7 @@ class BestFitCircle : public FitFunction, public Producer<Circle> {
   // function initialization method
   // ##############################
 
-  void init();
+  void init() override;
 
   // ############
   // exec methods

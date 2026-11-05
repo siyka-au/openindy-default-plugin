@@ -16,7 +16,7 @@ class XYZFilter : public ConstructFunction, public Transform<Point> {
   Q_OBJECT
  public:
   XYZFilter(QString name, bool removeX, bool removeY, bool removeZ,
-            QObject* parent = 0);
+            QObject* parent = nullptr);
 
   void init() override;
 

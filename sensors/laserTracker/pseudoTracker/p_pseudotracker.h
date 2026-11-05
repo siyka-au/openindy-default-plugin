@@ -29,62 +29,62 @@ class PseudoTracker : public LaserTracker {
   // sensor initialization method
   // ############################
 
-  void init();
+  void init() override;
 
   // ########################
   // sensor state and actions
   // ########################
 
-  bool doSelfDefinedAction(const QString& action);
-  bool abortAction();
+  bool doSelfDefinedAction(const QString& action) override;
+  bool abortAction() override;
 
   //! connect app with laser tracker
-  bool connectSensor();
+  bool connectSensor() override;
 
   //! disconnect app with laser tracker
-  bool disconnectSensor();
+  bool disconnectSensor() override;
 
   //! laser tracker measures a point and returns an observation
-  QList<QPointer<Reading> > measure(const MeasurementConfig& mConfig);
+  QList<QPointer<Reading> > measure(const MeasurementConfig& mConfig) override;
 
   //! stream
-  QVariantMap readingStream(const ReadingTypes& streamFormat);
+  QVariantMap readingStream(const ReadingTypes& streamFormat) override;
 
   //! getConnectionState
-  bool getConnectionState();
+  bool getConnectionState() override;
 
   //! return ready state of the sensor
-  bool getIsReadyForMeasurement();
+  bool getIsReadyForMeasurement() override;
 
   //! sensor stats
-  QMap<QString, QString> getSensorStatus();
+  QMap<QString, QString> getSensorStatus() override;
 
   //! checks if sensor is busy
-  bool getIsBusy();
+  bool getIsBusy() override;
 
-  bool search();
+  bool search() override;
 
  protected:
   //! starts initialization
-  bool initialize();
+  bool initialize() override;
 
   //! move laser tracker to specified position
   bool move(const double& azimuth, const double& zenith, const double& distance,
-            const bool& isRelative);
+            const bool& isRelative) override;
 
-  bool move(const double& x, const double& y, const double& z);
+  bool move(const double& x, const double& y, const double& z) override;
 
   //! sets laser tracke to home position
-  bool home();
+  bool home() override;
 
   //! turns motors on or off
-  bool changeMotorState();
+  bool changeMotorState() override;
 
   //! toggle between frontside and backside
-  bool toggleSightOrientation();
+  bool toggleSightOrientation() override;
 
   //! compensation
-  bool compensation();
+  bool compensation() override;
 
  private:
   QList<QPointer<Reading> > measurePolar(const MeasurementConfig& mConfig);

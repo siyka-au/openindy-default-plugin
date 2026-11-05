@@ -21,7 +21,7 @@ class PlaneFromPlane : public ConstructFunction, public Producer<Plane> {
   // function initialization method
   // ##############################
 
-  void init();
+  void init() override;
 
   // ############
   // exec methods

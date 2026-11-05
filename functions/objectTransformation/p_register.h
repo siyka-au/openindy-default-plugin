@@ -25,7 +25,7 @@ class Register : public ObjectTransformation,
   // function initialization method
   // ##############################
 
-  void init();
+  void init() override;
 
   // ############
   // exec methods

@@ -379,7 +379,7 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
   QVariantMap m;
 
-  QPointer<Reading> r(NULL);
+  QPointer<Reading> r(nullptr);
 
   switch (streamFormat) {
     case ePolarReading: {

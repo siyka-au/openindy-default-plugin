@@ -25,7 +25,7 @@ class BestFitCircleInPlane : public FitFunction,
   // function initialization method
   // ##############################
 
-  void init();
+  void init() override;
 
   // ############
   // exec methods

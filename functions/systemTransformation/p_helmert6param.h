@@ -19,7 +19,7 @@ class Helmert6Param : public Helmert7Param {
   // function initialization method
   // ##############################
 
-  void init();
+  void init() override;
 };
 
 #endif  // P_HELMERT6PARAM_H

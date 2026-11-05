@@ -21,7 +21,8 @@ class ConfiguredFunction : public SpecialFunction {
 
  public:
   ConfiguredFunction(ConfiguredFunctionConfig config,
-                     QList<QPointer<Function> > functions, QObject* parent = 0);
+                     QList<QPointer<Function> > functions,
+                     QObject* parent = nullptr);
   void init() override;
 
   // Stage 7d/D21: overrides execChecked(), not exec(), because

@@ -20,14 +20,14 @@ class OiExchangeAscii : public ExchangeSimpleAscii {
   // exchange initialization method
   // ##############################
 
-  void init();
+  void init() override;
 
   // #########################
   // import and export methods
   // #########################
 
-  void importOiData();
-  void exportOiData();
+  void importOiData() override;
+  void exportOiData() override;
 
   // #########################################
   // methods to get or set further information

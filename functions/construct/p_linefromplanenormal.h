@@ -33,7 +33,7 @@ class LineFromPlaneNormal : public ConstructFunction, public Producer<Line> {
   // function initialization method
   // ##############################
 
-  void init();
+  void init() override;
 
   // ############
   // exec methods

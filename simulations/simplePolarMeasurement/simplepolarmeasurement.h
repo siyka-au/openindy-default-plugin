@@ -29,17 +29,17 @@ class SimplePolarMeasurement : public SimulationModel {
   // simulation initialization method
   // ################################
 
-  void init();
+  void init() override;
 
   // ##################
   // simulation methods
   // ##################
 
   bool distort(const QPointer<Reading>& r, const OiMat& objectRelation,
-               const bool& newIterationStart);
-  bool analyseSimulationData(UncertaintyData& d);
+               const bool& newIterationStart) override;
+  bool analyseSimulationData(UncertaintyData& d) override;
   double getCorrelationCoefficient(const QList<double>& x,
-                                   const QList<double>& y);
+                                   const QList<double>& y) override;
 
  private:
   // all supported distributions;

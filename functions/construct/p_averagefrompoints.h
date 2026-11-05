@@ -41,7 +41,7 @@ class AverageFromPoints : public ConstructFunction, public Producer<Point> {
   // function initialization method
   // ##############################
 
-  void init();
+  void init() override;
 
   // ############
   // exec methods

@@ -123,7 +123,7 @@ OiTemplatePlugin::createDefinedFormatExchanges() {
  * \return
  */
 QPointer<Sensor> OiTemplatePlugin::createSensor(const QString& name) {
-  QPointer<Sensor> result(NULL);
+  QPointer<Sensor> result(nullptr);
   if (name.compare("PseudoTracker") == 0) {
     result = new PseudoTracker();
   }
@@ -137,7 +137,7 @@ QPointer<Sensor> OiTemplatePlugin::createSensor(const QString& name) {
  * \return
  */
 QPointer<Function> OiTemplatePlugin::createFunction(const QString& name) {
-  QPointer<Function> result(NULL);
+  QPointer<Function> result(nullptr);
   if (name.compare("NominalPoint") == 0) {
     result = new NominalPoint();
   } else if (name.compare("BestFitPoint") == 0) {
@@ -211,7 +211,7 @@ QPointer<Function> OiTemplatePlugin::createFunctionFromConfig(
     return new XYZFilter("YZFilter", false, true, true);  // keep X
   }
 
-  QPointer<Function> function(NULL);
+  QPointer<Function> function(nullptr);
 
   FunctionConfigParser parser;
   foreach (ConfiguredFunctionConfig config, parser.readConfigFromJson()) {
@@ -250,7 +250,7 @@ QPointer<Function> OiTemplatePlugin::createFunctionFromConfig(
  */
 QPointer<BundleAdjustment> OiTemplatePlugin::createBundleAdjustment(
     const QString& name) {
-  QPointer<BundleAdjustment> result(NULL);
+  QPointer<BundleAdjustment> result(nullptr);
   return result;
 }
 
@@ -262,7 +262,7 @@ QPointer<BundleAdjustment> OiTemplatePlugin::createBundleAdjustment(
  */
 QPointer<SimulationModel> OiTemplatePlugin::createSimulation(
     const QString& name) {
-  QPointer<SimulationModel> result(NULL);
+  QPointer<SimulationModel> result(nullptr);
 
   if (name.compare("SimplePolarMeasurement") == 0) {
     result = new SimplePolarMeasurement();
@@ -277,7 +277,7 @@ QPointer<SimulationModel> OiTemplatePlugin::createSimulation(
  * \return
  */
 QPointer<Tool> OiTemplatePlugin::createTool(const QString& name) {
-  QPointer<Tool> result(NULL);
+  QPointer<Tool> result(nullptr);
   return result;
 }
 
@@ -288,7 +288,7 @@ QPointer<Tool> OiTemplatePlugin::createTool(const QString& name) {
  */
 QPointer<ExchangeSimpleAscii> OiTemplatePlugin::createSimpleAsciiExchange(
     const QString& name) {
-  QPointer<ExchangeSimpleAscii> result(NULL);
+  QPointer<ExchangeSimpleAscii> result(nullptr);
 
   if (name.compare("OiExchangeAscii") == 0) {
     result = new OiExchangeAscii();
@@ -304,6 +304,6 @@ QPointer<ExchangeSimpleAscii> OiTemplatePlugin::createSimpleAsciiExchange(
  */
 QPointer<ExchangeDefinedFormat> OiTemplatePlugin::createDefinedFormatExchange(
     const QString& name) {
-  QPointer<ExchangeDefinedFormat> result(NULL);
+  QPointer<ExchangeDefinedFormat> result(nullptr);
   return result;
 }

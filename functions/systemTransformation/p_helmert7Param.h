@@ -31,7 +31,7 @@ class Helmert7Param : public SystemTransformation, public Producer<TrafoParam> {
   // function initialization method
   // ##############################
 
-  void init();
+  void init() override;
 
   // ############
   // exec methods
