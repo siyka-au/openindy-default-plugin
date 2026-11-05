@@ -438,7 +438,7 @@ bool Helmert7Param::adjust_7p(TrafoParam& tp) {
   // iterate till solution is ok
   int iterations = 0;
   OiVec stop;
-  do {
+  while (true) {
     // A matrix
     a = this->fillAMatrix(x0);
 
@@ -467,8 +467,11 @@ bool Helmert7Param::adjust_7p(TrafoParam& tp) {
     stop = x.t() * x;
     iterations++;
 
-  } while (stop.getAt(0) > (0.000001) ||
-           iterations < 100);  // termination criterion
+    // termination criterion
+    if (!(stop.getAt(0) > (0.000001) || iterations < 100)) {
+      break;
+    }
+  }
 
   // if(iterations < 100){ //adjustment successful
   OiVec v = a * x - l_diff;

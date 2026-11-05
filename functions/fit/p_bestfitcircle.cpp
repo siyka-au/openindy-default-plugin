@@ -86,9 +86,9 @@ bool BestFitCircle::setUpResult(Circle& circle) {
   int obsCount = inputPoints.size();
 
   // fill x,y,z arrays
-  double* x = new double[obsCount];
-  double* y = new double[obsCount];
-  double* z = new double[obsCount];
+  std::vector<double> x(obsCount);
+  std::vector<double> y(obsCount);
+  std::vector<double> z(obsCount);
 
   int k = 0;
 
@@ -312,9 +312,10 @@ bool BestFitCircle::setUpResult(Circle& circle) {
  * @param cz Z-value of centroid
  * @return plane
  */
-OiVec BestFitCircle::getApproximatedPlane(int nop, double x[], double y[],
-                                          double z[], double cx, double cy,
-                                          double cz) {
+OiVec BestFitCircle::getApproximatedPlane(int nop, std::span<const double> x,
+                                          std::span<const double> y,
+                                          std::span<const double> z, double cx,
+                                          double cy, double cz) {
   OiVec X(4);
   OiMat H(3, 3);
   for (int k = 0; k < nop; k++) {

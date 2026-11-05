@@ -196,7 +196,7 @@ bool BestFitSphere::fit(Sphere& sphere,
   OiVec xd(4);
   double xdxd = 0.0;
   OiVec verb(inputPoints.size() * 3);
-  do {
+  while (true) {
     OiMat A(inputPoints.size(), 4);
     OiMat B(inputPoints.size(), inputPoints.size() * 3);
     OiVec w(inputPoints.size());
@@ -277,7 +277,10 @@ bool BestFitSphere::fit(Sphere& sphere,
 
     OiVec::dot(xdxd, xd, xd);
 
-  } while ((xdxd > 0.000001) && (numIterations < 101));
+    if (!((xdxd > 0.000001) && (numIterations < 101))) {
+      break;
+    }
+  }
 
   if (numIterations >= 101) {
     emit this->sendMessage("No solution found during 100 iterations",

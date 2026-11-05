@@ -316,7 +316,7 @@ QList<QPointer<Reading> > PseudoTracker::measure(
           : 1000;
   this->isScanning = meaurementTypeScan;
 
-  do {
+  while (true) {
     for (int face = 0; face < faceCount; face++) {
       switch (getReadingType(mConfig)) {
         case ePolarReading: {
@@ -347,7 +347,10 @@ QList<QPointer<Reading> > PseudoTracker::measure(
     }
     qDebug() << "isScanning: " << isScanning;
 
-  } while (meaurementTypeScan && scanPointCount-- > 1 && this->isScanning);
+    if (!(meaurementTypeScan && scanPointCount-- > 1 && this->isScanning)) {
+      break;
+    }
+  }
   this->isScanning = false;
 
   if (readings.size() > 0) {

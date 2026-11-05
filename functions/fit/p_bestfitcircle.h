@@ -1,6 +1,9 @@
 #ifndef P_BESTFITCIRCLE_H
 #define P_BESTFITCIRCLE_H
 
+#include <span>
+#include <vector>
+
 #include "fitfunction.h"
 #include "oimat.h"
 #include "oivec.h"
@@ -29,8 +32,10 @@ class BestFitCircle : public FitFunction, public Producer<Circle> {
  private:
   bool setUpResult(Circle& circle);
 
-  OiVec getApproximatedPlane(int nop, double x[], double y[], double z[],
-                             double cx, double cy, double cz);
+  OiVec getApproximatedPlane(int nop, std::span<const double> x,
+                             std::span<const double> y,
+                             std::span<const double> z, double cx, double cy,
+                             double cz);
 };
 
 #endif  // P_BESTFITCIRCLE_H
