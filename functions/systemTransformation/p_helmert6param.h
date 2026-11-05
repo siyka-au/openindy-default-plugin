@@ -11,18 +11,15 @@ using namespace oi;
  * "calculate scale" parameter to "no", which routes Helmert7Param::exec()
  * to its existing unscaled 6-parameter (calc_6p) path.
  */
-class Helmert6Param : public Helmert7Param
-{
-    Q_OBJECT
+class Helmert6Param : public Helmert7Param {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
-
-    void init();
-
+  void init();
 };
 
-#endif // P_HELMERT6PARAM_H
+#endif  // P_HELMERT6PARAM_H

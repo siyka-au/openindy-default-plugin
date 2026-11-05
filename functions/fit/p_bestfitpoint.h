@@ -6,8 +6,8 @@
 #include <QtMath>
 
 #include "fitfunction.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 using namespace std;
@@ -15,40 +15,38 @@ using namespace std;
 /*!
  * \brief The BestFitPoint class
  */
-class BestFitPoint : public FitFunction, public Producer<Point>
-{
-    Q_OBJECT
+class BestFitPoint : public FitFunction, public Producer<Point> {
+  Q_OBJECT
 
-public:
+ public:
+  BestFitPoint(QObject* parent = 0)
+      : FitFunction(parent),
+        key("disable all observations but last one"),
+        value_no("no"),
+        value_yes("yes") {}
 
-    BestFitPoint(QObject *parent = 0) : FitFunction(parent),
-        key("disable all observations but last one"), value_no("no"), value_yes("yes") {
-    }
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Point, QString> exec() override;
 
-    std::expected<Point, QString> exec() override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
+  bool setUpResult(Point& point);
 
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Point &point);
-
-    const QString key; // disable all observations but last one
-    const QString value_no;
-    const QString value_yes;
-
+  const QString key;  // disable all observations but last one
+  const QString value_no;
+  const QString value_yes;
 };
 
-#endif // P_BESTFITPOINT_H
+#endif  // P_BESTFITPOINT_H

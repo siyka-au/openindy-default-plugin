@@ -2,37 +2,35 @@
 #define P_BESTFITCIRCLE_H
 
 #include "fitfunction.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 
 /*!
  * \brief The BestFitCircle class
  */
-class BestFitCircle : public FitFunction, public Producer<Circle>
-{
-    Q_OBJECT
+class BestFitCircle : public FitFunction, public Producer<Circle> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Circle, QString> exec() override;
 
-    std::expected<Circle, QString> exec() override;
+ private:
+  bool setUpResult(Circle& circle);
 
-private:
-
-    bool setUpResult(Circle &circle);
-
-    OiVec getApproximatedPlane(int nop, double x[], double y[], double z[], double cx, double cy, double cz);
+  OiVec getApproximatedPlane(int nop, double x[], double y[], double z[],
+                             double cx, double cy, double cz);
 };
 
-#endif // P_BESTFITCIRCLE_H
+#endif  // P_BESTFITCIRCLE_H

@@ -5,40 +5,36 @@
 #include <QPointer>
 
 #include "constructfunction.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 
 /*!
  * \brief The PlaneFromPlane class
  */
-class PlaneFromPlane : public ConstructFunction, public Producer<Plane>
-{
-    Q_OBJECT
+class PlaneFromPlane : public ConstructFunction, public Producer<Plane> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Plane, QString> exec() override;
 
-    std::expected<Plane, QString> exec() override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Plane &plane);
-
+  bool setUpResult(Plane& plane);
 };
 
-#endif // P_PLANEFROMPLANE_H
+#endif  // P_PLANEFROMPLANE_H

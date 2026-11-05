@@ -3,24 +3,23 @@
 /*!
  * \brief ChangeRadius::init
  */
-void ChangeRadius::init(){
+void ChangeRadius::init() {
+  // set plugin meta data
+  this->metaData.name = "ChangeRadius";
+  this->metaData.pluginName = "OpenIndy Default Plugin";
+  this->metaData.author = "bra";
+  this->metaData.description = QString("%1").arg(
+      "This functions adds the specified offset to the radius of the target "
+      "geometry");
+  this->metaData.iid = ObjectTransformation_iidd;
 
-    //set plugin meta data
-    this->metaData.name = "ChangeRadius";
-    this->metaData.pluginName = "OpenIndy Default Plugin";
-    this->metaData.author = "bra";
-    this->metaData.description = QString("%1")
-            .arg("This functions adds the specified offset to the radius of the target geometry");
-    this->metaData.iid = ObjectTransformation_iidd;
+  // set spplicable for
+  this->applicableFor.append(eSphereFeature);
+  this->applicableFor.append(eCircleFeature);
+  this->applicableFor.append(eCylinderFeature);
 
-    //set spplicable for
-    this->applicableFor.append(eSphereFeature);
-    this->applicableFor.append(eCircleFeature);
-    this->applicableFor.append(eCylinderFeature);
-
-    //set double parameter
-    this->doubleParameters.insert("offset [mm]", 0.0);
-
+  // set double parameter
+  this->doubleParameters.insert("offset [mm]", 0.0);
 }
 
 /*!
@@ -28,12 +27,12 @@ void ChangeRadius::init(){
  * \param sphere
  * \return
  */
-std::expected<Sphere, QString> ChangeRadius::exec(const Sphere &input){
-    Sphere sphere = input;
-    if(!this->setUpResult(sphere)){
-        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
-    }
-    return sphere;
+std::expected<Sphere, QString> ChangeRadius::exec(const Sphere& input) {
+  Sphere sphere = input;
+  if (!this->setUpResult(sphere)) {
+    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+  }
+  return sphere;
 }
 
 /*!
@@ -41,12 +40,12 @@ std::expected<Sphere, QString> ChangeRadius::exec(const Sphere &input){
  * \param input
  * \return
  */
-std::expected<Circle, QString> ChangeRadius::exec(const Circle &input){
-    Circle circle = input;
-    if(!this->setUpResult(circle)){
-        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
-    }
-    return circle;
+std::expected<Circle, QString> ChangeRadius::exec(const Circle& input) {
+  Circle circle = input;
+  if (!this->setUpResult(circle)) {
+    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+  }
+  return circle;
 }
 
 /*!
@@ -54,12 +53,12 @@ std::expected<Circle, QString> ChangeRadius::exec(const Circle &input){
  * \param input
  * \return
  */
-std::expected<Cylinder, QString> ChangeRadius::exec(const Cylinder &input){
-    Cylinder cylinder = input;
-    if(!this->setUpResult(cylinder)){
-        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
-    }
-    return cylinder;
+std::expected<Cylinder, QString> ChangeRadius::exec(const Cylinder& input) {
+  Cylinder cylinder = input;
+  if (!this->setUpResult(cylinder)) {
+    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+  }
+  return cylinder;
 }
 
 /*!
@@ -67,27 +66,26 @@ std::expected<Cylinder, QString> ChangeRadius::exec(const Cylinder &input){
  * \param sphere
  * \return
  */
-bool ChangeRadius::setUpResult(Sphere &sphere){
+bool ChangeRadius::setUpResult(Sphere& sphere) {
+  // get and check offset
+  double offset = 0.0;
+  if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
+    offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
+    offset = offset / 1000.0;
+  } else {
+    offset = this->doubleParameters.value("offset [mm]");
+    offset = offset / 1000.0;
+  }
 
-    //get and check offset
-    double offset = 0.0;
-    if(this->scalarInputParams.doubleParameter.contains("offset [mm]")){
-        offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
-        offset = offset / 1000.0;
-    }else{
-        offset = this->doubleParameters.value("offset [mm]");
-        offset = offset / 1000.0;
-    }
+  // add offset to radius of the sphere
+  Position position = sphere.getPosition();
+  Radius radius = sphere.getRadius();
+  radius.setRadius(radius.getRadius() + offset);
 
-    //add offset to radius of the sphere
-    Position position = sphere.getPosition();
-    Radius radius = sphere.getRadius();
-    radius.setRadius(radius.getRadius() + offset);
+  // set result
+  sphere.setSphere(position, radius);
 
-    //set result
-    sphere.setSphere(position, radius);
-
-    return true;
+  return true;
 }
 
 /*!
@@ -95,28 +93,27 @@ bool ChangeRadius::setUpResult(Sphere &sphere){
  * \param circle
  * \return
  */
-bool ChangeRadius::setUpResult(Circle &circle){
+bool ChangeRadius::setUpResult(Circle& circle) {
+  // get and check offset
+  double offset = 0.0;
+  if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
+    offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
+    offset = offset / 1000.0;
+  } else {
+    offset = this->doubleParameters.value("offset [mm]");
+    offset = offset / 1000.0;
+  }
 
-    //get and check offset
-    double offset = 0.0;
-    if(this->scalarInputParams.doubleParameter.contains("offset [mm]")){
-        offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
-        offset = offset / 1000.0;
-    }else{
-        offset = this->doubleParameters.value("offset [mm]");
-        offset = offset / 1000.0;
-    }
+  // add offset to radius of the circle
+  Position position = circle.getPosition();
+  Direction direction = circle.getDirection();
+  Radius radius = circle.getRadius();
+  radius.setRadius(radius.getRadius() + offset);
 
-    //add offset to radius of the circle
-    Position position = circle.getPosition();
-    Direction direction = circle.getDirection();
-    Radius radius = circle.getRadius();
-    radius.setRadius(radius.getRadius() + offset);
+  // set result
+  circle.setCircle(position, direction, radius);
 
-    //set result
-    circle.setCircle(position, direction, radius);
-
-    return true;
+  return true;
 }
 
 /*!
@@ -124,26 +121,25 @@ bool ChangeRadius::setUpResult(Circle &circle){
  * \param cylinder
  * \return
  */
-bool ChangeRadius::setUpResult(Cylinder &cylinder){
+bool ChangeRadius::setUpResult(Cylinder& cylinder) {
+  // get and check offset
+  double offset = 0.0;
+  if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
+    offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
+    offset = offset / 1000.0;
+  } else {
+    offset = this->doubleParameters.value("offset [mm]");
+    offset = offset / 1000.0;
+  }
 
-    //get and check offset
-    double offset = 0.0;
-    if(this->scalarInputParams.doubleParameter.contains("offset [mm]")){
-        offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
-        offset = offset / 1000.0;
-    }else{
-        offset = this->doubleParameters.value("offset [mm]");
-        offset = offset / 1000.0;
-    }
+  // add offset to radius of the cylinder
+  Position position = cylinder.getPosition();
+  Direction direction = cylinder.getDirection();
+  Radius radius = cylinder.getRadius();
+  radius.setRadius(radius.getRadius() + offset);
 
-    //add offset to radius of the cylinder
-    Position position = cylinder.getPosition();
-    Direction direction = cylinder.getDirection();
-    Radius radius = cylinder.getRadius();
-    radius.setRadius(radius.getRadius() + offset);
+  // set result
+  cylinder.setCylinder(position, direction, radius);
 
-    //set result
-    cylinder.setCylinder(position, direction, radius);
-
-    return true;
+  return true;
 }

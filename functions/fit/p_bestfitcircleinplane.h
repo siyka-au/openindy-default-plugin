@@ -6,8 +6,8 @@
 #include <QtMath>
 
 #include "fitfunction.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 using namespace std;
@@ -15,32 +15,30 @@ using namespace std;
 /*!
  * \brief The BestFitCircleInPlane class
  */
-class BestFitCircleInPlane : public FitFunction, public BestFitCircleUtil, public Producer<Circle>
-{
-    Q_OBJECT
+class BestFitCircleInPlane : public FitFunction,
+                             public BestFitCircleUtil,
+                             public Producer<Circle> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Circle, QString> exec() override;
 
-    std::expected<Circle, QString> exec() override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Circle &circle);
-
+  bool setUpResult(Circle& circle);
 };
 
-#endif // P_BESTFTICIRCLEINPLANE_H
+#endif  // P_BESTFTICIRCLEINPLANE_H

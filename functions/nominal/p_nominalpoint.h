@@ -23,24 +23,21 @@ using namespace oi;
  * deliberately out of scope here - this reads literal scalars only.
  * Tolerance is deferred too; there is nowhere to attach it yet.
  */
-class NominalPoint : public ConstructFunction, public Producer<Point>
-{
-    Q_OBJECT
+class NominalPoint : public ConstructFunction, public Producer<Point> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
-
-    std::expected<Point, QString> exec() override;
-
+  std::expected<Point, QString> exec() override;
 };
 
-#endif // P_NOMINALPOINT_H
+#endif  // P_NOMINALPOINT_H

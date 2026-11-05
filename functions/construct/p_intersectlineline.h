@@ -5,48 +5,40 @@
 #include <QPointer>
 
 #include "constructfunction.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 
-enum IntersectionTypes {
-    eAtFirstLine,
-    eAtSecondLine,
-    eMidPoint
-};
+enum IntersectionTypes { eAtFirstLine, eAtSecondLine, eMidPoint };
 
 /*!
  * \brief The IntersectLineline class
  */
-class IntersectLineLine : public ConstructFunction, public Producer<Point>
-{
-    Q_OBJECT
+class IntersectLineLine : public ConstructFunction, public Producer<Point> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Point, QString> exec() override;
 
-    std::expected<Point, QString> exec() override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Point &point);
-    bool isParallel(const QPointer<Line> &line1, const QPointer<Line> &line2);
-    IntersectionTypes getIntersectionType();
-
+  bool setUpResult(Point& point);
+  bool isParallel(const QPointer<Line>& line1, const QPointer<Line>& line2);
+  IntersectionTypes getIntersectionType();
 };
 
-#endif // P_INTERSECTLINELINE_H
+#endif  // P_INTERSECTLINELINE_H

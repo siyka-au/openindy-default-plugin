@@ -2,16 +2,16 @@
 #define CFUTIL_H
 
 #include <QString>
+
 #include "types.h"
 
 using namespace oi;
 
-class CFUtil
-{
-public:
-    CFUtil();
+class CFUtil {
+ public:
+  CFUtil();
 
-    static FeatureTypes featureTypesForName(QString name);
+  static FeatureTypes featureTypesForName(QString name);
 };
 
 #endif

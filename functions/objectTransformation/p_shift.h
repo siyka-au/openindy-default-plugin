@@ -5,39 +5,37 @@
 #include <QString>
 
 #include "objecttransformation.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 
-class Shift : public ObjectTransformation, public Transform<Plane>, public Transform<Circle>
-{
-    Q_OBJECT
+class Shift : public ObjectTransformation,
+              public Transform<Plane>,
+              public Transform<Circle> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Plane, QString> exec(const Plane& input) override;
+  std::expected<Circle, QString> exec(const Circle& input) override;
 
-    std::expected<Plane, QString> exec(const Plane &input) override;
-    std::expected<Circle, QString> exec(const Circle &input) override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Plane &plane);
-    bool setUpResult(Circle &circle);
-
+  bool setUpResult(Plane& plane);
+  bool setUpResult(Circle& circle);
 };
 
-#endif // P_SHIFTPLANE_H
+#endif  // P_SHIFTPLANE_H

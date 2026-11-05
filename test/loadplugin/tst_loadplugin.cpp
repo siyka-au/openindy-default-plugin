@@ -1,38 +1,35 @@
+#include <QList>
+#include <QPointer>
 #include <QString>
 #include <QtTest>
-#include <QPointer>
-#include <QList>
-#include "plugin.h"
+
 #include "chooselalib.h"
+#include "plugin.h"
 
 using namespace oi;
 
-class LoadPluginTest : public QObject
-{
-    Q_OBJECT
+class LoadPluginTest : public QObject {
+  Q_OBJECT
 
-public:
-    LoadPluginTest();
+ public:
+  LoadPluginTest();
 
-private Q_SLOTS:
-    void initTestCase();
-    void testPseudoTracker_eCartesianReading();
-    void testLoadPlugin();
+ private Q_SLOTS:
+  void initTestCase();
+  void testPseudoTracker_eCartesianReading();
+  void testLoadPlugin();
 
-private:
-
+ private:
 };
 
-LoadPluginTest::LoadPluginTest()
-{
-}
+LoadPluginTest::LoadPluginTest() {}
 
-void LoadPluginTest::initTestCase(){
-    // PseudoTracker's simulated readings go through OiMat rotation math
-    // (TrackerErrorModel); without a backend selected here, that
-    // dereferences a null linear-algebra pointer and crashes (main.cpp
-    // does this same call at real app startup)
-    ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+void LoadPluginTest::initTestCase() {
+  // PseudoTracker's simulated readings go through OiMat rotation math
+  // (TrackerErrorModel); without a backend selected here, that
+  // dereferences a null linear-algebra pointer and crashes (main.cpp
+  // does this same call at real app startup)
+  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
 }
 
 /*
@@ -47,50 +44,46 @@ void LoadPluginTest::initTestCase(){
  * Cannot load library ... Die angegebene Prozedur wurde nicht gefunden.
  * -> ???
  */
-void LoadPluginTest::testLoadPlugin(){
+void LoadPluginTest::testLoadPlugin() {
+  QString pluginPath = PLUGIN_PATH;
 
-    QString pluginPath = PLUGIN_PATH;
+  QVERIFY2(QFile::exists(pluginPath), pluginPath.toLatin1().data());
+  QPluginLoader pluginLoader(pluginPath);
 
-    QVERIFY2(QFile::exists(pluginPath), pluginPath.toLatin1().data());
-    QPluginLoader pluginLoader(pluginPath);
+  QObject* plugin = pluginLoader.instance();
+  QVERIFY2(plugin, pluginLoader.errorString().toLatin1().data());
 
-    QObject *plugin = pluginLoader.instance();
-    QVERIFY2(plugin, pluginLoader.errorString().toLatin1().data());
+  Plugin* oiPlugin = qobject_cast<Plugin*>(plugin);
+  QVERIFY2(oiPlugin, "qobject_cast");
 
-    Plugin *oiPlugin = qobject_cast<Plugin *>(plugin);
-    QVERIFY2(oiPlugin, "qobject_cast");
-
-    QList<QPointer<Function> > functions = oiPlugin->createFunctions();
-    QVERIFY2(functions.size() > 0, "no functions found");
-
+  QList<QPointer<Function> > functions = oiPlugin->createFunctions();
+  QVERIFY2(functions.size() > 0, "no functions found");
 }
-void LoadPluginTest::testPseudoTracker_eCartesianReading(){
+void LoadPluginTest::testPseudoTracker_eCartesianReading() {
+  QString pluginPath = PLUGIN_PATH;
 
-    QString pluginPath = PLUGIN_PATH;
+  QVERIFY2(QFile::exists(pluginPath), pluginPath.toLatin1().data());
+  QPluginLoader pluginLoader(pluginPath);
 
-    QVERIFY2(QFile::exists(pluginPath), pluginPath.toLatin1().data());
-    QPluginLoader pluginLoader(pluginPath);
+  QObject* plugin = pluginLoader.instance();
+  QVERIFY2(plugin, pluginLoader.errorString().toLatin1().data());
 
-    QObject *plugin = pluginLoader.instance();
-    QVERIFY2(plugin, pluginLoader.errorString().toLatin1().data());
+  Plugin* oiPlugin = qobject_cast<Plugin*>(plugin);
+  QVERIFY2(oiPlugin, "qobject_cast");
 
-    Plugin *oiPlugin = qobject_cast<Plugin *>(plugin);
-    QVERIFY2(oiPlugin, "qobject_cast");
+  QPointer<Sensor> sensor = oiPlugin->createSensor("PseudoTracker");
 
-    QPointer<Sensor> sensor = oiPlugin->createSensor("PseudoTracker");
+  sensor->init();
 
-    sensor->init();
-
-    MeasurementConfig config;
-    config.setMeasurementType(eSinglePoint_MeasurementType);
-    SensorConfiguration sc = sensor->getSensorConfiguration();
-    QMap<QString, QString> sp = sc.getStringParameter();
-    sp.insert("reading type", "cartesian");
-    sc.setStringParameter(sp);
-    sensor->setSensorConfiguration(sc);
-    QList<QPointer<Reading> > readings = sensor->measure(config);
-    QVERIFY2(readings.size() > 0, "no readings");
-
+  MeasurementConfig config;
+  config.setMeasurementType(eSinglePoint_MeasurementType);
+  SensorConfiguration sc = sensor->getSensorConfiguration();
+  QMap<QString, QString> sp = sc.getStringParameter();
+  sp.insert("reading type", "cartesian");
+  sc.setStringParameter(sp);
+  sensor->setSensorConfiguration(sc);
+  QList<QPointer<Reading> > readings = sensor->measure(config);
+  QVERIFY2(readings.size() > 0, "no readings");
 }
 
 QTEST_APPLESS_MAIN(LoadPluginTest)

@@ -6,8 +6,8 @@
 #include <QtMath>
 
 #include "constructfunction.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 using namespace std;
@@ -15,32 +15,28 @@ using namespace std;
 /*!
  * \brief The PointFromPoints class
  */
-class PointFromPoints : public ConstructFunction, public Producer<Point>
-{
-    Q_OBJECT
+class PointFromPoints : public ConstructFunction, public Producer<Point> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Point, QString> exec() override;
 
-    std::expected<Point, QString> exec() override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Point &point);
-
+  bool setUpResult(Point& point);
 };
 
-#endif // P_POINTFROMPOINTS_H
+#endif  // P_POINTFROMPOINTS_H

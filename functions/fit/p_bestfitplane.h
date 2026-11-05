@@ -6,40 +6,38 @@
 #include <QtMath>
 
 #include "fitfunction.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 
 /*!
  * \brief The BestFitPlane class
  */
-class BestFitPlane : public FitFunction, public BestFitPlaneUtil, public Producer<Plane>
-{
-    Q_OBJECT
+class BestFitPlane : public FitFunction,
+                     public BestFitPlaneUtil,
+                     public Producer<Plane> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Plane, QString> exec() override;
 
-    std::expected<Plane, QString> exec() override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Plane &plane);
-
+  bool setUpResult(Plane& plane);
 };
 
-#endif // P_BESTFITPLANE_H
+#endif  // P_BESTFITPLANE_H

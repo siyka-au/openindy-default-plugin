@@ -2,25 +2,23 @@
 #define CFFUNCTIONDATA_H
 
 #include <QString>
-#include "function.h"
+
 #include "featurewrapper.h"
+#include "function.h"
 
 using namespace oi;
 
+class CFFunctionData {
+ public:
+  CFFunctionData();
 
-class CFFunctionData
-{
-public:
-    CFFunctionData();
+  QString prettyPrint();
 
-    QString prettyPrint();
+ public:
+  QPointer<Function> function;
 
-public:
-    QPointer<Function> function;
-
-    // feature returned / modified by this function
-    QPointer<FeatureWrapper> feature;
-
+  // feature returned / modified by this function
+  QPointer<FeatureWrapper> feature;
 };
 
-#endif // CFFUNCTIONDATA_H
+#endif  // CFFUNCTIONDATA_H

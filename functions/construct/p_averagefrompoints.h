@@ -33,32 +33,28 @@ using namespace oi;
  * D13). This function's job is combining already-measured Points, which
  * is a different, simpler operation.
  */
-class AverageFromPoints : public ConstructFunction, public Producer<Point>
-{
-    Q_OBJECT
+class AverageFromPoints : public ConstructFunction, public Producer<Point> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Point, QString> exec() override;
 
-    std::expected<Point, QString> exec() override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Point &point);
-
+  bool setUpResult(Point& point);
 };
 
-#endif // P_AVERAGEFROMPOINTS_H
+#endif  // P_AVERAGEFROMPOINTS_H

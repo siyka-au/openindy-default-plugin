@@ -1,10 +1,12 @@
 #ifndef SIMPLEPOLARMEASUREMENT_H
 #define SIMPLEPOLARMEASUREMENT_H
 
-#include "simulationmodel.h"
 #include <random>
+
+#include "simulationmodel.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
+
 #include <QDebug>
 #include <QtAlgorithms>
 
@@ -19,61 +21,57 @@ using namespace oi;
  *  Ben Hughes(Laser tracker error determination using
  *  a network measurement)
  */
-class SimplePolarMeasurement : public SimulationModel
-{
-    Q_OBJECT
+class SimplePolarMeasurement : public SimulationModel {
+  Q_OBJECT
 
-public:
+ public:
+  // ################################
+  // simulation initialization method
+  // ################################
 
-    //################################
-    //simulation initialization method
-    //################################
+  void init();
 
-    void init();
+  // ##################
+  // simulation methods
+  // ##################
 
-    //##################
-    //simulation methods
-    //##################
+  bool distort(const QPointer<Reading>& r, const OiMat& objectRelation,
+               const bool& newIterationStart);
+  bool analyseSimulationData(UncertaintyData& d);
+  double getCorrelationCoefficient(const QList<double>& x,
+                                   const QList<double>& y);
 
-    bool distort(const QPointer<Reading> &r, const OiMat &objectRelation, const bool &newIterationStart);
-    bool analyseSimulationData(UncertaintyData &d);
-    double getCorrelationCoefficient(const QList<double> &x, const QList<double> &y);
+ private:
+  // all supported distributions;
+  QStringList distributions;
 
-private:
+  double variance;
+  double expectation;
 
-    //all supported distributions;
-    QStringList distributions;
+  bool newIteration;
 
-    double variance;
-    double expectation;
+  double refraction;
+  double distortedRefraction;
+  double verticalDn;
+  double horizontalDn;
 
-    bool newIteration;
+  double ref_coefficientOfExpansion;
+  double ref_materialTemperature;
+  double coefficientOfExpansion;
+  double materialTemperature;
 
-    double refraction;
-    double distortedRefraction;
-    double verticalDn;
-    double horizontalDn;
+  double distortComponent(UncertaintyComponent u);
 
-    double ref_coefficientOfExpansion;
-    double ref_materialTemperature;
-    double coefficientOfExpansion;
-    double materialTemperature;
+  bool distortionBySensor(Reading* r);
+  bool distortionByEnviroment(Reading* r);
+  bool distortionByHuman(Reading* r);
+  bool distortionByObject(Reading* r, OiMat objectRelation);
 
-    double distortComponent(UncertaintyComponent u);
+  void checkDistribution(UncertaintyData& d);
+  void calcUncertainty(UncertaintyData& d);
 
-
-    bool distortionBySensor(Reading * r);
-    bool distortionByEnviroment(Reading *r);
-    bool distortionByHuman(Reading *r);
-    bool distortionByObject(Reading *r, OiMat objectRelation);
-
-    void checkDistribution(UncertaintyData &d);
-    void calcUncertainty(UncertaintyData &d);
-
-    double edlenRefractionCalculation(double temperature,double pressure, double humidity, double wavelength);
-
-
-
+  double edlenRefractionCalculation(double temperature, double pressure,
+                                    double humidity, double wavelength);
 };
 
-#endif // SIMPLEPOLARMEASUREMENT_H
+#endif  // SIMPLEPOLARMEASUREMENT_H

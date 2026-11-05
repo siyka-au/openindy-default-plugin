@@ -6,25 +6,24 @@
 /**
  * @brief parsed parameter from JSON
  */
-class CFCParameter: public Node {
+class CFCParameter : public Node {
+ public:
+  CFCParameter(QString name, QString comment, QString feature,
+               QList<QPointer<Node> > subnodes, QObject* parent = 0);
 
-public:
-    CFCParameter(QString name, QString comment, QString feature, QList<QPointer<Node> > subnodes, QObject *parent = 0);
+  QList<QPointer<Node> >& getSubnodes() override;
 
-    QList<QPointer<Node> > &getSubnodes() override;
+  QString getName() override;
 
-    QString getName() override;
+  QString prettyPrint() override;
 
-    QString prettyPrint() override;
+  QString getFeature();
 
-    QString getFeature();
-
-private:
-    QString name;
-    QString comment;
-    QString feature;
-    QList<QPointer<Node> > subnodes;
-
+ private:
+  QString name;
+  QString comment;
+  QString feature;
+  QList<QPointer<Node> > subnodes;
 };
 
-#endif // CFCPARAMETER_H
+#endif  // CFCPARAMETER_H

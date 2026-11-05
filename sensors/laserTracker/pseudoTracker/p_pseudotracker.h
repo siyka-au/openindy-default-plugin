@@ -1,15 +1,15 @@
 #ifndef P_PSEUDOTRACKER_H
 #define P_PSEUDOTRACKER_H
 
-#include <atomic>
-#include <QtGlobal>
 #include <QDateTime>
-#include <QObject>
 #include <QDebug>
-#include <QThread>
 #include <QFile>
 #include <QMap>
+#include <QObject>
 #include <QString>
+#include <QThread>
+#include <QtGlobal>
+#include <atomic>
 #include <cmath>
 
 #include "lasertracker.h"
@@ -21,106 +21,103 @@ using namespace oi;
 /*!
  * \brief The PseudoTracker class
  */
-class PseudoTracker : public LaserTracker
-{
-    Q_OBJECT
+class PseudoTracker : public LaserTracker {
+  Q_OBJECT
 
-public:
+ public:
+  // ############################
+  // sensor initialization method
+  // ############################
 
-    //############################
-    //sensor initialization method
-    //############################
+  void init();
 
-    void init();
+  // ########################
+  // sensor state and actions
+  // ########################
 
-    //########################
-    //sensor state and actions
-    //########################
+  bool doSelfDefinedAction(const QString& action);
+  bool abortAction();
 
-    bool doSelfDefinedAction(const QString &action);
-    bool abortAction();
+  //! connect app with laser tracker
+  bool connectSensor();
 
-    //! connect app with laser tracker
-    bool connectSensor();
+  //! disconnect app with laser tracker
+  bool disconnectSensor();
 
-    //! disconnect app with laser tracker
-    bool disconnectSensor();
+  //! laser tracker measures a point and returns an observation
+  QList<QPointer<Reading> > measure(const MeasurementConfig& mConfig);
 
-    //! laser tracker measures a point and returns an observation
-    QList<QPointer<Reading> > measure(const MeasurementConfig &mConfig);
+  //! stream
+  QVariantMap readingStream(const ReadingTypes& streamFormat);
 
-    //! stream
-    QVariantMap readingStream(const ReadingTypes &streamFormat);
+  //! getConnectionState
+  bool getConnectionState();
 
-    //! getConnectionState
-    bool getConnectionState();
+  //! return ready state of the sensor
+  bool getIsReadyForMeasurement();
 
-    //! return ready state of the sensor
-    bool getIsReadyForMeasurement();
+  //! sensor stats
+  QMap<QString, QString> getSensorStatus();
 
-    //!sensor stats
-    QMap<QString, QString> getSensorStatus();
+  //! checks if sensor is busy
+  bool getIsBusy();
 
-    //!checks if sensor is busy
-    bool getIsBusy();
+  bool search();
 
-    bool search();
+ protected:
+  //! starts initialization
+  bool initialize();
 
-protected:
+  //! move laser tracker to specified position
+  bool move(const double& azimuth, const double& zenith, const double& distance,
+            const bool& isRelative);
 
-    //! starts initialization
-    bool initialize();
+  bool move(const double& x, const double& y, const double& z);
 
-    //! move laser tracker to specified position
-    bool move(const double &azimuth, const double &zenith, const double &distance, const bool &isRelative);
+  //! sets laser tracke to home position
+  bool home();
 
-    bool move(const double &x, const double &y, const double &z);
+  //! turns motors on or off
+  bool changeMotorState();
 
-    //! sets laser tracke to home position
-    bool home();
+  //! toggle between frontside and backside
+  bool toggleSightOrientation();
 
-    //! turns motors on or off
-    bool changeMotorState();
+  //! compensation
+  bool compensation();
 
-    //! toggle between frontside and backside
-    bool toggleSightOrientation();
+ private:
+  QList<QPointer<Reading> > measurePolar(const MeasurementConfig& mConfig);
+  QList<QPointer<Reading> > measureDistance(const MeasurementConfig& mConfig);
+  QList<QPointer<Reading> > measureDirection(const MeasurementConfig& mConfig);
+  QList<QPointer<Reading> > measureCartesian(const MeasurementConfig& mConfig);
+  QList<QPointer<Reading> > measureLevel(const MeasurementConfig& mConfig);
 
-    //! compensation
-    bool compensation();
+  //! the true (noise-free) aim as a noisy polar draw, using this
+  //! instance's configured error terms - sigmaAzimuth/sigmaZenith/
+  //! sigmaDistance on the result are this model's own estimate of the
+  //! noise it just applied, not a static default
+  ReadingPolar simulateAim() const;
 
-private:
-    QList<QPointer<Reading> > measurePolar(const MeasurementConfig &mConfig);
-    QList<QPointer<Reading> > measureDistance(const MeasurementConfig &mConfig);
-    QList<QPointer<Reading> > measureDirection(const MeasurementConfig &mConfig);
-    QList<QPointer<Reading> > measureCartesian(const MeasurementConfig &mConfig);
-    QList<QPointer<Reading> > measureLevel(const MeasurementConfig &mConfig);
+  // ################
+  // helper variables
+  // ################
 
-    //! the true (noise-free) aim as a noisy polar draw, using this
-    //! instance's configured error terms - sigmaAzimuth/sigmaZenith/
-    //! sigmaDistance on the result are this model's own estimate of the
-    //! noise it just applied, not a static default
-    ReadingPolar simulateAim() const;
+  double myAzimuth;
+  double myZenith;
+  double myDistance;
 
-    //################
-    //helper variables
-    //################
+  bool myMotor;
+  bool myInit;
+  bool myCompIt;
+  int side;
+  bool isConnected;
 
-    double myAzimuth;
-    double myZenith;
-    double myDistance;
+  std::atomic<bool> isScanning;
 
-    bool myMotor;
-    bool myInit;
-    bool myCompIt;
-    int side;
-    bool isConnected;
+  std::atomic<bool> returnReading;
 
-    std::atomic<bool> isScanning;
-
-    std::atomic<bool> returnReading;
-
-    int measureTime; // [ms]
-
+  int measureTime;  // [ms]
 };
 
-#endif // P_PSEUDOTRACKER_H
+#endif  // P_PSEUDOTRACKER_H

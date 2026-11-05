@@ -1,86 +1,84 @@
 #ifndef P_EXTENDEDTEMPERATURECOMPENSATION_H
 #define P_EXTENDEDTEMPERATURECOMPENSATION_H
 
-#include "systemtransformation.h"
-#include "pluginmetadata.h"
 #include <QtCore/qmath.h>
+
+#include "pluginmetadata.h"
+#include "systemtransformation.h"
 
 using namespace oi;
 using namespace std;
 
-//not stable, temporary not ready to use
+// not stable, temporary not ready to use
 
 /*!
- * \brief The ExtendedTemperatureCompensation class is a system transformation with temperature compensation.
- * By specifying a minimum of 3 common points between the systems, a reference temperature and the material, this
- * function calculates the scales (x,y,z) , translation and rotation
+ * \brief The ExtendedTemperatureCompensation class is a system transformation
+ * with temperature compensation. By specifying a minimum of 3 common points
+ * between the systems, a reference temperature and the material, this function
+ * calculates the scales (x,y,z) , translation and rotation
  */
-class ExtendedTemperatureCompensation : public SystemTransformation
-{
-    Q_OBJECT
+class ExtendedTemperatureCompensation : public SystemTransformation {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+ protected:
+  // ############
+  // exec methods
+  // ############
 
-protected:
+  bool exec(TrafoParam& trafoParam);
 
-    //############
-    //exec methods
-    //############
+  // ##############################################################################################
+  // tell OpenIndy wether the input elements shall be shown as one entry in
+  // function plugin loader)
+  // ##############################################################################################
 
-    bool exec(TrafoParam &trafoParam);
+  virtual bool mergeInputElements();
 
-    //##############################################################################################
-    //tell OpenIndy wether the input elements shall be shown as one entry in function plugin loader)
-    //##############################################################################################
+ private:
+  QStringList protocol;
 
-    virtual bool mergeInputElements();
+  bool svdError;
 
-private:
+  QList<OiVec> locSystem;
+  QList<OiVec> refSystem;
 
-    QStringList protocol;
+  OiVec translation;
+  OiVec rotation;
+  OiVec scale;
 
-    bool svdError;
+  bool calc(TrafoParam& tp);
+  void initPoints();
+  void getExtraParameter();
+  OiVec approxTranslation(OiVec rot, OiVec s);
+  OiVec approxRotation();
+  OiVec approxScale(OiVec rot);
+  OiVec calcCentroidPoint(QList<OiVec> points);
+  OiVec fillLVector();
+  OiMat fillAMatrix(OiVec x0);
+  OiMat getRotationMatrix(OiVec rot);
+  void preliminaryTransformation();
+  OiMat scaleMatrix(OiVec s);
+  OiVec fillL0Vector(OiVec x0);
 
-    QList<OiVec> locSystem;
-    QList<OiVec> refSystem;
+  // for approx of rotation
+  vector<OiVec> centroidReducedCoord(QList<OiVec> input, OiVec centroid);
+  vector<OiMat> modelMatrix(vector<OiVec> locC, vector<OiVec> refC);
+  OiMat normalEquationMatrix(vector<OiMat> vecA);
+  OiVec quaternion(OiMat n);
+  OiMat rotationMatrix(OiVec q);
+  OiVec getRotationAngles(OiMat r);
 
-    OiVec translation;
-    OiVec rotation;
-    OiVec scale;
-
-    bool calc(TrafoParam &tp);
-    void initPoints();
-    void getExtraParameter();
-    OiVec approxTranslation(OiVec rot, OiVec s);
-    OiVec approxRotation();
-    OiVec approxScale(OiVec rot);
-    OiVec calcCentroidPoint(QList<OiVec> points);
-    OiVec fillLVector();
-    OiMat fillAMatrix(OiVec x0);
-    OiMat getRotationMatrix(OiVec rot);
-    void preliminaryTransformation();
-    OiMat scaleMatrix(OiVec s);
-    OiVec fillL0Vector(OiVec x0);
-
-    //for approx of rotation
-    vector<OiVec> centroidReducedCoord(QList<OiVec> input, OiVec centroid);
-    vector<OiMat> modelMatrix(vector<OiVec> locC, vector<OiVec> refC);
-    OiMat normalEquationMatrix(vector<OiMat>vecA);
-    OiVec quaternion(OiMat n);
-    OiMat rotationMatrix(OiVec q);
-    OiVec getRotationAngles(OiMat r);
-
-
-    //to save the values in the transformation parameter
-    //rotation matrix see functions above "getRoationMatrix(OiVec rot)"
-    OiMat getTranslationMatrix(OiVec trans);
-    OiMat getScaleMatrix(OiVec s);
+  // to save the values in the transformation parameter
+  // rotation matrix see functions above "getRoationMatrix(OiVec rot)"
+  OiMat getTranslationMatrix(OiVec trans);
+  OiMat getScaleMatrix(OiVec s);
 };
 
-#endif // P_EXTENDEDTEMPERATURECOMPENSATION_H
+#endif  // P_EXTENDEDTEMPERATURECOMPENSATION_H

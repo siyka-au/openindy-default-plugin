@@ -5,41 +5,37 @@
 #include <QPointer>
 
 #include "constructfunction.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 
 /*!
  * \brief The IntersectLinePlane class
  */
-class IntersectLinePlane : public ConstructFunction, public Producer<Point>
-{
-    Q_OBJECT
+class IntersectLinePlane : public ConstructFunction, public Producer<Point> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Point, QString> exec() override;
 
-    std::expected<Point, QString> exec() override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Point &point);
-    bool isIntersection(const QPointer<Line> &line, const QPointer<Plane> &plane);
-
+  bool setUpResult(Point& point);
+  bool isIntersection(const QPointer<Line>& line, const QPointer<Plane>& plane);
 };
 
-#endif // P_INTERSECTLINEPLANE_H
+#endif  // P_INTERSECTLINEPLANE_H

@@ -4,19 +4,16 @@
  * \brief OiExchangePts::getMetaData
  * \return
  */
-PluginMetaData *OiExchangePts::getMetaData() const{
+PluginMetaData* OiExchangePts::getMetaData() const {
+  PluginMetaData* metaData = new PluginMetaData();
 
-    PluginMetaData* metaData = new PluginMetaData();
+  metaData->name = "OiExchangePts";
+  metaData->pluginName = "OpenIndy Default Plugin";
+  metaData->author = "br";
+  metaData->description = QString("%1").arg("Read *.pts files.");
+  metaData->iid = "de.openIndy.Plugin.OiExchange.OiExchangeDefinedFormat.v001";
 
-    metaData->name = "OiExchangePts";
-    metaData->pluginName = "OpenIndy Default Plugin";
-    metaData->author = "br";
-    metaData->description = QString("%1")
-            .arg("Read *.pts files.");
-    metaData->iid = "de.openIndy.Plugin.OiExchange.OiExchangeDefinedFormat.v001";
-
-    return metaData;
-
+  return metaData;
 }
 
 /*!
@@ -24,49 +21,37 @@ PluginMetaData *OiExchangePts::getMetaData() const{
  * \param projectData
  * \return
  */
-bool OiExchangePts::importOiData(OiExchangeObject &projectData){
-
-    return true;
-
-}
+bool OiExchangePts::importOiData(OiExchangeObject& projectData) { return true; }
 
 /*!
  * \brief OiExchangePts::exportOiData
  * \param projectData
  * \return
  */
-bool OiExchangePts::exportOiData(OiExchangeObject &projectData){
-
-    return true;
-
-}
+bool OiExchangePts::exportOiData(OiExchangeObject& projectData) { return true; }
 
 /*!
  * \brief OiExchangePts::getSupportedGeometries
  * \return
  */
-QList<Configuration::GeometryTypes> OiExchangePts::getSupportedGeometries(){
+QList<Configuration::GeometryTypes> OiExchangePts::getSupportedGeometries() {
+  QList<Configuration::GeometryTypes> supportedGeometries;
 
-    QList<Configuration::GeometryTypes> supportedGeometries;
+  // add supported geometries
+  supportedGeometries.append(Configuration::ePointCloudGeometry);
 
-    //add supported geometries
-    supportedGeometries.append(Configuration::ePointCloudGeometry);
-
-    return supportedGeometries;
-
+  return supportedGeometries;
 }
 
 /*!
  * \brief OiExchangePts::getSupportedFileExtensions
  * \return
  */
-QStringList OiExchangePts::getSupportedFileExtensions() const{
+QStringList OiExchangePts::getSupportedFileExtensions() const {
+  QStringList supportedFileExtensions;
 
-    QStringList supportedFileExtensions;
+  // add supported file extensions
+  supportedFileExtensions.append("*.pts");
 
-    //add supported file extensions
-    supportedFileExtensions.append("*.pts");
-
-    return supportedFileExtensions;
-
+  return supportedFileExtensions;
 }

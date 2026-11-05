@@ -6,8 +6,8 @@
 #include <QtMath>
 
 #include "fitfunction.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 using namespace std;
@@ -15,32 +15,30 @@ using namespace std;
 /*!
  * \brief The BestFitLine class
  */
-class BestFitLine : public FitFunction, public FunctionUtil, public Producer<Line>
-{
-    Q_OBJECT
+class BestFitLine : public FitFunction,
+                    public FunctionUtil,
+                    public Producer<Line> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Line, QString> exec() override;
 
-    std::expected<Line, QString> exec() override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Line &line);
-
+  bool setUpResult(Line& line);
 };
 
-#endif // P_BESTFTILINE_H
+#endif  // P_BESTFTILINE_H

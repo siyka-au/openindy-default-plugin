@@ -5,58 +5,52 @@
 #include <QPointer>
 
 #include "fitfunction.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 
 /*!
  * \brief The BestFitCylinder class
  */
-class BestFitCylinder : public FitFunction, public BestFitCylinderUtil, public Producer<Cylinder>
-{
-    Q_OBJECT
+class BestFitCylinder : public FitFunction,
+                        public BestFitCylinderUtil,
+                        public Producer<Cylinder> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init() override;
 
-    void init() override;
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Cylinder, QString> exec() override;
 
-    std::expected<Cylinder, QString> exec() override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Cylinder &cylinder);
-
+  bool setUpResult(Cylinder& cylinder);
 };
 
-class BestFitCylinderAppxDirection: public BestFitCylinder
-{
-    Q_OBJECT
+class BestFitCylinderAppxDirection : public BestFitCylinder {
+  Q_OBJECT
 
-public:
-    void init() override;
-
+ public:
+  void init() override;
 };
 
-class BestFitCylinderAppxDummyPoint: public BestFitCylinder
-{
-    Q_OBJECT
+class BestFitCylinderAppxDummyPoint : public BestFitCylinder {
+  Q_OBJECT
 
-public:
-    void init() override;
-
+ public:
+  void init() override;
 };
 
-#endif // P_BESTFITCYLINDER_H
+#endif  // P_BESTFITCYLINDER_H

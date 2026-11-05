@@ -3,28 +3,27 @@
 /*!
  * \brief Register::init
  */
-void Register::init(){
+void Register::init() {
+  // set plugin meta data
+  this->metaData.name = "Register";
+  this->metaData.pluginName = "OpenIndy Default Plugin";
+  this->metaData.author = "bra";
+  this->metaData.description = QString("%1").arg(
+      "This function projects the target geometry in the specified plane.");
+  this->metaData.iid = ObjectTransformation_iidd;
 
-    //set plugin meta data
-    this->metaData.name = "Register";
-    this->metaData.pluginName = "OpenIndy Default Plugin";
-    this->metaData.author = "bra";
-    this->metaData.description = QString("%1")
-            .arg("This function projects the target geometry in the specified plane.");
-    this->metaData.iid = ObjectTransformation_iidd;
+  // set needed elements
+  NeededElement param1;
+  param1.description =
+      "Select a plane in which the target geometry is to be projected.";
+  param1.infinite = false;
+  param1.typeOfElement = ePlaneElement;
+  this->neededElements.append(param1);
 
-    //set needed elements
-    NeededElement param1;
-    param1.description = "Select a plane in which the target geometry is to be projected.";
-    param1.infinite = false;
-    param1.typeOfElement = ePlaneElement;
-    this->neededElements.append(param1);
-
-    //set spplicable for
-    this->applicableFor.append(ePointFeature);
-    this->applicableFor.append(eSphereFeature);
-    this->applicableFor.append(eCircleFeature);
-
+  // set spplicable for
+  this->applicableFor.append(ePointFeature);
+  this->applicableFor.append(eSphereFeature);
+  this->applicableFor.append(eCircleFeature);
 }
 
 /*!
@@ -32,12 +31,12 @@ void Register::init(){
  * \param point
  * \return
  */
-std::expected<Point, QString> Register::exec(const Point &input){
-    Point point = input;
-    if(!this->setUpResult(point)){
-        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
-    }
-    return point;
+std::expected<Point, QString> Register::exec(const Point& input) {
+  Point point = input;
+  if (!this->setUpResult(point)) {
+    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+  }
+  return point;
 }
 
 /*!
@@ -45,12 +44,12 @@ std::expected<Point, QString> Register::exec(const Point &input){
  * \param input
  * \return
  */
-std::expected<Sphere, QString> Register::exec(const Sphere &input){
-    Sphere sphere = input;
-    if(!this->setUpResult(sphere)){
-        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
-    }
-    return sphere;
+std::expected<Sphere, QString> Register::exec(const Sphere& input) {
+  Sphere sphere = input;
+  if (!this->setUpResult(sphere)) {
+    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+  }
+  return sphere;
 }
 
 /*!
@@ -58,12 +57,12 @@ std::expected<Sphere, QString> Register::exec(const Sphere &input){
  * \param input
  * \return
  */
-std::expected<Circle, QString> Register::exec(const Circle &input){
-    Circle circle = input;
-    if(!this->setUpResult(circle)){
-        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
-    }
-    return circle;
+std::expected<Circle, QString> Register::exec(const Circle& input) {
+  Circle circle = input;
+  if (!this->setUpResult(circle)) {
+    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+  }
+  return circle;
 }
 
 /*!
@@ -71,32 +70,30 @@ std::expected<Circle, QString> Register::exec(const Circle &input){
  * \param point
  * \return
  */
-bool Register::setUpResult(Point &point){
+bool Register::setUpResult(Point& point) {
+  // get and check plane
+  if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
+    return false;
+  }
+  QPointer<Plane> plane = this->inputElements[0].at(0).plane;
+  if (plane.isNull() || !plane->getIsSolved()) {
+    return false;
+  }
 
-    //get and check plane
-    if(!this->inputElements.contains(0) || this->inputElements[0].size() != 1){
-        return false;
-    }
-    QPointer<Plane> plane = this->inputElements[0].at(0).plane;
-    if(plane.isNull() || !plane->getIsSolved()){
-        return false;
-    }
+  // get the position of the point and the plane and the normal vector
+  OiVec n_plane = plane->getDirection().getVector();
+  n_plane.normalize();
+  OiVec x_plane = plane->getPosition().getVector();
+  OiVec x_point = point.getPosition().getVector();
 
-    //get the position of the point and the plane and the normal vector
-    OiVec n_plane = plane->getDirection().getVector();
-    n_plane.normalize();
-    OiVec x_plane = plane->getPosition().getVector();
-    OiVec x_point = point.getPosition().getVector();
+  registerPointToPlane(x_point, x_plane, n_plane);
 
-    registerPointToPlane(x_point, x_plane, n_plane);
+  // set result
+  Position position = point.getPosition();
+  position.setVector(x_point);
+  point.setPoint(position);
 
-    //set result
-    Position position = point.getPosition();
-    position.setVector(x_point);
-    point.setPoint(position);
-
-    return true;
-
+  return true;
 }
 
 /*!
@@ -104,47 +101,45 @@ bool Register::setUpResult(Point &point){
  * \param sphere
  * \return
  */
-bool Register::setUpResult(Sphere &sphere){
+bool Register::setUpResult(Sphere& sphere) {
+  // get and check plane
+  if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
+    return false;
+  }
+  QPointer<Plane> plane = this->inputElements[0].at(0).plane;
+  if (plane.isNull() || !plane->getIsSolved()) {
+    return false;
+  }
 
-    //get and check plane
-    if(!this->inputElements.contains(0) || this->inputElements[0].size() != 1){
-        return false;
-    }
-    QPointer<Plane> plane = this->inputElements[0].at(0).plane;
-    if(plane.isNull() || !plane->getIsSolved()){
-        return false;
-    }
+  // get the position of the sphere and the plane and the normal vector
+  OiVec n_plane = plane->getDirection().getVector();
+  n_plane.normalize();
+  OiVec x_plane = plane->getPosition().getVector();
+  OiVec x_sphere = sphere.getPosition().getVector();
 
-    //get the position of the sphere and the plane and the normal vector
-    OiVec n_plane = plane->getDirection().getVector();
-    n_plane.normalize();
-    OiVec x_plane = plane->getPosition().getVector();
-    OiVec x_sphere = sphere.getPosition().getVector();
+  // calculate the distance of the plane from the origin
+  double d;
+  OiVec::dot(d, x_plane, n_plane);
+  if (d < 0.0) {
+    n_plane = -1.0 * n_plane;
+    d = -d;
+  }
 
-    //calculate the distance of the plane from the origin
-    double d;
-    OiVec::dot(d, x_plane, n_plane);
-    if(d < 0.0){
-        n_plane = -1.0 * n_plane;
-        d = -d;
-    }
+  // calculate the distance of the sphere position from the plane
+  double s;
+  OiVec::dot(s, x_sphere, n_plane);
+  s = s - d;
 
-    //calculate the distance of the sphere position from the plane
-    double s;
-    OiVec::dot(s, x_sphere, n_plane);
-    s = s - d;
+  // project the sphere position into the plane
+  x_sphere = x_sphere - s * n_plane;
 
-    //project the sphere position into the plane
-    x_sphere = x_sphere - s * n_plane;
+  // set result
+  Position position = sphere.getPosition();
+  position.setVector(x_sphere);
+  Radius radius = sphere.getRadius();
+  sphere.setSphere(position, radius);
 
-    //set result
-    Position position = sphere.getPosition();
-    position.setVector(x_sphere);
-    Radius radius = sphere.getRadius();
-    sphere.setSphere(position, radius);
-
-    return true;
-
+  return true;
 }
 
 /*!
@@ -152,44 +147,42 @@ bool Register::setUpResult(Sphere &sphere){
  * \param circle
  * \return
  */
-bool Register::setUpResult(Circle &circle){
+bool Register::setUpResult(Circle& circle) {
+  // get and check plane
+  if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
+    return false;
+  }
+  QPointer<Plane> plane = this->inputElements[0].at(0).plane;
+  if (plane.isNull() || !plane->getIsSolved()) {
+    return false;
+  }
 
-    //get and check plane
-    if(!this->inputElements.contains(0) || this->inputElements[0].size() != 1){
-        return false;
-    }
-    QPointer<Plane> plane = this->inputElements[0].at(0).plane;
-    if(plane.isNull() || !plane->getIsSolved()){
-        return false;
-    }
+  // get the position of the sphere and the plane and the normal vector
+  OiVec n_plane = plane->getDirection().getVector();
+  n_plane.normalize();
+  OiVec x_plane = plane->getPosition().getVector();
+  OiVec x_circle = circle.getPosition().getVector();
 
-    //get the position of the sphere and the plane and the normal vector
-    OiVec n_plane = plane->getDirection().getVector();
-    n_plane.normalize();
-    OiVec x_plane = plane->getPosition().getVector();
-    OiVec x_circle = circle.getPosition().getVector();
+  // calculate the distance of the plane from the origin
+  double d;
+  OiVec::dot(d, x_plane, n_plane);
+  if (d < 0.0) {
+    n_plane = -1.0 * n_plane;
+    d = -d;
+  }
 
-    //calculate the distance of the plane from the origin
-    double d;
-    OiVec::dot(d, x_plane, n_plane);
-    if(d < 0.0){
-        n_plane = -1.0 * n_plane;
-        d = -d;
-    }
+  // calculate the distance of the sphere position from the plane
+  double s;
+  OiVec::dot(s, x_circle, n_plane);
+  s = s - d;
 
-    //calculate the distance of the sphere position from the plane
-    double s;
-    OiVec::dot(s, x_circle, n_plane);
-    s = s - d;
+  // project the sphere position into the plane
+  x_circle = x_circle - s * n_plane;
 
-    //project the sphere position into the plane
-    x_circle = x_circle - s * n_plane;
+  // set result
+  Position position = circle.getPosition();
+  position.setVector(x_circle);
+  circle.setCircle(position, circle.getDirection(), circle.getRadius());
 
-    //set result
-    Position position = circle.getPosition();
-    position.setVector(x_circle);
-    circle.setCircle(position, circle.getDirection(), circle.getRadius());
-
-    return true;
-
+  return true;
 }

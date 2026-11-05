@@ -3,27 +3,29 @@
 /*!
  * \brief PointFromPoints::init
  */
-void PointFromPoints::init(){
+void PointFromPoints::init() {
+  // set plugin meta data
+  this->metaData.name = "PointFromPoints";
+  this->metaData.pluginName = "OpenIndy Default Plugin";
+  this->metaData.author = "bra";
+  this->metaData.description =
+      QString("%1 %2")
+          .arg("This function calculates an adjusted point.")
+          .arg(
+              "You can input as many points as you want which are then used to "
+              "find the best fit 3D point.");
+  this->metaData.iid = ConstructFunction_iidd;
 
-    //set plugin meta data
-    this->metaData.name = "PointFromPoints";
-    this->metaData.pluginName = "OpenIndy Default Plugin";
-    this->metaData.author = "bra";
-    this->metaData.description = QString("%1 %2")
-            .arg("This function calculates an adjusted point.")
-            .arg("You can input as many points as you want which are then used to find the best fit 3D point.");
-    this->metaData.iid = ConstructFunction_iidd;
+  // set needed elements
+  NeededElement param1;
+  param1.description =
+      "Select at least one points to calculate the best fit point.";
+  param1.infinite = true;
+  param1.typeOfElement = ePositionElement;
+  this->neededElements.append(param1);
 
-    //set needed elements
-    NeededElement param1;
-    param1.description = "Select at least one points to calculate the best fit point.";
-    param1.infinite = true;
-    param1.typeOfElement = ePositionElement;
-    this->neededElements.append(param1);
-
-    //set spplicable for
-    this->applicableFor.append(ePointFeature);
-
+  // set spplicable for
+  this->applicableFor.append(ePointFeature);
 }
 
 /*!
@@ -31,101 +33,106 @@ void PointFromPoints::init(){
  * \param point
  * \return
  */
-std::expected<Point, QString> PointFromPoints::exec(){
-    Point point;
-    if(!this->setUpResult(point)){
-        return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
-    }
-    return point;
+std::expected<Point, QString> PointFromPoints::exec() {
+  Point point;
+  if (!this->setUpResult(point)) {
+    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+  }
+  return point;
 }
 
 /*!
  * \brief PointFromPoints::setUpResult
  * \param point
  */
-bool PointFromPoints::setUpResult(Point &point){
-
-    //get and check input points
-    if(!this->inputElements.contains(0) || this->inputElements[0].size() < 1){
-        emit this->sendMessage(QString("Not enough valid points to fit the point %1").arg(point.getFeatureName()), eWarningMessage);
-        return false;
+bool PointFromPoints::setUpResult(Point& point) {
+  // get and check input points
+  if (!this->inputElements.contains(0) || this->inputElements[0].size() < 1) {
+    emit this->sendMessage(
+        QString("Not enough valid points to fit the point %1")
+            .arg(point.getFeatureName()),
+        eWarningMessage);
+    return false;
+  }
+  QList<OiVec> inputPoints;
+  foreach (const InputElement& element, this->inputElements[0]) {
+    if (!element.geometry.isNull() && element.geometry->getIsSolved() &&
+        element.geometry->hasPosition()) {
+      inputPoints.append(element.geometry->getPosition().getVector());
+      this->setIsUsed(0, element.id, true);
+    } else {
+      this->setIsUsed(0, element.id, false);
     }
-    QList<OiVec> inputPoints;
-    foreach(const InputElement &element, this->inputElements[0]){
-        if(!element.geometry.isNull() && element.geometry->getIsSolved()&& element.geometry->hasPosition()){
-            inputPoints.append(element.geometry->getPosition().getVector());
-            this->setIsUsed(0, element.id, true);
-        } else {
-            this->setIsUsed(0, element.id, false);
-        }
+  }
+  if (inputPoints.size() < 1) {
+    emit this->sendMessage(
+        QString("Not enough valid points to fit the point %1")
+            .arg(point.getFeatureName()),
+        eWarningMessage);
+    return false;
+  }
+
+  // fill l vector
+  OiVec l;
+  foreach (const OiVec p, inputPoints) {
+    l.add(p.getAt(0));
+    l.add(p.getAt(1));
+    l.add(p.getAt(2));
+  }
+
+  // fill A matrix
+  OiMat a(l.getSize(), 3);
+  for (int i = 0; i < l.getSize(); i++) {
+    if ((i % 3) == 0) {
+      a.setAt(i, Point::unknownCenterX, 1.0);
+    } else if ((i % 3) == 1) {
+      a.setAt(i, Point::unknownCenterY, 1.0);
+    } else if ((i % 3) == 2) {
+      a.setAt(i, Point::unknownCenterZ, 1.0);
     }
-    if(inputPoints.size() < 1){
-        emit this->sendMessage(QString("Not enough valid points to fit the point %1").arg(point.getFeatureName()), eWarningMessage);
-        return false;
-    }
+  }
 
-    //fill l vector
-    OiVec l;
-    foreach(const OiVec p, inputPoints){
-        l.add( p.getAt(0) );
-        l.add( p.getAt(1) );
-        l.add( p.getAt(2) );
-    }
+  // adjust
+  OiMat n = a.t() * a;
+  OiVec c = a.t() * l;
+  OiMat qxx;
+  OiVec x, v;
+  try {
+    qxx = n.inv();
+    x = qxx * c;
+    v = a * x - l;
+  } catch (const logic_error& e) {
+    emit this->sendMessage(e.what(), eErrorMessage);
+    return false;
+  } catch (const runtime_error& e) {
+    emit this->sendMessage(e.what(), eErrorMessage);
+    return false;
+  }
 
-    //fill A matrix
-    OiMat a(l.getSize(), 3);
-    for(int i = 0; i < l.getSize(); i++){
-        if( (i%3) == 0 ){
-            a.setAt(i, Point::unknownCenterX, 1.0);
-        }else if( (i%3) == 1 ){
-            a.setAt(i, Point::unknownCenterY, 1.0);
-        }else if( (i%3) == 2 ){
-            a.setAt(i, Point::unknownCenterZ, 1.0);
-        }
-    }
+  // calculate point based corrections
+  OiVec corr;
+  for (int i = 0; i < inputPoints.size(); i++) {
+    corr.add(qSqrt(v.getAt(3 * i) * v.getAt(3 * i) +
+                   v.getAt(3 * i + 1) * v.getAt(3 * i + 1) +
+                   v.getAt(3 * i + 2) * v.getAt(3 * i + 2)));
+  }
 
-    //adjust
-    OiMat n = a.t() * a;
-    OiVec c = a.t() * l;
-    OiMat qxx;
-    OiVec x, v;
-    try{
-        qxx = n.inv();
-        x = qxx * c;
-        v = a * x - l;
-    }catch(const logic_error &e){
-        emit this->sendMessage(e.what(), eErrorMessage);
-        return false;
-    }catch(const runtime_error &e){
-        emit this->sendMessage(e.what(), eErrorMessage);
-        return false;
-    }
+  // calculate standard deviation
+  double stdev = 0.0;
+  OiVec::dot(stdev, corr, corr);
+  stdev = qSqrt(stdev / (inputPoints.size() - 1.0));
 
-    //calculate point based corrections
-    OiVec corr;
-    for(int i = 0; i < inputPoints.size(); i++){
-        corr.add(qSqrt(v.getAt(3*i)*v.getAt(3*i)
-                       + v.getAt(3*i+1)*v.getAt(3*i+1)
-                       + v.getAt(3*i+2)*v.getAt(3*i+2)));
-    }
+  // set result
+  Position position;
+  position.setVector(x);
+  point.setPoint(position);
 
-    //calculate standard deviation
-    double stdev = 0.0;
-    OiVec::dot(stdev, corr, corr);
-    stdev = qSqrt(stdev / (inputPoints.size() - 1.0));
+  // set statistic
+  this->statistic.setIsValid(true);
+  this->statistic.setQxx(qxx);
+  this->statistic.setV(corr);
+  this->statistic.setStdev(stdev);
+  point.setStatistic(this->statistic);
 
-    //set result
-    Position position;
-    position.setVector(x);
-    point.setPoint(position);
-
-    //set statistic
-    this->statistic.setIsValid(true);
-    this->statistic.setQxx(qxx);
-    this->statistic.setV(corr);
-    this->statistic.setStdev(stdev);
-    point.setStatistic(this->statistic);
-
-    return true;
-
+  return true;
 }

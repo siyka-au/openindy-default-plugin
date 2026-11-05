@@ -5,43 +5,43 @@
 #include <QPointer>
 
 #include "objecttransformation.h"
-#include "oivec.h"
 #include "oimat.h"
+#include "oivec.h"
 
 using namespace oi;
 
-class TranslateByValue : public ObjectTransformation, public Transform<Point>, public Transform<Line>, public Transform<Plane>, public Transform<Sphere>
-{
-    Q_OBJECT
+class TranslateByValue : public ObjectTransformation,
+                         public Transform<Point>,
+                         public Transform<Line>,
+                         public Transform<Plane>,
+                         public Transform<Sphere> {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // function initialization method
+  // ##############################
 
-    //##############################
-    //function initialization method
-    //##############################
+  void init();
 
-    void init();
+  // ############
+  // exec methods
+  // ############
 
-    //############
-    //exec methods
-    //############
+  std::expected<Point, QString> exec(const Point& input) override;
+  std::expected<Line, QString> exec(const Line& input) override;
+  std::expected<Plane, QString> exec(const Plane& input) override;
+  std::expected<Sphere, QString> exec(const Sphere& input) override;
 
-    std::expected<Point, QString> exec(const Point &input) override;
-    std::expected<Line, QString> exec(const Line &input) override;
-    std::expected<Plane, QString> exec(const Plane &input) override;
-    std::expected<Sphere, QString> exec(const Sphere &input) override;
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    bool setUpResult(Point &point);
-    bool setUpResult(Line &line);
-    bool setUpResult(Plane &plane);
-    bool setUpResult(Sphere &sphere);
-
+  bool setUpResult(Point& point);
+  bool setUpResult(Line& line);
+  bool setUpResult(Plane& plane);
+  bool setUpResult(Sphere& sphere);
 };
 
-#endif // P_TRANSLATEBYVALUE_H
+#endif  // P_TRANSLATEBYVALUE_H

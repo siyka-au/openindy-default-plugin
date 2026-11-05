@@ -1,9 +1,9 @@
 #ifndef P_OIEXCHANGEASCII_H
 #define P_OIEXCHANGEASCII_H
 
-#include <exception>
 #include <QRegularExpression>
 #include <QVariantList>
+#include <exception>
 
 #include "exchangesimpleascii.h"
 #include "oijob.h"
@@ -12,41 +12,40 @@
 using namespace std;
 using namespace oi;
 
-class OiExchangeAscii : public ExchangeSimpleAscii
-{ 
-    Q_OBJECT
+class OiExchangeAscii : public ExchangeSimpleAscii {
+  Q_OBJECT
 
-public:
+ public:
+  // ##############################
+  // exchange initialization method
+  // ##############################
 
-    //##############################
-    //exchange initialization method
-    //##############################
+  void init();
 
-    void init();
+  // #########################
+  // import and export methods
+  // #########################
 
-    //#########################
-    //import and export methods
-    //#########################
+  void importOiData();
+  void exportOiData();
 
-    void importOiData();
-    void exportOiData();
+  // #########################################
+  // methods to get or set further information
+  // #########################################
 
-    //#########################################
-    //methods to get or set further information
-    //#########################################
+  QList<ExchangeSimpleAscii::ColumnType> getDefaultColumnOrder(
+      const GeometryTypes& typeOfGeometry);
+  QMap<ExchangeSimpleAscii::ColumnType, QVariantList> getFilePreview(
+      const GeometryTypes& typeOfGeometry);
+  QList<ExchangeSimpleAscii::ColumnType> getPossibleColumns(
+      const GeometryTypes& typeOfGeometry);
 
-    QList<ExchangeSimpleAscii::ColumnType> getDefaultColumnOrder(const GeometryTypes &typeOfGeometry);
-    QMap<ExchangeSimpleAscii::ColumnType, QVariantList> getFilePreview(const GeometryTypes &typeOfGeometry);
-    QList<ExchangeSimpleAscii::ColumnType> getPossibleColumns(const GeometryTypes &typeOfGeometry);
+ private:
+  // ##############
+  // helper methods
+  // ##############
 
-private:
-
-    //##############
-    //helper methods
-    //##############
-
-    QRegularExpression getDelimiter(const QString &delimiterName) const;
-
+  QRegularExpression getDelimiter(const QString& delimiterName) const;
 };
 
-#endif // P_OIEXCHANGEASCII_H
+#endif  // P_OIEXCHANGEASCII_H
