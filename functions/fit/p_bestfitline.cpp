@@ -83,7 +83,7 @@ bool BestFitLine::setUpResult(Line& line) {
   foreach (const QPointer<Point>& point, inputPoints) {
     centroid = centroid + point->getPosition().getVector();
   }
-  centroid = centroid * (1.0 / inputPoints.size());
+  centroid = centroid * (1.0 / static_cast<double>(inputPoints.size()));
 
   // principle component analysis
   OiMat a(inputPoints.size(), 3);
@@ -156,7 +156,8 @@ bool BestFitLine::setUpResult(Line& line) {
 
   // set statistic
   this->statistic.setIsValid(true);
-  this->statistic.setStdev(qSqrt(vtv / (inputPoints.size() - 2.0)));
+  this->statistic.setStdev(
+      qSqrt(vtv / (static_cast<double>(inputPoints.size()) - 2.0)));
   line.setStatistic(this->statistic);
 
   return true;

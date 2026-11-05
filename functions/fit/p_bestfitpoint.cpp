@@ -151,7 +151,7 @@ bool BestFitPoint::setUpResult(Point& point) {
   // calculate standard deviation
   double stdev = 0.0;
   OiVec::dot(stdev, corr, corr);
-  stdev = qSqrt(stdev / (inputObservations.size() - 1.0));
+  stdev = qSqrt(stdev / (static_cast<double>(inputObservations.size()) - 1.0));
 
   // set result
   Position position;

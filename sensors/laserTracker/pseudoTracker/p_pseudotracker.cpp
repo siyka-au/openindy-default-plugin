@@ -312,7 +312,7 @@ QList<QPointer<Reading> > PseudoTracker::measure(
   this->measureTime =
       mConfig.getMeasurementType() ==
               MeasurementTypes::eScanTimeDependent_MeasurementType
-          ? mConfig.getTimeInterval() * 1000
+          ? static_cast<int>(mConfig.getTimeInterval() * 1000)
           : 1000;
   this->isScanning = meaurementTypeScan;
 

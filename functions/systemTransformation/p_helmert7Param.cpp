@@ -194,7 +194,8 @@ vector<OiVec> Helmert7Param::calcCentroidCoord() {
     centroidLoc = centroidLoc + coord;
   }
   if (this->locSystem.count() > 0) {
-    result.push_back(centroidLoc / this->locSystem.count());
+    result.push_back(centroidLoc /
+                     static_cast<double>(this->locSystem.count()));
   }
   // centroid for target system
   OiVec centroidRef(3);
@@ -206,7 +207,8 @@ vector<OiVec> Helmert7Param::calcCentroidCoord() {
     centroidRef = centroidRef + coord;
   }
   if (refSystem.count() > 0) {
-    result.push_back(centroidRef / this->refSystem.count());
+    result.push_back(centroidRef /
+                     static_cast<double>(this->refSystem.count()));
   }
   return result;
 }
@@ -403,7 +405,8 @@ void Helmert7Param::fillTrafoParam(OiMat r, vector<OiVec> locC,
   }
 
   Statistic stats;
-  stats.setStdev(sqrt(sumVV / (3.0 * this->locSystem.size() - 7.0)));
+  stats.setStdev(
+      sqrt(sumVV / (3.0 * static_cast<double>(this->locSystem.size()) - 7.0)));
   tp.setStatistic(stats);
   // tp.generateHomogenMatrix();
 }
@@ -476,7 +479,9 @@ bool Helmert7Param::adjust_7p(TrafoParam& tp) {
   // if(iterations < 100){ //adjustment successful
   OiVec v = a * x - l_diff;
   OiVec vtv = v.t() * v;
-  double s0_post = sqrt(vtv.getAt(0) / (3.0 * this->locSystem.length() - 7.0));
+  double s0_post =
+      sqrt(vtv.getAt(0) /
+           (3.0 * static_cast<double>(this->locSystem.length()) - 7.0));
   OiMat sxx = s0_post * s0_post * qxx;
   // tp.getStatistic()->stdev = s0_post;
   result = true;
@@ -614,7 +619,8 @@ bool Helmert7Param::calc_6p(TrafoParam& tp) {
   }
 
   Statistic statistic;
-  statistic.setStdev(sqrt(sumVV / (3.0 * this->locSystem.size() - 6.0)));
+  statistic.setStdev(
+      sqrt(sumVV / (3.0 * static_cast<double>(this->locSystem.size()) - 6.0)));
   tp.setStatistic(statistic);
 
   // get new rotation and translation between pseudo-loc system and ref system
@@ -665,7 +671,8 @@ bool Helmert7Param::calc_6p(TrafoParam& tp) {
 
   OiVec v = a * x - l_diff;
   OiVec vtv = v.t() * v;
-  double s0_post = sqrt(vtv.getAt(0) / (3 * this->locSystem.length() - 6));
+  double s0_post = sqrt(
+      vtv.getAt(0) / (3 * static_cast<double>(this->locSystem.length()) - 6));
   OiMat sxx = s0_post * s0_post * qxx;
 
   // tp.getStatistic()->stdev = s0_post;

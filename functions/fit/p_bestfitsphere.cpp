@@ -101,7 +101,7 @@ bool BestFitSphere::approximate(Sphere& sphere,
   for (const auto& inputPoint : inputPoints) {
     centroid = centroid + inputPoint->getPosition().getVector();
   }
-  centroid = centroid / inputPoints.size();
+  centroid = centroid / static_cast<double>(inputPoints.size());
 
   // Drixler
   OiMat N(4, 4);

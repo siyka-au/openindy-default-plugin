@@ -32,13 +32,13 @@ double stddev(const std::vector<double>& values) {
   if (values.size() < 2) {
     return 0.0;
   }
-  const double mean =
-      std::accumulate(values.begin(), values.end(), 0.0) / values.size();
+  const double mean = std::accumulate(values.begin(), values.end(), 0.0) /
+                      static_cast<double>(values.size());
   double sumSq = 0.0;
   for (const double v : values) {
     sumSq += (v - mean) * (v - mean);
   }
-  return std::sqrt(sumSq / (values.size() - 1));
+  return std::sqrt(sumSq / (static_cast<double>(values.size()) - 1));
 }
 
 }  // namespace

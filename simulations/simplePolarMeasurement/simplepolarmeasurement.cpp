@@ -545,7 +545,7 @@ bool SimplePolarMeasurement::analyseSimulationData(UncertaintyData& d) {
       sumDD += d.values.at(i);
     }
 
-    d.expectation = sumDD / d.values.size();
+    d.expectation = sumDD / static_cast<double>(d.values.size());
 
     this->calcUncertainty(d);
     this->checkDistribution(d);
@@ -589,8 +589,8 @@ double SimplePolarMeasurement::getCorrelationCoefficient(
     sumYY += y.at(i);
   }
 
-  double mX = sumXX / x.size();
-  double mY = sumYY / y.size();
+  double mX = sumXX / static_cast<double>(x.size());
+  double mY = sumYY / static_cast<double>(y.size());
 
   double sumXi2 = 0.0;
   double sumYi2 = 0.0;
@@ -963,7 +963,7 @@ void SimplePolarMeasurement::checkDistribution(UncertaintyData& d) {
   double chi2Uniform = 0.0;
 
   QList<double> tmpList = d.values;
-  double n = tmpList.size();
+  double n = static_cast<double>(tmpList.size());
   std::sort(tmpList.begin(), tmpList.end());
 
   double classification = (d.maxValue - d.minValue) / 10;
@@ -1014,7 +1014,7 @@ void SimplePolarMeasurement::calcUncertainty(UncertaintyData& d) {
     sumVV += (d.expectation - v) * (d.expectation - v);
   }
 
-  d.uncertainty = sqrt(sumVV / (d.values.size() - 1.0));
+  d.uncertainty = sqrt(sumVV / (static_cast<double>(d.values.size()) - 1.0));
 }
 
 double SimplePolarMeasurement::edlenRefractionCalculation(double temperature,

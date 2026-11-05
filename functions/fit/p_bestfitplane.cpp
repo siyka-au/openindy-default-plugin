@@ -170,7 +170,8 @@ bool BestFitPlane::setUpResult(Plane& plane) {
 
   // set statistic
   this->statistic.setIsValid(true);
-  this->statistic.setStdev(qSqrt(eVal / (usedPositions.size() - 3.0)));
+  this->statistic.setStdev(
+      qSqrt(eVal / (static_cast<double>(usedPositions.size()) - 3.0)));
   plane.setStatistic(this->statistic);
 
   return true;
