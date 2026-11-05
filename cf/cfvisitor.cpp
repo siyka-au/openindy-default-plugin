@@ -42,7 +42,7 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
     } else if (node->getFeature().compare("global.copy") == 0) {
       QPointer<FeatureWrapper> copy = new FeatureWrapper();
       switch (ctx.global_feature->getFeatureTypeEnum()) {
-        case ePointFeature: {
+        case FeatureTypes::ePointFeature: {
           QPointer<Point> src = ctx.global_feature->getPoint();
           QPointer<Point> dest = new Point(src->getPosition());
           copy->setPoint(dest);
@@ -83,7 +83,7 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
             QString("add input element id: %2, %3, %4 to function: %1 (%5)")
                 .arg(parentFunction->getMetaData().name)
                 .arg(ie.id)
-                .arg(ie.typeOfElement)
+                .arg(static_cast<int>(ie.typeOfElement))
                 .arg(ie.label)
                 .arg(index),
             level);
@@ -102,7 +102,7 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
           QString("add input element id: %2, %3, %4 to function: %1 (%5)")
               .arg(parentFunction->getMetaData().name)
               .arg(ie.id)
-              .arg(ie.typeOfElement)
+              .arg(static_cast<int>(ie.typeOfElement))
               .arg(ie.label)
               .arg(index),
           level);

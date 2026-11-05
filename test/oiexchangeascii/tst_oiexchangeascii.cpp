@@ -39,7 +39,7 @@ P20	-749.56	2987.57	-453.59\r\n\
   exchange->init();
 
   // setup
-  exchange->setGeometryType(ePointGeometry);
+  exchange->setGeometryType(GeometryTypes::ePointGeometry);
   exchange->setSkipFirstLine(true);
   exchange->setDelimiter("whitespace [ ]");
 
@@ -59,9 +59,9 @@ P20	-749.56	2987.57	-453.59\r\n\
   exchange->setNominalSystem(QPointer<CoordinateSystem>(new CoordinateSystem(
       QPointer<Station>())) /*features.at(0)->getCoordinateSystem()*/);
 
-  exchange->setUnit(eMetric, eUnitMilliMeter);
-  exchange->setUnit(eAngular, eUnitDecimalDegree);
-  exchange->setUnit(eTemperature, eUnitGrad);
+  exchange->setUnit(DimensionType::eMetric, UnitType::eUnitMilliMeter);
+  exchange->setUnit(DimensionType::eAngular, UnitType::eUnitDecimalDegree);
+  exchange->setUnit(DimensionType::eTemperature, UnitType::eUnitGrad);
 
   // import data
   exchange->importOiData();
@@ -92,7 +92,7 @@ P20	-749.56	2987.57	-453.59\r\n\
 }
 
 void OiExchangeAsciiTest::testImportLevel() {
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 
   QString data(
       "\
@@ -110,7 +110,7 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
   exchange->init();
 
   // setup
-  exchange->setGeometryType(ePlaneGeometry);
+  exchange->setGeometryType(GeometryTypes::ePlaneGeometry);
   exchange->setSkipFirstLine(true);
   exchange->setDelimiter("whitespace [ ]");
 
@@ -119,7 +119,7 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
 
   // read column count from file / device
   exchange->setUserDefinedColumns(
-      exchange->getDefaultColumnOrder(ePlaneGeometry));
+      exchange->getDefaultColumnOrder(GeometryTypes::ePlaneGeometry));
 
   exchange->setFeatures(QList<QPointer<FeatureWrapper> >());  // only export
   exchange->setExportObservations(false);                     // only export
@@ -127,9 +127,9 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
   exchange->setNominalSystem(QPointer<CoordinateSystem>(new CoordinateSystem(
       QPointer<Station>())) /*features.at(0)->getCoordinateSystem()*/);
 
-  exchange->setUnit(eMetric, eUnitMilliMeter);
-  exchange->setUnit(eAngular, eUnitDecimalDegree);
-  exchange->setUnit(eTemperature, eUnitGrad);
+  exchange->setUnit(DimensionType::eMetric, UnitType::eUnitMilliMeter);
+  exchange->setUnit(DimensionType::eAngular, UnitType::eUnitDecimalDegree);
+  exchange->setUnit(DimensionType::eTemperature, UnitType::eUnitGrad);
 
   // import data
   exchange->importOiData();

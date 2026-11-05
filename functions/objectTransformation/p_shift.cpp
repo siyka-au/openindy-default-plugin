@@ -13,8 +13,8 @@ void Shift::init() {
   this->metaData.iid = ObjectTransformation_iidd;
 
   // set spplicable for
-  this->applicableFor.append(ePlaneFeature);
-  this->applicableFor.append(eCircleFeature);
+  this->applicableFor.append(FeatureTypes::ePlaneFeature);
+  this->applicableFor.append(FeatureTypes::eCircleFeature);
 
   // set double parameter
   this->doubleParameters.insert("offset [mm]", 0.0);

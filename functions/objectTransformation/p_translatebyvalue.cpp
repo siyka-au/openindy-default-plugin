@@ -16,14 +16,14 @@ void TranslateByValue::init() {
   NeededElement param1;
   param1.description = "Select a geometry that has a vector.";
   param1.infinite = false;
-  param1.typeOfElement = eDirectionElement;
+  param1.typeOfElement = ElementTypes::eDirectionElement;
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(ePointFeature);
-  this->applicableFor.append(eLineFeature);
-  this->applicableFor.append(ePlaneFeature);
-  this->applicableFor.append(eSphereFeature);
+  this->applicableFor.append(FeatureTypes::ePointFeature);
+  this->applicableFor.append(FeatureTypes::eLineFeature);
+  this->applicableFor.append(FeatureTypes::ePlaneFeature);
+  this->applicableFor.append(FeatureTypes::eSphereFeature);
 
   // set double parameter
   this->doubleParameters.insert("offset [mm]", 0.0);

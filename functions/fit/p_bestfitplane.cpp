@@ -29,19 +29,19 @@ void BestFitPlane::init() {
   param1.description =
       "Select at least three points to calculate the best fit plane.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
   this->neededElements.append(param1);
 
   NeededElement param2;
   param2.description = "Dummy point to indicate plane normal.";
   param2.infinite = true;
-  param2.typeOfElement = ePointElement;
+  param2.typeOfElement = ElementTypes::ePointElement;
   param2.roleName = "dummyPoint";
   this->neededElements.append(param2);
 
   // set spplicable for
-  this->applicableFor.append(ePlaneFeature);
+  this->applicableFor.append(FeatureTypes::ePlaneFeature);
 }
 
 /*!
@@ -66,7 +66,7 @@ bool BestFitPlane::setUpResult(Plane& plane) {
   if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
     emit this->sendMessage(
         QString("No points tagged for plane %1").arg(plane.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -104,7 +104,7 @@ bool BestFitPlane::setUpResult(Plane& plane) {
             "Not enough points tagged for plane %1 (have %2, need at least 3)")
             .arg(plane.getFeatureName())
             .arg(usedPositions.size()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -114,7 +114,7 @@ bool BestFitPlane::setUpResult(Plane& plane) {
   if (!bestFitPlane(centroid, n, eVal, points)) {
     emit this->sendMessage(
         QString("Cannot fit plane %1").arg(plane.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 

@@ -22,7 +22,7 @@ class TrackerErrorModelTest : public QObject {
 };
 
 void TrackerErrorModelTest::initTestCase() {
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
 void TrackerErrorModelTest::reportedSigmaMatchesExternalScatter() {

@@ -19,7 +19,7 @@ void NominalPoint::init() {
   this->neededElements.clear();
 
   // set applicable for
-  this->applicableFor.append(ePointFeature);
+  this->applicableFor.append(FeatureTypes::ePointFeature);
 
   // scalar input parameters, in the job's default unit (metres)
   this->doubleParameters.insert("x [m]", 0.0);

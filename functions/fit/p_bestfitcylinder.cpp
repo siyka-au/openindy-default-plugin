@@ -29,12 +29,12 @@ void BestFitCylinder::init() {
   param1.description =
       "Select at least five points to calculate the best fit cylinder.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(eCylinderFeature);
+  this->applicableFor.append(FeatureTypes::eCylinderFeature);
 
   this->stringParameters.insert("approximation", "first two points");
   this->stringParameters.insert("approximation", "guess axis");
@@ -67,7 +67,7 @@ bool BestFitCylinder::setUpResult(Cylinder& cylinder) {
   if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
     emit this->sendMessage(QString("No points tagged for cylinder %1")
                                .arg(cylinder.getFeatureName()),
-                           eWarningMessage);
+                           MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -95,7 +95,7 @@ bool BestFitCylinder::setUpResult(Cylinder& cylinder) {
       emit this->sendMessage(
           QString("Not enough valid points to fit the cylinder %1")
               .arg(cylinder.getFeatureName()),
-          eWarningMessage);
+          MessageTypes::eWarningMessage);
       return false;
     }
 
@@ -141,18 +141,18 @@ void BestFitCylinderAppxDirection::init() {
   param1.description =
       "Select at least five points to calculate the best fit cylinder.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
   this->neededElements.append(param1);
 
   NeededElement param2;
   param2.description = "approximation direction.";
   param2.infinite = true;
-  param2.typeOfElement = eDirectionElement;
+  param2.typeOfElement = ElementTypes::eDirectionElement;
   this->neededElements.append(param2);
 
   // set spplicable for
-  this->applicableFor.append(eCylinderFeature);
+  this->applicableFor.append(FeatureTypes::eCylinderFeature);
 
   this->scalarInputParams.isValid = true;
   this->scalarInputParams.stringParameter.insert("approximation",
@@ -184,19 +184,19 @@ void BestFitCylinderAppxDummyPoint::init() {
   param1.description =
       "Select at least five points to calculate the best fit cylinder.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
   this->neededElements.append(param1);
 
   NeededElement param3;
   param3.description = "Dummy points to indicate cylinder normal.";
   param3.infinite = true;
-  param3.typeOfElement = ePointElement;
+  param3.typeOfElement = ElementTypes::ePointElement;
   param3.roleName = "dummyPoint";
   this->neededElements.append(param3);
 
   // set spplicable for
-  this->applicableFor.append(eCylinderFeature);
+  this->applicableFor.append(FeatureTypes::eCylinderFeature);
 
   this->scalarInputParams.isValid = true;
   this->scalarInputParams.stringParameter.insert("approximation",

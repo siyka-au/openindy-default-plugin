@@ -21,7 +21,7 @@
 using namespace oi;
 using namespace std;
 
-enum ScaleTypes { noScale, pointScale, tempScale };
+enum class ScaleTypes { noScale, pointScale, tempScale };
 
 class Helmert7Param : public SystemTransformation, public Producer<TrafoParam> {
   Q_OBJECT

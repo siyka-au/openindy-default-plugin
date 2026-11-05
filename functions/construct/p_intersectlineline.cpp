@@ -18,17 +18,17 @@ void IntersectLineLine::init() {
   NeededElement param1;
   param1.description = "Select a line to calculate the intersection.";
   param1.infinite = false;
-  param1.typeOfElement = eLineElement;
+  param1.typeOfElement = ElementTypes::eLineElement;
   this->neededElements.append(param1);
 
   NeededElement param2;
   param2.description = "Select a line to calculate the intersection.";
   param2.infinite = false;
-  param2.typeOfElement = eLineElement;
+  param2.typeOfElement = ElementTypes::eLineElement;
   this->neededElements.append(param2);
 
   // set spplicable for
-  this->applicableFor.append(ePointFeature);
+  this->applicableFor.append(FeatureTypes::ePointFeature);
 
   this->stringParameters.insert("intersection", "at first line");
   this->stringParameters.insert("intersection", "at second line");
@@ -91,7 +91,7 @@ bool IntersectLineLine::setUpResult(Point& point) {
     emit this->sendMessage(QString("line %1 and line %2 are parallel")
                                .arg(line1->getFeatureName())
                                .arg(line2->getFeatureName()),
-                           eWarningMessage);
+                           MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -125,15 +125,15 @@ bool IntersectLineLine::setUpResult(Point& point) {
 
   OiVec s;
   switch (getIntersectionType()) {
-    case eAtSecondLine:
+    case IntersectionTypes::eAtSecondLine:
       s = fline2;
       break;
 
-    case eMidPoint:
+    case IntersectionTypes::eMidPoint:
       s = (fline1 + fline2) / 2.;
       break;
 
-    case eAtFirstLine:  // fall though
+    case IntersectionTypes::eAtFirstLine:  // fall though
     default:
       s = fline1;
   }

@@ -11,7 +11,7 @@
 
 using namespace oi;
 
-enum Axis {
+enum class Axis {
   eXAxis = 0,
   eYAxis,
   eZAxis  // ijk

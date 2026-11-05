@@ -64,7 +64,7 @@ class PipelineFilterTest : public QObject {
 };
 
 void PipelineFilterTest::initTestCase() {
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
 QPointer<OiJob> PipelineFilterTest::makeJobWithActiveStation(
@@ -407,7 +407,7 @@ void PipelineFilterTest::
     point->addObservation(observation);
     observations.append(observation);
     InputElement element(observation->getId());
-    element.typeOfElement = eObservationElement;
+    element.typeOfElement = ElementTypes::eObservationElement;
     element.observation = observation;
     function->addInputElement(element, 0);
   };

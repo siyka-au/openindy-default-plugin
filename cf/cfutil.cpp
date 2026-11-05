@@ -4,49 +4,49 @@
 
 FeatureTypes CFUtil::featureTypesForName(QString name) {
   if (name.compare("Circle") == 0) {
-    return eCircleFeature;
+    return FeatureTypes::eCircleFeature;
   } else if (name.compare("Cone") == 0) {
-    return eConeFeature;
+    return FeatureTypes::eConeFeature;
   } else if (name.compare("Cylinder") == 0) {
-    return eCylinderFeature;
+    return FeatureTypes::eCylinderFeature;
   } else if (name.compare("Ellipse") == 0) {
-    return eEllipseFeature;
+    return FeatureTypes::eEllipseFeature;
   } else if (name.compare("Ellipsoid") == 0) {
-    return eEllipsoidFeature;
+    return FeatureTypes::eEllipsoidFeature;
   } else if (name.compare("Hyperboloid") == 0) {
-    return eHyperboloidFeature;
+    return FeatureTypes::eHyperboloidFeature;
   } else if (name.compare("Line") == 0) {
-    return eLineFeature;
+    return FeatureTypes::eLineFeature;
   } else if (name.compare("Nurbs") == 0) {
-    return eNurbsFeature;
+    return FeatureTypes::eNurbsFeature;
   } else if (name.compare("Paraboloid") == 0) {
-    return eParaboloidFeature;
+    return FeatureTypes::eParaboloidFeature;
   } else if (name.compare("Plane") == 0) {
-    return ePlaneFeature;
+    return FeatureTypes::ePlaneFeature;
   } else if (name.compare("Point") == 0) {
-    return ePointFeature;
+    return FeatureTypes::ePointFeature;
   } else if (name.compare("PointCloud") == 0) {
-    return ePointCloudFeature;
+    return FeatureTypes::ePointCloudFeature;
   } else if (name.compare("ScalarEntityAngle") == 0) {
-    return eScalarEntityAngleFeature;
+    return FeatureTypes::eScalarEntityAngleFeature;
   } else if (name.compare("ScalarEntityDistance") == 0) {
-    return eScalarEntityDistanceFeature;
+    return FeatureTypes::eScalarEntityDistanceFeature;
   } else if (name.compare("ScalarEntityMeasurementSeries") == 0) {
-    return eScalarEntityMeasurementSeriesFeature;
+    return FeatureTypes::eScalarEntityMeasurementSeriesFeature;
   } else if (name.compare("ScalarEntityTemperature") == 0) {
-    return eScalarEntityTemperatureFeature;
+    return FeatureTypes::eScalarEntityTemperatureFeature;
   } else if (name.compare("SlottedHole") == 0) {
-    return eSlottedHoleFeature;
+    return FeatureTypes::eSlottedHoleFeature;
   } else if (name.compare("Sphere") == 0) {
-    return eSphereFeature;
+    return FeatureTypes::eSphereFeature;
   } else if (name.compare("Torus") == 0) {
-    return eTorusFeature;
+    return FeatureTypes::eTorusFeature;
   } else if (name.compare("CoordinateSystem") == 0) {
-    return eCoordinateSystemFeature;
+    return FeatureTypes::eCoordinateSystemFeature;
   } else if (name.compare("Station") == 0) {
-    return eStationFeature;
+    return FeatureTypes::eStationFeature;
   } else if (name.compare("TrafoParam") == 0) {
-    return eTrafoParamFeature;
+    return FeatureTypes::eTrafoParamFeature;
   }
   throw std::logic_error(QString("no FeatureTypes for \"%1\" found")
                              .arg(name)

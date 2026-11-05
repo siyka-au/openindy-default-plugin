@@ -22,11 +22,11 @@ void BestFitPoint::init() {
   param1.description =
       "Select at least one observation to calculate the best fit point.";
   param1.infinite = true;
-  param1.typeOfElement = eObservationElement;
+  param1.typeOfElement = ElementTypes::eObservationElement;
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(ePointFeature);
+  this->applicableFor.append(FeatureTypes::ePointFeature);
 
   this->stringParameters.insert(key, value_no);
   this->stringParameters.insert(key, value_yes);
@@ -59,15 +59,15 @@ bool BestFitPoint::setUpResult(Point& point) {
     emit this->sendMessage(
         QString("Not enough valid observations to fit the point %1")
             .arg(point.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
   if (this->scalarInputParams.stringParameter.contains(key) &&
       this->scalarInputParams.stringParameter.value(key).compare(value_yes) ==
           0) {
-    for (int sideInt = SensorFaces::eFrontSide;
-         sideInt <= SensorFaces::eUndefinedSide; sideInt++) {
+    for (int sideInt = static_cast<int>(SensorFaces::eFrontSide);
+         sideInt <= static_cast<int>(SensorFaces::eUndefinedSide); sideInt++) {
       SensorFaces side = static_cast<SensorFaces>(sideInt);
       QList<int> obsIds;  // observation ids
       foreach (InputElement e, this->inputElements[0]) {
@@ -90,7 +90,7 @@ bool BestFitPoint::setUpResult(Point& point) {
     emit this->sendMessage(
         QString("Not enough valid observations to fit the point %1")
             .arg(point.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -124,10 +124,10 @@ bool BestFitPoint::setUpResult(Point& point) {
     x = qxx * c;
     v = a * x - l;
   } catch (const logic_error& e) {
-    emit this->sendMessage(e.what(), eErrorMessage);
+    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
     return false;
   } catch (const runtime_error& e) {
-    emit this->sendMessage(e.what(), eErrorMessage);
+    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
     return false;
   }
 

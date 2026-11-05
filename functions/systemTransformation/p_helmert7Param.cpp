@@ -22,11 +22,11 @@ void Helmert7Param::init() {
   NeededElement param1;
   param1.description = "Select points for calculating the transformation.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(eTrafoParamFeature);
+  this->applicableFor.append(FeatureTypes::eTrafoParamFeature);
 
   // scale type
   this->stringParameters.insert("calculate scale", "yes");
@@ -79,7 +79,7 @@ bool Helmert7Param::setUpResult(TrafoParam& trafoParam) {
 
   if (locSystem.count() == refSystem.count() &&
       locSystem.count() > 2) {  // if enough common points available
-    if (this->scaleType == pointScale) {
+    if (this->scaleType == ScaleTypes::pointScale) {
       if (this->calc_7p(trafoParam)) {
         if (locSystem.count() > 3) {
           return this->adjust_7p(trafoParam);
@@ -91,7 +91,8 @@ bool Helmert7Param::setUpResult(TrafoParam& trafoParam) {
       return this->calc_6p(trafoParam);
     }
   } else {
-    emit this->sendMessage("Not enough common points!", eWarningMessage);
+    emit this->sendMessage("Not enough common points!",
+                           MessageTypes::eWarningMessage);
   }
   return false;
 }
@@ -107,7 +108,7 @@ void Helmert7Param::getScaleType() {
       if (this->scalarInputParams.stringParameter.contains("use temperature")) {
         if (this->scalarInputParams.stringParameter.value("use temperature")
                 .compare("no") == 0) {
-          this->scaleType = pointScale;
+          this->scaleType = ScaleTypes::pointScale;
           return;
         } else {
           if (this->scalarInputParams.stringParameter
@@ -115,12 +116,12 @@ void Helmert7Param::getScaleType() {
                   .compare("no") == 0) {
             this->scalarInputParams.doubleParameter["reference"] = 20.0;
           }
-          this->scaleType = tempScale;
+          this->scaleType = ScaleTypes::tempScale;
           return;
         }
       }
     } else {
-      this->scaleType = noScale;
+      this->scaleType = ScaleTypes::noScale;
       return;
     }
   }
@@ -992,7 +993,7 @@ OiMat Helmert7Param::p6_getScaleMatrix(OiVec s) {
 double Helmert7Param::setScaleValue() {
   double scale = 1.0;
 
-  if (this->scaleType == noScale) {
+  if (this->scaleType == ScaleTypes::noScale) {
     scale = 1.0;
   } else {
     double act = this->scalarInputParams.doubleParameter.value("actual");

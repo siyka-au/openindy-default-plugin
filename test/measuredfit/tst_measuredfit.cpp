@@ -66,7 +66,7 @@ class MeasuredFitTest : public QObject {
 };
 
 void MeasuredFitTest::initTestCase() {
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
 QPointer<OiJob> MeasuredFitTest::makeJobWithActiveStation(

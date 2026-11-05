@@ -29,7 +29,7 @@ void LoadPluginTest::initTestCase() {
   // (TrackerErrorModel); without a backend selected here, that
   // dereferences a null linear-algebra pointer and crashes (main.cpp
   // does this same call at real app startup)
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
 /*
@@ -76,7 +76,7 @@ void LoadPluginTest::testPseudoTracker_eCartesianReading() {
   sensor->init();
 
   MeasurementConfig config;
-  config.setMeasurementType(eSinglePoint_MeasurementType);
+  config.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
   SensorConfiguration sc = sensor->getSensorConfiguration();
   QMap<QString, QString> sp = sc.getStringParameter();
   sp.insert("reading type", "cartesian");

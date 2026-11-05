@@ -18,16 +18,16 @@ void PointBetweenTwoPoints::init() {
   NeededElement param1;
   param1.description = "Select first point.";
   param1.infinite = false;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   NeededElement param2;
   param2.description = "Select second point.";
   param2.infinite = false;
-  param2.typeOfElement = ePointElement;
+  param2.typeOfElement = ElementTypes::ePointElement;
   this->neededElements.append(param1);
   this->neededElements.append(param2);
 
   // set spplicable for
-  this->applicableFor.append(ePointFeature);
+  this->applicableFor.append(FeatureTypes::ePointFeature);
 }
 
 /*!
@@ -59,7 +59,7 @@ bool PointBetweenTwoPoints::setUpResult(Point& point) {
   if (this->inputElements[0].first().point->getId() ==
       this->inputElements[1].first().point->getId()) {
     emit this->sendMessage(QString("Input geometries are equal."),
-                           eWarningMessage);
+                           MessageTypes::eWarningMessage);
     return false;
   }
 

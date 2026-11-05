@@ -20,21 +20,21 @@ void RectifyToPoint::init() {
   param1.description =
       "Select a position used for the orientation of the target geometry.";
   param1.infinite = false;
-  param1.typeOfElement = ePositionElement;
+  param1.typeOfElement = ElementTypes::ePositionElement;
   this->neededElements.append(param1);
 
   NeededElement param2;
   param2.description =
       "Select a station used for the orientation of the target geometry.";
   param2.infinite = false;
-  param2.typeOfElement = eStationElement;
+  param2.typeOfElement = ElementTypes::eStationElement;
   this->neededElements.append(param2);
 
   // set spplicable for
-  this->applicableFor.append(ePlaneFeature);
-  this->applicableFor.append(eCircleFeature);
-  this->applicableFor.append(eLineFeature);
-  this->applicableFor.append(eCylinderFeature);
+  this->applicableFor.append(FeatureTypes::ePlaneFeature);
+  this->applicableFor.append(FeatureTypes::eCircleFeature);
+  this->applicableFor.append(FeatureTypes::eLineFeature);
+  this->applicableFor.append(FeatureTypes::eCylinderFeature);
 
   // set string parameter
   this->stringParameters.insert("sense", "negative");

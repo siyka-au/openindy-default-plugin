@@ -27,7 +27,7 @@ QPointer<Point> makePoint(double x, double y, double z, int id) {
 void addInputPoint(QPointer<Function> function, const QPointer<Point>& point,
                    int neededElementsIndex = 0) {
   InputElement element(point->getId());
-  element.typeOfElement = ePointElement;
+  element.typeOfElement = ElementTypes::ePointElement;
   element.point = point;
   function->addInputElement(element, neededElementsIndex);
 }
@@ -89,7 +89,7 @@ class CollectionBindingTest : public QObject {
 };
 
 void CollectionBindingTest::initTestCase() {
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
 void CollectionBindingTest::pointsAddedAfterInitialResolutionArePickedUp() {

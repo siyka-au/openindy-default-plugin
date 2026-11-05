@@ -32,19 +32,19 @@ void BestFitCircleInPlane::init() {
   param1.description =
       "Select at least three points to calculate the best fit circle.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
   this->neededElements.append(param1);
 
   NeededElement param2;
   param2.description = "Dummy point to indicate circle normal.";
   param2.infinite = true;
-  param2.typeOfElement = ePointElement;
+  param2.typeOfElement = ElementTypes::ePointElement;
   param2.roleName = "dummyPoint";
   this->neededElements.append(param2);
 
   // set spplicable for
-  this->applicableFor.append(eCircleFeature);
+  this->applicableFor.append(FeatureTypes::eCircleFeature);
 }
 
 /*!
@@ -70,7 +70,7 @@ bool BestFitCircleInPlane::setUpResult(Circle& circle) {
   if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
     emit this->sendMessage(
         QString("No points tagged for circle %1").arg(circle.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -95,7 +95,7 @@ bool BestFitCircleInPlane::setUpResult(Circle& circle) {
       emit this->sendMessage(
           QString("Not enough valid points to fit the circle %1")
               .arg(circle.getFeatureName()),
-          eWarningMessage);
+          MessageTypes::eWarningMessage);
       return false;
     }
 

@@ -689,7 +689,7 @@ double SimplePolarMeasurement::distortComponent(UncertaintyComponent u) {
 }
 
 bool SimplePolarMeasurement::distortionBySensor(Reading* r) {
-  if (r->getTypeOfReading() != ePolarReading) {
+  if (r->getTypeOfReading() != ReadingTypes::ePolarReading) {
     return false;
   }
 

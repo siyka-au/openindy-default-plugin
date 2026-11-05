@@ -139,71 +139,71 @@ ElementTypes FunctionConfigParser::typeOfElement(QJsonValue value) {
   }
   QString s = value.toString();
   if (s.compare("Circle") == 0) {
-    return eCircleElement;
+    return ElementTypes::eCircleElement;
   } else if (s.compare("Cone") == 0) {
-    return eConeElement;
+    return ElementTypes::eConeElement;
   } else if (s.compare("Cylinder") == 0) {
-    return eCylinderElement;
+    return ElementTypes::eCylinderElement;
   } else if (s.compare("Ellipse") == 0) {
-    return eEllipseElement;
+    return ElementTypes::eEllipseElement;
   } else if (s.compare("Ellipsoid") == 0) {
-    return eEllipsoidElement;
+    return ElementTypes::eEllipsoidElement;
   } else if (s.compare("Hyperboloid") == 0) {
-    return eHyperboloidElement;
+    return ElementTypes::eHyperboloidElement;
   } else if (s.compare("Line") == 0) {
-    return eLineElement;
+    return ElementTypes::eLineElement;
   } else if (s.compare("Nurbs") == 0) {
-    return eNurbsElement;
+    return ElementTypes::eNurbsElement;
   } else if (s.compare("Paraboloid") == 0) {
-    return eParaboloidElement;
+    return ElementTypes::eParaboloidElement;
   } else if (s.compare("Plane") == 0) {
-    return ePlaneElement;
+    return ElementTypes::ePlaneElement;
   } else if (s.compare("Point") == 0) {
-    return ePointElement;
+    return ElementTypes::ePointElement;
   } else if (s.compare("PointCloud") == 0) {
-    return ePointCloudElement;
+    return ElementTypes::ePointCloudElement;
   } else if (s.compare("ScalarEntityAngle") == 0) {
-    return eScalarEntityAngleElement;
+    return ElementTypes::eScalarEntityAngleElement;
   } else if (s.compare("ScalarEntityDistance") == 0) {
-    return eScalarEntityDistanceElement;
+    return ElementTypes::eScalarEntityDistanceElement;
   } else if (s.compare("ScalarEntityMeasurementSeries") == 0) {
-    return eScalarEntityMeasurementSeriesElement;
+    return ElementTypes::eScalarEntityMeasurementSeriesElement;
   } else if (s.compare("ScalarEntityTemperature") == 0) {
-    return eScalarEntityTemperatureElement;
+    return ElementTypes::eScalarEntityTemperatureElement;
   } else if (s.compare("SlottedHole") == 0) {
-    return eSlottedHoleElement;
+    return ElementTypes::eSlottedHoleElement;
   } else if (s.compare("Sphere") == 0) {
-    return eSphereElement;
+    return ElementTypes::eSphereElement;
   } else if (s.compare("Torus") == 0) {
-    return eTorusElement;
+    return ElementTypes::eTorusElement;
   } else if (s.compare("Direction") == 0) {
-    return eDirectionElement;
+    return ElementTypes::eDirectionElement;
   } else if (s.compare("Position") == 0) {
-    return ePositionElement;
+    return ElementTypes::ePositionElement;
   } else if (s.compare("Radius") == 0) {
-    return eRadiusElement;
+    return ElementTypes::eRadiusElement;
   } else if (s.compare("CoordinateSystem") == 0) {
-    return eCoordinateSystemElement;
+    return ElementTypes::eCoordinateSystemElement;
   } else if (s.compare("Station") == 0) {
-    return eStationElement;
+    return ElementTypes::eStationElement;
   } else if (s.compare("TrafoParam") == 0) {
-    return eTrafoParamElement;
+    return ElementTypes::eTrafoParamElement;
   } else if (s.compare("Observation") == 0) {
-    return eObservationElement;
+    return ElementTypes::eObservationElement;
   } else if (s.compare("ReadingCartesian") == 0) {
-    return eReadingCartesianElement;
+    return ElementTypes::eReadingCartesianElement;
   } else if (s.compare("ReadingPolar") == 0) {
-    return eReadingPolarElement;
+    return ElementTypes::eReadingPolarElement;
   } else if (s.compare("ReadingDistance") == 0) {
-    return eReadingDistanceElement;
+    return ElementTypes::eReadingDistanceElement;
   } else if (s.compare("ReadingDirection") == 0) {
-    return eReadingDirectionElement;
+    return ElementTypes::eReadingDirectionElement;
   } else if (s.compare("ReadingTemperature") == 0) {
-    return eReadingTemperatureElement;
+    return ElementTypes::eReadingTemperatureElement;
   } else if (s.compare("ReadingLevel") == 0) {
-    return eReadingLevelElement;
+    return ElementTypes::eReadingLevelElement;
   } else {
-    return eUndefinedElement;
+    return ElementTypes::eUndefinedElement;
   }
 }
 

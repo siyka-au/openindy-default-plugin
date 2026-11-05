@@ -22,11 +22,11 @@ void PointFromPlaneOrigin::init() {
   NeededElement param1;
   param1.description = "Select the plane whose position defines the point.";
   param1.infinite = false;
-  param1.typeOfElement = ePlaneElement;
+  param1.typeOfElement = ElementTypes::ePlaneElement;
   this->neededElements.append(param1);
 
   // set applicable for
-  this->applicableFor.append(ePointFeature);
+  this->applicableFor.append(FeatureTypes::ePointFeature);
 }
 
 /*!
@@ -51,7 +51,7 @@ bool PointFromPlaneOrigin::setUpResult(Point& point) {
   if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
     emit this->sendMessage(
         QString("No plane set for point %1").arg(point.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -61,7 +61,7 @@ bool PointFromPlaneOrigin::setUpResult(Point& point) {
     this->setIsUsed(0, element.id, false);
     emit this->sendMessage(QString("The plane for point %1 is not solved")
                                .arg(point.getFeatureName()),
-                           eWarningMessage);
+                           MessageTypes::eWarningMessage);
     return false;
   }
 

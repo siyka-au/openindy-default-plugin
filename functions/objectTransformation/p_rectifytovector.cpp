@@ -18,14 +18,14 @@ void RectifyToVector::init() {
   param1.description =
       "Select a direction used for the orientation of the target geometry.";
   param1.infinite = false;
-  param1.typeOfElement = eDirectionElement;
+  param1.typeOfElement = ElementTypes::eDirectionElement;
   this->neededElements.append(param1);
 
   NeededElement param2;
   param2.description =
       "Select a station used for the orientation of the target geometry.";
   param2.infinite = false;
-  param2.typeOfElement = eStationElement;
+  param2.typeOfElement = ElementTypes::eStationElement;
   this->neededElements.append(param2);
 
   NeededElement param3;
@@ -33,12 +33,12 @@ void RectifyToVector::init() {
       "Select a coordinate system used for the orientation of the target "
       "geometry.";
   param3.infinite = false;
-  param3.typeOfElement = eCoordinateSystemElement;
+  param3.typeOfElement = ElementTypes::eCoordinateSystemElement;
   this->neededElements.append(param3);
 
   // set spplicable for
-  this->applicableFor.append(ePlaneFeature);
-  this->applicableFor.append(eCircleFeature);
+  this->applicableFor.append(FeatureTypes::ePlaneFeature);
+  this->applicableFor.append(FeatureTypes::eCircleFeature);
 
   // set string parameter
   this->stringParameters.insert("rectify to station / coordinate system",
@@ -124,13 +124,13 @@ bool RectifyToVector::direction(OiVec& direction) {
     QPointer<Station> rectifyStation = this->inputElements[1].at(0).station;
     if (!rectifyStation.isNull()) {
       switch (axis()) {
-        case eXAxis:
+        case Axis::eXAxis:
           direction = rectifyStation->getXAxis().getVector();
           return true;
-        case eYAxis:
+        case Axis::eYAxis:
           direction = rectifyStation->getYAxis().getVector();
           return true;
-        case eZAxis:
+        case Axis::eZAxis:
           direction = rectifyStation->getZAxis().getVector();
           return true;
       }
@@ -142,13 +142,13 @@ bool RectifyToVector::direction(OiVec& direction) {
         this->inputElements[2].at(0).coordSystem;
     if (!rectifyCoordinateSystem.isNull()) {
       switch (axis()) {
-        case eXAxis:
+        case Axis::eXAxis:
           direction = rectifyCoordinateSystem->getXAxis().getVector();
           return true;
-        case eYAxis:
+        case Axis::eYAxis:
           direction = rectifyCoordinateSystem->getYAxis().getVector();
           return true;
-        case eZAxis:
+        case Axis::eZAxis:
           direction = rectifyCoordinateSystem->getZAxis().getVector();
           return true;
       }

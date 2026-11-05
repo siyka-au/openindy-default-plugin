@@ -22,11 +22,11 @@ void LineFromPlaneNormal::init() {
   NeededElement param1;
   param1.description = "Select the plane whose normal defines the line.";
   param1.infinite = false;
-  param1.typeOfElement = ePlaneElement;
+  param1.typeOfElement = ElementTypes::ePlaneElement;
   this->neededElements.append(param1);
 
   // set applicable for
-  this->applicableFor.append(eLineFeature);
+  this->applicableFor.append(FeatureTypes::eLineFeature);
 }
 
 /*!
@@ -51,7 +51,7 @@ bool LineFromPlaneNormal::setUpResult(Line& line) {
   if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
     emit this->sendMessage(
         QString("No plane set for line %1").arg(line.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -63,7 +63,7 @@ bool LineFromPlaneNormal::setUpResult(Line& line) {
     this->setIsUsed(0, element.id, false);
     emit this->sendMessage(QString("The plane for line %1 is not solved")
                                .arg(line.getFeatureName()),
-                           eWarningMessage);
+                           MessageTypes::eWarningMessage);
     return false;
   }
 

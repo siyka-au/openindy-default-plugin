@@ -10,7 +10,7 @@
 
 using namespace oi;
 
-enum IntersectionTypes { eAtFirstLine, eAtSecondLine, eMidPoint };
+enum class IntersectionTypes { eAtFirstLine, eAtSecondLine, eMidPoint };
 
 /*!
  * \brief The IntersectLineline class

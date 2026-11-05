@@ -43,13 +43,13 @@ QPointer<FeatureWrapper> CFContext::createApplicableFeature(
   QPointer<FeatureWrapper> featureWrapper = new FeatureWrapper();
 
   switch (featureType) {
-    case ePointFeature: {
+    case FeatureTypes::ePointFeature: {
       QPointer<Point> feature = new Point();
       feature->setFeatureName("generated Point");
       featureWrapper->setPoint(feature);
       return featureWrapper;
     }
-    case eScalarEntityDistanceFeature: {
+    case FeatureTypes::eScalarEntityDistanceFeature: {
       QPointer<ScalarEntityDistance> feature = new ScalarEntityDistance();
       feature->setFeatureName("generated ScalarEntityDistance");
       featureWrapper->setScalarEntityDistance(feature);
@@ -67,13 +67,13 @@ InputElement CFContext::createInputElement(QPointer<FeatureWrapper> feature) {
                       .arg(feature->getFeatureTypeString());
 
   switch (feature->getFeatureTypeEnum()) {
-    case ePointFeature:
-      element.typeOfElement = ePointElement;
+    case FeatureTypes::ePointFeature:
+      element.typeOfElement = ElementTypes::ePointElement;
       element.point = feature->getPoint();
       element.geometry = feature->getPoint();
       break;
-    case eScalarEntityDistanceFeature:
-      element.typeOfElement = eScalarEntityDistanceElement;
+    case FeatureTypes::eScalarEntityDistanceFeature:
+      element.typeOfElement = ElementTypes::eScalarEntityDistanceElement;
       element.scalarEntityDistance = feature->getScalarEntityDistance();
       element.geometry = feature->getScalarEntityDistance();
       break;

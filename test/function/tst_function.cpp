@@ -138,7 +138,8 @@ class FunctionTest : public QObject {
   void testCircleInPlaneFromPoints_with_DummyPoint();  // OI-805
 
   void printMessage(const QString& msg, const MessageTypes& msgType,
-                    const MessageDestinations& msgDest = eConsoleMessage);
+                    const MessageDestinations& msgDest =
+                        MessageDestinations::eConsoleMessage);
 
  private:
   QPointer<Function> createFunction(QString name);
@@ -179,7 +180,7 @@ class FunctionTest : public QObject {
 FunctionTest::FunctionTest() {}
 
 void FunctionTest::initTestCase() {
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
 void FunctionTest::printMessage(const QString& msg, const MessageTypes& msgType,
@@ -222,7 +223,7 @@ void FunctionTest::addInputObservations(QString data,
     reading->setObservation(observation);
 
     InputElement* element = new InputElement(id);
-    element->typeOfElement = eObservationElement;
+    element->typeOfElement = ElementTypes::eObservationElement;
     element->observation = observation;
     element->shouldBeUsed = shouldBeUsed;
 
@@ -249,7 +250,7 @@ void FunctionTest::addInputPoints(QString data, QPointer<Function> function,
     feature->setFeatureName(QString("point_%1").arg(id));
 
     InputElement* element = new InputElement(id);
-    element->typeOfElement = ePointElement;
+    element->typeOfElement = ElementTypes::ePointElement;
     element->point = feature;
     element->geometry = feature;
     element->shouldBeUsed = shouldBeUsed;
@@ -282,7 +283,7 @@ void FunctionTest::addInputLine(double x, double y, double z, double i,
   line->setFeatureName(QString("line_%1").arg(id));
 
   InputElement* element = new InputElement(id);
-  element->typeOfElement = eLineElement;
+  element->typeOfElement = ElementTypes::eLineElement;
   element->line = line;
   element->geometry = line;
 
@@ -313,7 +314,7 @@ void FunctionTest::addInputStation(double x, double y, double z, double i,
   station->setIsSolved(true);
 
   InputElement* element = new InputElement(id);
-  element->typeOfElement = eStationElement;
+  element->typeOfElement = ElementTypes::eStationElement;
   element->station = station;
 
   function->addInputElement(*element, inputElementKey);
@@ -345,7 +346,7 @@ void FunctionTest::addInputCoordinateSystem(double x, double y, double z,
   coordianteSystem->setIsSolved(true);
 
   InputElement* element = new InputElement(id);
-  element->typeOfElement = eCoordinateSystemElement;
+  element->typeOfElement = ElementTypes::eCoordinateSystemElement;
   element->coordSystem = coordianteSystem;
 
   function->addInputElement(*element, inputElementKey);
@@ -361,7 +362,7 @@ void FunctionTest::addInputCoordinateSystem(OiMat trafo,
   coordianteSystem->setIsSolved(true);
 
   InputElement* element = new InputElement(id);
-  element->typeOfElement = eCoordinateSystemElement;
+  element->typeOfElement = ElementTypes::eCoordinateSystemElement;
   element->coordSystem = coordianteSystem;
 
   function->addInputElement(*element, inputElementKey);
@@ -379,7 +380,7 @@ void FunctionTest::addInputPoint(double x, double y, double z,
   feature->setFeatureName(QString("point_%1").arg(id));
 
   InputElement* element = new InputElement(id);
-  element->typeOfElement = ePointElement;
+  element->typeOfElement = ElementTypes::ePointElement;
   element->point = feature;
   element->geometry = feature;
 
@@ -412,7 +413,7 @@ void FunctionTest::addInputCircle(double x, double y, double z, double i,
   feature->setFeatureName(QString("circle_%1").arg(id));
 
   InputElement* element = new InputElement(id);
-  element->typeOfElement = eCircleElement;
+  element->typeOfElement = ElementTypes::eCircleElement;
   element->circle = feature;
   element->geometry = feature;
 
@@ -442,7 +443,7 @@ void FunctionTest::addInputPlane(double x, double y, double z, double i,
   feature->setFeatureName(QString("plane_%1").arg(id));
 
   InputElement* element = new InputElement(id);
-  element->typeOfElement = ePlaneElement;
+  element->typeOfElement = ElementTypes::ePlaneElement;
   element->plane = feature;
   element->geometry = feature;
 

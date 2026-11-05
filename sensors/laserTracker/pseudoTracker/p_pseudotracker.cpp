@@ -12,26 +12,26 @@ void PseudoTracker::init() {
   this->metaData.iid = LaserTracker_iidd;
 
   // set supported reading types
-  this->supportedReadingTypes.append(eCartesianReading);
-  this->supportedReadingTypes.append(ePolarReading);
-  this->supportedReadingTypes.append(eDirectionReading);
-  this->supportedReadingTypes.append(eDistanceReading);
-  this->supportedReadingTypes.append(eLevelReading);
-  this->supportedReadingTypes.append(eTemperatureReading);
-  this->supportedReadingTypes.append(eLevelReading);
+  this->supportedReadingTypes.append(ReadingTypes::eCartesianReading);
+  this->supportedReadingTypes.append(ReadingTypes::ePolarReading);
+  this->supportedReadingTypes.append(ReadingTypes::eDirectionReading);
+  this->supportedReadingTypes.append(ReadingTypes::eDistanceReading);
+  this->supportedReadingTypes.append(ReadingTypes::eLevelReading);
+  this->supportedReadingTypes.append(ReadingTypes::eTemperatureReading);
+  this->supportedReadingTypes.append(ReadingTypes::eLevelReading);
 
   // set supported sensor actions
-  this->supportedSensorActions.append(eConnect);
-  this->supportedSensorActions.append(eDisconnect);
-  this->supportedSensorActions.append(eMeasure);
-  this->supportedSensorActions.append(eHome);
-  this->supportedSensorActions.append(eInitialize);
-  this->supportedSensorActions.append(eMoveAngle);
-  this->supportedSensorActions.append(eMoveXYZ);
-  this->supportedSensorActions.append(eToggleSight);
-  this->supportedSensorActions.append(eCompensation);
-  this->supportedSensorActions.append(eMotorState);
-  this->supportedSensorActions.append(eSearch);
+  this->supportedSensorActions.append(SensorFunctions::eConnect);
+  this->supportedSensorActions.append(SensorFunctions::eDisconnect);
+  this->supportedSensorActions.append(SensorFunctions::eMeasure);
+  this->supportedSensorActions.append(SensorFunctions::eHome);
+  this->supportedSensorActions.append(SensorFunctions::eInitialize);
+  this->supportedSensorActions.append(SensorFunctions::eMoveAngle);
+  this->supportedSensorActions.append(SensorFunctions::eMoveXYZ);
+  this->supportedSensorActions.append(SensorFunctions::eToggleSight);
+  this->supportedSensorActions.append(SensorFunctions::eCompensation);
+  this->supportedSensorActions.append(SensorFunctions::eMotorState);
+  this->supportedSensorActions.append(SensorFunctions::eSearch);
 
   // this simulator only fabricates readings on demand; there is no live stream
   this->supportedAcquisitionModes.append(AcquisitionMode::eDiscrete);
@@ -163,17 +163,20 @@ void PseudoTracker::init() {
 bool PseudoTracker::doSelfDefinedAction(const QString& action) {
   qDebug() << "PseudoTracker::doSelfDefinedAction(): " << action;
   if (action == "echo") {
-    emit this->sensorMessage(action, eInformationMessage, eMessageBoxMessage);
+    emit this->sensorMessage(action, MessageTypes::eInformationMessage,
+                             MessageDestinations::eMessageBoxMessage);
   } else if (action == "stopMeasure") {
     this->isScanning = false;
     emit this->sensorMessage("try to stop / finish measurement",
-                             eInformationMessage, eConsoleMessage);
+                             MessageTypes::eInformationMessage,
+                             MessageDestinations::eConsoleMessage);
   } else if (action == "toggle return readings") {
     this->returnReading = !this->returnReading;  // toggle
     emit this->sensorMessage(
         QString("return readings: %1")
             .arg(this->returnReading.load() ? "true" : "false"),
-        eInformationMessage, eConsoleMessage);
+        MessageTypes::eInformationMessage,
+        MessageDestinations::eConsoleMessage);
   }
   return true;
 }
@@ -319,23 +322,23 @@ QList<QPointer<Reading> > PseudoTracker::measure(
   while (true) {
     for (int face = 0; face < faceCount; face++) {
       switch (getReadingType(mConfig)) {
-        case ePolarReading: {
+        case ReadingTypes::ePolarReading: {
           readings += measurePolar(mConfig);
           break;
         }
-        case eDistanceReading: {
+        case ReadingTypes::eDistanceReading: {
           readings += measureDistance(mConfig);
           break;
         }
-        case eDirectionReading: {
+        case ReadingTypes::eDirectionReading: {
           readings += measureDirection(mConfig);
           break;
         }
-        case eCartesianReading: {
+        case ReadingTypes::eCartesianReading: {
           readings += measureCartesian(mConfig);
           break;
         }
-        case eLevelReading: {
+        case ReadingTypes::eLevelReading: {
           readings += measureLevel(mConfig);
           break;
         }
@@ -385,7 +388,7 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
   QPointer<Reading> r(nullptr);
 
   switch (streamFormat) {
-    case ePolarReading: {
+    case ReadingTypes::ePolarReading: {
       const ReadingPolar rPolar = this->simulateAim();
 
       r = new Reading(rPolar);
@@ -396,7 +399,7 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
       break;
     }
-    case eCartesianReading: {
+    case ReadingTypes::eCartesianReading: {
       const ReadingPolar rPolar = this->simulateAim();
 
       r = new Reading(rPolar);
@@ -407,7 +410,7 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
       break;
     }
-    case eDistanceReading: {
+    case ReadingTypes::eDistanceReading: {
       ReadingDistance rDistance;
       rDistance.distance = this->myDistance;
       rDistance.isValid = true;
@@ -418,7 +421,7 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
       break;
     }
-    case eDirectionReading: {
+    case ReadingTypes::eDirectionReading: {
       ReadingDirection rDirection;
       rDirection.azimuth = this->myAzimuth;
       rDirection.zenith = this->myZenith;
@@ -431,13 +434,13 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
       break;
     }
-    case eTemperatureReading: {
+    case ReadingTypes::eTemperatureReading: {
       break;
     }
-    case eLevelReading: {
+    case ReadingTypes::eLevelReading: {
       break;
     }
-    case eUndefinedReading: {
+    case ReadingTypes::eUndefinedReading: {
       break;
     }
     default:
@@ -677,7 +680,8 @@ ReadingPolar PseudoTracker::simulateAim() const {
 }
 
 bool PseudoTracker::search() {
-  emit this->sensorMessage("search", eInformationMessage, eConsoleMessage);
+  emit this->sensorMessage("search", MessageTypes::eInformationMessage,
+                           MessageDestinations::eConsoleMessage);
   QThread::msleep(1000);
   return true;
 }

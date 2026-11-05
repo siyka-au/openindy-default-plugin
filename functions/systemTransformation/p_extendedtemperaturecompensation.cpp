@@ -22,11 +22,11 @@ void ExtendedTemperatureCompensation::init() {
   NeededElement param1;
   param1.description = "Select points for calculating the transformation.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(eTrafoParamFeature);
+  this->applicableFor.append(FeatureTypes::eTrafoParamFeature);
 }
 
 /*!
@@ -63,7 +63,7 @@ bool ExtendedTemperatureCompensation::exec(TrafoParam& trafoParam) {
   } else {
     emit this->sendMessage(
         "Not enough points to calculate transformation parameters",
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 }
@@ -264,7 +264,7 @@ OiVec ExtendedTemperatureCompensation::approxTranslation(OiVec rot, OiVec s) {
 OiVec ExtendedTemperatureCompensation::approxRotation() {
   // calculate approximated rotation angles with Drixler algorithm
   //=> good approximation of preliminary transformation, so a rotation matrix
-  //with small angles can be used later at adjusting the parameters iterativ
+  // with small angles can be used later at adjusting the parameters iterativ
 
   vector<OiVec> centroidCoords;
   // get centroid coords

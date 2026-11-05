@@ -4,7 +4,7 @@
 
 void DistanceBetweenTwoPoints::init() {
   this->metaData.name = "DistanceBetweenTwoPoints";
-  this->applicableFor.append(eScalarEntityDistanceFeature);
+  this->applicableFor.append(FeatureTypes::eScalarEntityDistanceFeature);
 }
 
 std::expected<ScalarEntityDistance, QString> DistanceBetweenTwoPoints::exec() {

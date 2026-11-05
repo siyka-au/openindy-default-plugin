@@ -45,7 +45,7 @@ Direction dir(double i, double j, double k) {
 void bindPlane(QPointer<Function> function,
                const QPointer<FeatureWrapper>& planeFeature) {
   InputElement element(1);
-  element.typeOfElement = ePlaneElement;
+  element.typeOfElement = ElementTypes::ePlaneElement;
   element.shouldBeUsed = true;
   element.plane = planeFeature->getPlane();
   element.geometry = planeFeature->getGeometry();
@@ -78,7 +78,7 @@ class DerivedFeaturesTest : public QObject {
 };
 
 void DerivedFeaturesTest::initTestCase() {
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
 void DerivedFeaturesTest::lineTakesPlaneNormalAndPosition() {

@@ -96,7 +96,7 @@ class CalibratedConstellationTest : public QObject {
 };
 
 void CalibratedConstellationTest::initTestCase() {
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
 void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {

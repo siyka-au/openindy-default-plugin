@@ -25,12 +25,12 @@ void BestFitSphere::init() {
   param1.description =
       "Select at least four points to calculate the best fit sphere.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(eSphereFeature);
+  this->applicableFor.append(FeatureTypes::eSphereFeature);
 }
 
 /*!
@@ -56,7 +56,7 @@ bool BestFitSphere::setUpResult(Sphere& sphere) {
   if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
     emit this->sendMessage(
         QString("No points tagged for sphere %1").arg(sphere.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -77,7 +77,7 @@ bool BestFitSphere::setUpResult(Sphere& sphere) {
     emit this->sendMessage(
         QString("Not enough valid points to fit the sphere %1")
             .arg(sphere.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -148,7 +148,7 @@ bool BestFitSphere::approximate(Sphere& sphere,
   try {
     Q = N.inv();
   } catch (exception& e) {
-    emit this->sendMessage(e.what(), eErrorMessage);
+    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
     return false;
   }
 
@@ -250,7 +250,7 @@ bool BestFitSphere::fit(Sphere& sphere,
     try {
       Q = N.inv();
     } catch (exception& e) {
-      emit this->sendMessage(e.what(), eErrorMessage);
+      emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
       return false;
     }
 
@@ -284,7 +284,7 @@ bool BestFitSphere::fit(Sphere& sphere,
 
   if (numIterations >= 101) {
     emit this->sendMessage("No solution found during 100 iterations",
-                           eWarningMessage);
+                           MessageTypes::eWarningMessage);
     return false;
   }
 

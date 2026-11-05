@@ -21,11 +21,11 @@ void PointFromPoints::init() {
   param1.description =
       "Select at least one points to calculate the best fit point.";
   param1.infinite = true;
-  param1.typeOfElement = ePositionElement;
+  param1.typeOfElement = ElementTypes::ePositionElement;
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(ePointFeature);
+  this->applicableFor.append(FeatureTypes::ePointFeature);
 }
 
 /*!
@@ -51,7 +51,7 @@ bool PointFromPoints::setUpResult(Point& point) {
     emit this->sendMessage(
         QString("Not enough valid points to fit the point %1")
             .arg(point.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
   QList<OiVec> inputPoints;
@@ -68,7 +68,7 @@ bool PointFromPoints::setUpResult(Point& point) {
     emit this->sendMessage(
         QString("Not enough valid points to fit the point %1")
             .arg(point.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -102,10 +102,10 @@ bool PointFromPoints::setUpResult(Point& point) {
     x = qxx * c;
     v = a * x - l;
   } catch (const logic_error& e) {
-    emit this->sendMessage(e.what(), eErrorMessage);
+    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
     return false;
   } catch (const runtime_error& e) {
-    emit this->sendMessage(e.what(), eErrorMessage);
+    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
     return false;
   }
 

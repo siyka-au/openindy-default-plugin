@@ -32,12 +32,12 @@ void BestFitCircle::init() {
       "Select at least three non-collinear points to calculate the best fit "
       "circle.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(eCircleFeature);
+  this->applicableFor.append(FeatureTypes::eCircleFeature);
 }
 
 /*!
@@ -62,7 +62,7 @@ bool BestFitCircle::setUpResult(Circle& circle) {
   if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
     emit this->sendMessage(
         QString("No points tagged for circle %1").arg(circle.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
   QList<QPointer<Point> > inputPoints;
@@ -79,7 +79,7 @@ bool BestFitCircle::setUpResult(Circle& circle) {
     emit this->sendMessage(
         QString("Not enough valid points to fit the point %1")
             .arg(circle.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -287,7 +287,7 @@ bool BestFitCircle::setUpResult(Circle& circle) {
     r.corrections.insert("vx", v.getAt(i * 3));
     r.corrections.insert("vx", v.getAt(3 * i + 1));
     r.corrections.insert("vx", v.getAt(3 * i + 2));
-    r.dimension = eMetric;
+    r.dimension = DimensionType::eMetric;
     myStats.addDisplayResidual(r);
   }
   myStats.setQxx(Qxx);

@@ -19,13 +19,13 @@ void Register::init() {
   param1.description =
       "Select a plane in which the target geometry is to be projected.";
   param1.infinite = false;
-  param1.typeOfElement = ePlaneElement;
+  param1.typeOfElement = ElementTypes::ePlaneElement;
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(ePointFeature);
-  this->applicableFor.append(eSphereFeature);
-  this->applicableFor.append(eCircleFeature);
+  this->applicableFor.append(FeatureTypes::ePointFeature);
+  this->applicableFor.append(FeatureTypes::eSphereFeature);
+  this->applicableFor.append(FeatureTypes::eCircleFeature);
 }
 
 /*!

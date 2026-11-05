@@ -16,11 +16,11 @@ void PlaneFromPlane::init() {
   NeededElement param1;
   param1.description = "Select the plane to copy.";
   param1.infinite = false;
-  param1.typeOfElement = ePlaneElement;
+  param1.typeOfElement = ElementTypes::ePlaneElement;
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(ePlaneFeature);
+  this->applicableFor.append(FeatureTypes::ePlaneFeature);
 }
 
 /*!
@@ -52,7 +52,7 @@ bool PlaneFromPlane::setUpResult(Plane& plane) {
     emit this->sendMessage(
         QString("Not enough valid input to copy the plane %1")
             .arg(plane.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 

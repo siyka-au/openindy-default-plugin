@@ -14,9 +14,9 @@ void ChangeRadius::init() {
   this->metaData.iid = ObjectTransformation_iidd;
 
   // set spplicable for
-  this->applicableFor.append(eSphereFeature);
-  this->applicableFor.append(eCircleFeature);
-  this->applicableFor.append(eCylinderFeature);
+  this->applicableFor.append(FeatureTypes::eSphereFeature);
+  this->applicableFor.append(FeatureTypes::eCircleFeature);
+  this->applicableFor.append(FeatureTypes::eCylinderFeature);
 
   // set double parameter
   this->doubleParameters.insert("offset [mm]", 0.0);

@@ -23,12 +23,12 @@ void BestFitLine::init() {
   param1.description =
       "Select at least two points to calculate the best fit line.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
   this->neededElements.append(param1);
 
   // set spplicable for
-  this->applicableFor.append(eLineFeature);
+  this->applicableFor.append(FeatureTypes::eLineFeature);
 }
 
 /*!
@@ -54,7 +54,7 @@ bool BestFitLine::setUpResult(Line& line) {
   if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
     emit this->sendMessage(
         QString("No points tagged for line %1").arg(line.getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -74,7 +74,7 @@ bool BestFitLine::setUpResult(Line& line) {
   if (inputPoints.size() < 2) {
     emit this->sendMessage(QString("Not enough valid points to fit the line %1")
                                .arg(line.getFeatureName()),
-                           eWarningMessage);
+                           MessageTypes::eWarningMessage);
     return false;
   }
 

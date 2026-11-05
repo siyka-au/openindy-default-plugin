@@ -42,7 +42,7 @@ class SetPlaneFunction : public ConstructFunction, public Producer<Plane> {
  public:
   SetPlaneFunction(QObject* parent = 0) : ConstructFunction(parent) {
     this->metaData.name = "SetPlaneFunction";
-    this->applicableFor.append(ePlaneFeature);
+    this->applicableFor.append(FeatureTypes::ePlaneFeature);
   }
   Position position;
   Direction direction;
@@ -88,7 +88,7 @@ class OwnedPlaneAccessorsTest : public QObject {
 };
 
 void OwnedPlaneAccessorsTest::initTestCase() {
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
 QPointer<OiJob> OwnedPlaneAccessorsTest::makeJobWithPlane(
@@ -241,7 +241,7 @@ void OwnedPlaneAccessorsTest::editingAGeneratedAccessorIsRejected() {
   // a direct user edit, exactly the entry point the nominal properties
   // dialog uses, must be rejected - it is bound to the plane
   QMap<GeometryParameters, double> edit;
-  edit.insert(eUnknownX, 999.0);
+  edit.insert(GeometryParameters::eUnknownX, 999.0);
   point->setUnknownParameters(edit);
 
   QCOMPARE(point->getPosition().getVector().getAt(0), 1.0);

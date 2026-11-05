@@ -9,7 +9,9 @@ XYZFilter::XYZFilter(QString name, bool removeX, bool removeY, bool removeZ,
   this->metaData.name = name;
 }
 
-void XYZFilter::init() { this->applicableFor.append(ePointFeature); }
+void XYZFilter::init() {
+  this->applicableFor.append(FeatureTypes::ePointFeature);
+}
 
 std::expected<Point, QString> XYZFilter::exec(const Point& input) {
   if (this->inputElements[0].isEmpty()) {

@@ -19,17 +19,17 @@ void IntersectPlanePlane::init() {
   NeededElement param1;
   param1.description = "Select a plane to calculate the line of intersection.";
   param1.infinite = false;
-  param1.typeOfElement = ePlaneElement;
+  param1.typeOfElement = ElementTypes::ePlaneElement;
   NeededElement param2;
   param2.description =
       "Select another plane to calculate the line intersection.";
   param2.infinite = false;
-  param2.typeOfElement = ePlaneElement;
+  param2.typeOfElement = ElementTypes::ePlaneElement;
   this->neededElements.append(param1);
   this->neededElements.append(param2);
 
   // set spplicable for
-  this->applicableFor.append(eLineFeature);
+  this->applicableFor.append(FeatureTypes::eLineFeature);
 }
 
 /*!
@@ -61,7 +61,7 @@ bool IntersectPlanePlane::setUpResult(Line& line) {
   if (this->inputElements[0].first().plane->getId() ==
       this->inputElements[1].first().plane->getId()) {
     emit this->sendMessage(QString("Input geometries are equal."),
-                           eWarningMessage);
+                           MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -78,7 +78,7 @@ bool IntersectPlanePlane::setUpResult(Line& line) {
         QString("No intersection between plane %1 and plane %2")
             .arg(plane1->getFeatureName())
             .arg(plane2->getFeatureName()),
-        eWarningMessage);
+        MessageTypes::eWarningMessage);
     return false;
   }
 

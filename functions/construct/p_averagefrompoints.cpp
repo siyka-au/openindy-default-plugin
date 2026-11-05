@@ -24,12 +24,12 @@ void AverageFromPoints::init() {
   NeededElement param1;
   param1.description = "Select as many points as you want to average.";
   param1.infinite = true;
-  param1.typeOfElement = ePointElement;
+  param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
   this->neededElements.append(param1);
 
   // set applicable for
-  this->applicableFor.append(ePointFeature);
+  this->applicableFor.append(FeatureTypes::ePointFeature);
 }
 
 /*!
@@ -54,7 +54,7 @@ bool AverageFromPoints::setUpResult(Point& point) {
   if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
     emit this->sendMessage(QString("No points to average for point %1")
                                .arg(point.getFeatureName()),
-                           eWarningMessage);
+                           MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -86,7 +86,7 @@ bool AverageFromPoints::setUpResult(Point& point) {
   if (usedCount == 0) {
     emit this->sendMessage(QString("No solved points to average for point %1")
                                .arg(point.getFeatureName()),
-                           eWarningMessage);
+                           MessageTypes::eWarningMessage);
     return false;
   }
 

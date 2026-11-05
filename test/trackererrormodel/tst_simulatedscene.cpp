@@ -39,7 +39,7 @@ class SimulatedSceneTest : public QObject {
 };
 
 void SimulatedSceneTest::initTestCase() {
-  ChooseLALib::setLinearAlgebra(ChooseLALib::Armadillo);
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
 void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget() {
@@ -113,7 +113,7 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget() {
     point->setIsSolved(true);
 
     InputElement element(id);
-    element.typeOfElement = ePointElement;
+    element.typeOfElement = ElementTypes::ePointElement;
     element.point = point;
     element.shouldBeUsed = true;
     function->addInputElement(element, 0);

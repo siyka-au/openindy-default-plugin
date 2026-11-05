@@ -25,9 +25,9 @@ void OiExchangeAscii::init() {
   this->supportedDelimiters.append("semicolon [;]");
 
   // set supported geometries
-  this->supportedGeometries.append(ePointGeometry);
-  this->supportedGeometries.append(ePlaneGeometry);
-  this->supportedGeometries.append(ePlaneLevelGeometry);
+  this->supportedGeometries.append(GeometryTypes::ePointGeometry);
+  this->supportedGeometries.append(GeometryTypes::ePlaneGeometry);
+  this->supportedGeometries.append(GeometryTypes::ePlaneLevelGeometry);
 }
 
 /*!
@@ -78,8 +78,8 @@ QList<ExchangeSimpleAscii::ColumnType> OiExchangeAscii::getDefaultColumnOrder(
     // depending on the geometry type and the number of columns fill the default
     // columns order
     switch (typeOfGeometry) {
-      case ePlaneGeometry:
-      case ePlaneLevelGeometry:
+      case GeometryTypes::ePlaneGeometry:
+      case GeometryTypes::ePlaneLevelGeometry:
         if (numColumns == 7) {
           defaultColumnOrder.append(OiExchangeAscii::eColumnFeatureName);
           defaultColumnOrder.append(OiExchangeAscii::eColumnX);
@@ -90,7 +90,7 @@ QList<ExchangeSimpleAscii::ColumnType> OiExchangeAscii::getDefaultColumnOrder(
           defaultColumnOrder.append(OiExchangeAscii::eColumnPrimaryK);
         }
         break;
-      case ePointGeometry:
+      case GeometryTypes::ePointGeometry:
         if (numColumns == 1) {
           defaultColumnOrder.append(OiExchangeAscii::eColumnX);
         } else if (numColumns == 2) {
@@ -133,7 +133,7 @@ QList<ExchangeSimpleAscii::ColumnType> OiExchangeAscii::getDefaultColumnOrder(
     }
 
   } catch (const exception& e) {
-    emit this->sendMessage(e.what(), eErrorMessage);
+    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
   }
 
   return defaultColumnOrder;
@@ -198,7 +198,7 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
     this->device->close();
 
   } catch (const exception& e) {
-    emit this->sendMessage(e.what(), eErrorMessage);
+    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
   }
 
   return filePreview;
@@ -215,7 +215,7 @@ QList<ExchangeSimpleAscii::ColumnType> OiExchangeAscii::getPossibleColumns(
 
   // add all possible columns depending on the type of geometry
   switch (typeOfGeometry) {
-    case ePointGeometry:
+    case GeometryTypes::ePointGeometry:
       possibleColumns.append(ExchangeSimpleAscii::eColumnX);
       possibleColumns.append(ExchangeSimpleAscii::eColumnY);
       possibleColumns.append(ExchangeSimpleAscii::eColumnZ);
@@ -327,9 +327,11 @@ void OiExchangeAscii::importOiData() {
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
-            if (this->units.contains(eMetric) &&
-                this->units.value(eMetric) != eUnitMeter) {
-              x = convertToDefault(x, this->units.value(eMetric));
+            if (this->units.contains(DimensionType::eMetric) &&
+                this->units.value(DimensionType::eMetric) !=
+                    UnitType::eUnitMeter) {
+              x = convertToDefault(x,
+                                   this->units.value(DimensionType::eMetric));
             }
 
             if (!errorWhileParsing) {
@@ -344,9 +346,11 @@ void OiExchangeAscii::importOiData() {
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
-            if (this->units.contains(eMetric) &&
-                this->units.value(eMetric) != eUnitMeter) {
-              y = convertToDefault(y, this->units.value(eMetric));
+            if (this->units.contains(DimensionType::eMetric) &&
+                this->units.value(DimensionType::eMetric) !=
+                    UnitType::eUnitMeter) {
+              y = convertToDefault(y,
+                                   this->units.value(DimensionType::eMetric));
             }
 
             if (!errorWhileParsing) {
@@ -361,9 +365,11 @@ void OiExchangeAscii::importOiData() {
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
-            if (this->units.contains(eMetric) &&
-                this->units.value(eMetric) != eUnitMeter) {
-              z = convertToDefault(z, this->units.value(eMetric));
+            if (this->units.contains(DimensionType::eMetric) &&
+                this->units.value(DimensionType::eMetric) !=
+                    UnitType::eUnitMeter) {
+              z = convertToDefault(z,
+                                   this->units.value(DimensionType::eMetric));
             }
 
             if (!errorWhileParsing) {
@@ -379,9 +385,11 @@ void OiExchangeAscii::importOiData() {
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
-            if (this->units.contains(eAngular) &&
-                this->units.value(eAngular) != eUnitDecimalDegree) {
-              value = convertToDefault(value, this->units.value(eAngular));
+            if (this->units.contains(DimensionType::eAngular) &&
+                this->units.value(DimensionType::eAngular) !=
+                    UnitType::eUnitDecimalDegree) {
+              value = convertToDefault(
+                  value, this->units.value(DimensionType::eAngular));
             }
 
             if (!errorWhileParsing) {
@@ -394,9 +402,11 @@ void OiExchangeAscii::importOiData() {
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
-            if (this->units.contains(eAngular) &&
-                this->units.value(eAngular) != eUnitDecimalDegree) {
-              value = convertToDefault(value, this->units.value(eAngular));
+            if (this->units.contains(DimensionType::eAngular) &&
+                this->units.value(DimensionType::eAngular) !=
+                    UnitType::eUnitDecimalDegree) {
+              value = convertToDefault(
+                  value, this->units.value(DimensionType::eAngular));
             }
 
             if (!errorWhileParsing) {
@@ -409,9 +419,11 @@ void OiExchangeAscii::importOiData() {
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
-            if (this->units.contains(eAngular) &&
-                this->units.value(eAngular) != eUnitDecimalDegree) {
-              value = convertToDefault(value, this->units.value(eAngular));
+            if (this->units.contains(DimensionType::eAngular) &&
+                this->units.value(DimensionType::eAngular) !=
+                    UnitType::eUnitDecimalDegree) {
+              value = convertToDefault(
+                  value, this->units.value(DimensionType::eAngular));
             }
 
             if (!errorWhileParsing) {
@@ -432,7 +444,7 @@ void OiExchangeAscii::importOiData() {
       // create geometry and add the imported nominal to OpenIndy
       if (!errorWhileParsing) {
         switch (this->typeOfGeometry) {
-          case ePointGeometry: {
+          case GeometryTypes::ePointGeometry: {
             QPointer<Point> myNominal = new Point();
             // I use QT property system for transportation, because "common" is
             // not "common" of nominal point but actual point!
@@ -458,13 +470,14 @@ void OiExchangeAscii::importOiData() {
 
             break;
           }
-          case ePlaneGeometry:
-          case ePlaneLevelGeometry: {
+          case GeometryTypes::ePlaneGeometry:
+          case GeometryTypes::ePlaneLevelGeometry: {
             QPointer<Plane> plane = new Plane();
             // I use QT property system for transportation, because level is a
             // special plane
-            plane->setProperty("OI_FEATURE_PLANE_LEVEL",
-                               this->typeOfGeometry == ePlaneLevelGeometry);
+            plane->setProperty(
+                "OI_FEATURE_PLANE_LEVEL",
+                this->typeOfGeometry == GeometryTypes::ePlaneLevelGeometry);
 
             plane->setFeatureName(columnData.featureName);
             plane->setGroupName(columnData.groupName);
@@ -509,7 +522,8 @@ void OiExchangeAscii::importOiData() {
     emit this->importFinished(true);
 
   } catch (const exception& e) {
-    emit this->sendMessage(e.what(), eErrorMessage, eMessageBoxMessage);
+    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage,
+                           MessageDestinations::eMessageBoxMessage);
   }
 }
 
@@ -542,7 +556,7 @@ void OiExchangeAscii::exportOiData() {
                   line.append(QString::number(
                       convertFromDefault(
                           fw->getGeometry()->getPosition().getVector().getAt(0),
-                          this->units[eMetric]),
+                          this->units[DimensionType::eMetric]),
                       'f', this->getDistanceDigits()));
                 } else {
                   line.append("-");
@@ -553,7 +567,7 @@ void OiExchangeAscii::exportOiData() {
                   line.append(QString::number(
                       convertFromDefault(
                           fw->getGeometry()->getPosition().getVector().getAt(1),
-                          this->units[eMetric]),
+                          this->units[DimensionType::eMetric]),
                       'f', this->getDistanceDigits()));
                 } else {
                   line.append("-");
@@ -564,7 +578,7 @@ void OiExchangeAscii::exportOiData() {
                   line.append(QString::number(
                       convertFromDefault(
                           fw->getGeometry()->getPosition().getVector().getAt(2),
-                          this->units[eMetric]),
+                          this->units[DimensionType::eMetric]),
                       'f', this->getDistanceDigits()));
                 } else {
                   line.append("-");
@@ -602,7 +616,7 @@ void OiExchangeAscii::exportOiData() {
                   line.append(QString::number(
                       convertFromDefault(
                           fw->getGeometry()->getRadius().getRadius(),
-                          this->units[eMetric]),
+                          this->units[DimensionType::eMetric]),
                       'f', this->getDistanceDigits()));
                 } else {
                   line.append("-");
@@ -626,6 +640,7 @@ void OiExchangeAscii::exportOiData() {
     }
 
   } catch (const exception& e) {
-    emit this->sendMessage(e.what(), eErrorMessage, eMessageBoxMessage);
+    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage,
+                           MessageDestinations::eMessageBoxMessage);
   }
 }
