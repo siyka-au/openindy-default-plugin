@@ -46,8 +46,8 @@ void Helmert7Param::init() {
   // materials
   QList<QString> materials = getMaterials();
 
-  for (int i = 0; i < materials.size(); i++) {
-    this->stringParameters.insert("material", materials.at(i));
+  for (const auto& material : materials) {
+    this->stringParameters.insert("material", material);
   }
 }
 
@@ -787,10 +787,8 @@ void Helmert7Param::p6_preliminaryTransformation() {
   this->refSystem = this->extendVector(this->refSystem);
 
   QList<OiVec> tmpLoc;
-  for (int i = 0; i < this->locSystem.size(); i++) {
+  for (auto tmp : this->locSystem) {
     // get vector point i
-    OiVec tmp = this->locSystem.at(i);
-
     // rotate the point
     OiVec rt = rot * tmp;
 
@@ -1004,8 +1002,7 @@ double Helmert7Param::setScaleValue() {
 QList<OiVec> Helmert7Param::extendVector(QList<OiVec> vec) {
   QList<OiVec> result;
 
-  for (int i = 0; i < vec.size(); i++) {
-    OiVec v = vec.at(i);
+  for (auto v : vec) {
     v.add(1.0);
     result.append(v);
   }

@@ -14,7 +14,7 @@ class CFVisitor : public NodeVisitor {
   Q_OBJECT
 
  public:
-  CFVisitor(CFContext ctx);
+  explicit CFVisitor(CFContext ctx);
 
   void pre(QPointer<Node> node, int index, int level) override;
   void post(QPointer<Node> node, int index, int level) override;

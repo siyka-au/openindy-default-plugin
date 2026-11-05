@@ -98,16 +98,16 @@ bool BestFitSphere::approximate(Sphere& sphere,
                                 const QList<QPointer<Point> >& inputPoints) {
   // calculate centroid coordinates
   OiVec centroid(3);
-  for (int i = 0; i < inputPoints.size(); i++) {
-    centroid = centroid + inputPoints.at(i)->getPosition().getVector();
+  for (const auto& inputPoint : inputPoints) {
+    centroid = centroid + inputPoint->getPosition().getVector();
   }
   centroid = centroid / inputPoints.size();
 
   // Drixler
   OiMat N(4, 4);
   OiVec n(4);
-  for (int i = 0; i < inputPoints.size(); i++) {
-    const OiVec pos = inputPoints.at(i)->getPosition().getVector();
+  for (const auto& inputPoint : inputPoints) {
+    const OiVec pos = inputPoint->getPosition().getVector();
 
     double x = pos.getAt(0) - centroid.getAt(0);
     double y = pos.getAt(1) - centroid.getAt(1);
@@ -293,10 +293,10 @@ bool BestFitSphere::fit(Sphere& sphere,
   sphere.setSphere(position, radius);
 
   // calculate display residuals for each observation
-  for (int i = 0; i < allUsablePoints.size(); i++) {
-    OiVec xyz = allUsablePoints[i]->getPosition().getVector();
+  for (const auto& allUsablePoint : allUsablePoints) {
+    OiVec xyz = allUsablePoint->getPosition().getVector();
     OiVec dr = xyz - position.getVector();
-    this->addDisplayResidual(allUsablePoints[i]->getId(), dr.length() - r);
+    this->addDisplayResidual(allUsablePoint->getId(), dr.length() - r);
   }
 
   // calculate standard deviation

@@ -153,8 +153,8 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
       this->getDefaultColumnOrder(typeOfGeometry);
 
   // insert an empty list for each column as default
-  for (int i = 0; i < defaultColumnOrder.size(); i++) {
-    filePreview.insert(defaultColumnOrder.at(i), QVariantList());
+  for (auto i : defaultColumnOrder) {
+    filePreview.insert(i, QVariantList());
   }
 
   try {

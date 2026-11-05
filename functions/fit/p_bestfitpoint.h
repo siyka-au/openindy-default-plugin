@@ -19,7 +19,7 @@ class BestFitPoint : public FitFunction, public Producer<Point> {
   Q_OBJECT
 
  public:
-  BestFitPoint(QObject* parent = nullptr)
+  explicit BestFitPoint(QObject* parent = nullptr)
       : FitFunction(parent),
         key("disable all observations but last one"),
         value_no("no"),

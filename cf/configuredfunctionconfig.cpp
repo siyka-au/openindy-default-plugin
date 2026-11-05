@@ -45,16 +45,16 @@ void ConfiguredFunctionConfig::collectFunctionNames(
 
 QList<NeededElement> ConfiguredFunctionConfig::getNeededElements() {
   QList<NeededElement> list;
-  for (int i = 0; i < this->neededElements.size(); i++) {
-    list.append(this->neededElements[i].second);
+  for (auto& neededElement : this->neededElements) {
+    list.append(neededElement.second);
   }
   return list;
 }
 
 QList<QString> ConfiguredFunctionConfig::getNeededElementNames() {
   QList<QString> list;
-  for (int i = 0; i < this->neededElements.size(); i++) {
-    list.append(this->neededElements[i].first);
+  for (auto& neededElement : this->neededElements) {
+    list.append(neededElement.first);
   }
   return list;
 }
