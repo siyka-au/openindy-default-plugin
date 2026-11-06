@@ -114,7 +114,7 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
                           << LocalPoint("A5", xyz(0.20, 0.30, 0.00), true)
                           << LocalPoint("A6", xyz(0.45, 0.30, 0.00), true)
                           << LocalPoint("FID", xyz(0.225, 0.15, 0.05), false),
-      "CAL-0001", QDate(2026, 1, 1));
+      "CAL-0001", std::chrono::year{2026} / 1 / 1);
 
   QCOMPARE(board.measuredPoints().size(), 6);
   QCOMPARE(board.derivedPoints().size(), 1);

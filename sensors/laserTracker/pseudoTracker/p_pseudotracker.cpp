@@ -520,7 +520,7 @@ QList<QPointer<Reading> > PseudoTracker::measurePolar(
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
                                  // this class between 1 and 2
-  p->setMeasuredAt(QDateTime::currentDateTime());
+  p->setMeasuredAt(std::chrono::system_clock::now());
 
   QVariant td = mConfig.getTransientData("isDummyPoint");
   if (td.isValid()) {
@@ -563,7 +563,7 @@ QList<QPointer<Reading> > PseudoTracker::measureDistance(
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
                                  // this class between 1 and 2
-  p->setMeasuredAt(QDateTime::currentDateTime());
+  p->setMeasuredAt(std::chrono::system_clock::now());
 
   QThread::msleep(1000);
 
@@ -598,7 +598,7 @@ QList<QPointer<Reading> > PseudoTracker::measureDirection(
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
                                  // this class between 1 and 2
-  p->setMeasuredAt(QDateTime::currentDateTime());
+  p->setMeasuredAt(std::chrono::system_clock::now());
 
   QThread::msleep(1000);
 
@@ -628,7 +628,7 @@ QList<QPointer<Reading> > PseudoTracker::measureCartesian(
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
                                  // this class between 1 and 2
-  p->setMeasuredAt(QDateTime::currentDateTime());
+  p->setMeasuredAt(std::chrono::system_clock::now());
 
   QVariant td = mConfig.getTransientData("isDummyPoint");
   if (td.isValid()) {
@@ -705,7 +705,7 @@ QList<QPointer<Reading> > PseudoTracker::measureLevel(
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
                                  // this class between 1 and 2
-  p->setMeasuredAt(QDateTime::currentDateTime());
+  p->setMeasuredAt(std::chrono::system_clock::now());
 
   QThread::msleep(1000);
 
