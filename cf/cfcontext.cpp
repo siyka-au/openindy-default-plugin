@@ -1,5 +1,6 @@
 #include "cfcontext.h"
 
+#include <utility>
 #include <vector>
 
 #include "containers.h"
@@ -12,7 +13,7 @@ CFContext::CFContext() {}
  * @return function instance and removes function from list
  */
 oi::Guarded<Function> CFContext::getFunction(QString name) {
-  for (int index = 0; index < functions.size(); index++) {
+  for (int index = 0; std::cmp_less(index, functions.size()); index++) {
     if (!functions[index].isNull() &&
         functions[index]->getMetaData().name.compare(name) == 0) {
       oi::Guarded<Function> f = functions[static_cast<std::size_t>(index)];

@@ -81,7 +81,7 @@ PS_PlaneSegment* PS_PlaneSegment::detectPlane(const QList<PS_Point_PC*>& points,
 
         // if the plane contains mostly all points of the voxel then break the
         // search because no better plane can be found
-        if (result->getPoints().size() >= points.size() - 3) {
+        if (result->getPoints().size() + 3 >= points.size()) {
           break;
         }
       }

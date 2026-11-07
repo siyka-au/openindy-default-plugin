@@ -1,5 +1,6 @@
 #include "p_helmert7Param.h"
 
+#include <utility>
 #include <vector>
 
 #include "containers.h"
@@ -143,7 +144,8 @@ void Helmert7Param::initPoints() {
   if (this->inputPointsStartSystem.size() >= 3 &&
       this->inputPointsStartSystem.size() ==
           this->inputPointsDestinationSystem.size()) {
-    for (int i = 0; i < this->inputPointsStartSystem.size(); i++) {
+    for (int i = 0; std::cmp_less(i, this->inputPointsStartSystem.size());
+         i++) {
       this->locSystem.push_back(
           this->inputPointsStartSystem.at(i).getPosition().getVector());
       this->refSystem.push_back(
@@ -249,7 +251,7 @@ vector<OiMat> Helmert7Param::modelMatrix(vector<OiVec> locC,
                                          vector<OiVec> refC) {
   vector<OiMat> result;
   if (locC.size() == refC.size()) {
-    for (int i = 0; i < locC.size(); i++) {
+    for (int i = 0; std::cmp_less(i, locC.size()); i++) {
       OiMat a(4, 4);
       a.setAt(0, 1, -(locC.at(i).getAt(0) - refC.at(i).getAt(0)));
       a.setAt(0, 2, -(locC.at(i).getAt(1) - refC.at(i).getAt(1)));
@@ -342,7 +344,7 @@ void Helmert7Param::fillTrafoParam(OiMat r, vector<OiVec> locC,
   // calc scale
   double o = 0.0;
   double u = 0.0;
-  for (int i = 0; i < locC.size(); i++) {
+  for (int i = 0; std::cmp_less(i, locC.size()); i++) {
     OiVec vecO = refC.at(i).t() * r * locC.at(i);
     OiVec vecU = locC.at(i).t() * locC.at(i);
     o += vecO.getAt(0);
@@ -393,7 +395,7 @@ void Helmert7Param::fillTrafoParam(OiMat r, vector<OiVec> locC,
 
   OiVec start(4);
   OiVec dest(4);
-  for (int i = 0; i < this->locSystem.size(); i++) {
+  for (int i = 0; std::cmp_less(i, this->locSystem.size()); i++) {
     start.setAt(0, this->refSystem.at(i).getAt(0));
     start.setAt(1, this->refSystem.at(i).getAt(1));
     start.setAt(2, this->refSystem.at(i).getAt(2));
@@ -502,7 +504,7 @@ bool Helmert7Param::adjust_7p(TrafoParam& tp) {
  */
 OiMat Helmert7Param::fillAMatrix(OiVec x0) {
   OiMat a(locSystem.size() * 3, 7);
-  for (int row = 0; row < locSystem.size() * 3; row++) {
+  for (int row = 0; std::cmp_less(row, locSystem.size() * 3); row++) {
     if ((row + 1) % 3 == 1) {  // observation of x
       a.setAt(row, 0, 0);
       a.setAt(row, 1, -locSystem.at(row / 3).getAt(2) * x0.getAt(3));
@@ -548,7 +550,7 @@ OiMat Helmert7Param::fillAMatrix(OiVec x0) {
  */
 OiVec Helmert7Param::fillLVector() {
   OiVec l(this->locSystem.size() * 3);
-  for (int row = 0; row < this->locSystem.size() * 3; row++) {
+  for (int row = 0; std::cmp_less(row, this->locSystem.size() * 3); row++) {
     if ((row + 1) % 3 == 1) {  // observation of x
       l.setAt(row, this->locSystem.at(row / 3).getAt(0));
     } else if ((row + 1) % 3 == 2) {  // observation of y
@@ -568,7 +570,7 @@ OiVec Helmert7Param::fillLVector() {
  */
 OiVec Helmert7Param::fillL0Vector(OiVec x0) {
   OiVec l0(this->locSystem.size() * 3);
-  for (int row = 0; row < this->locSystem.size() * 3; row++) {
+  for (int row = 0; std::cmp_less(row, this->locSystem.size() * 3); row++) {
     if ((row + 1) % 3 == 1) {  // observation of x
       l0.setAt(
           row,
@@ -614,7 +616,7 @@ bool Helmert7Param::calc_6p(TrafoParam& tp) {
   // get standard deviation
   double sumVV = 0.0;
 
-  for (int i = 0; i < this->locSystem.size(); i++) {
+  for (int i = 0; std::cmp_less(i, this->locSystem.size()); i++) {
     OiVec diffVec = this->refSystem.at(i) - this->locSystem.at(i);
     sumVV += diffVec.getAt(0) * diffVec.getAt(0);
     sumVV += diffVec.getAt(1) * diffVec.getAt(1);
@@ -721,7 +723,7 @@ OiMat Helmert7Param::p6_fillAMatrix(OiVec x0) {
   // loc system is transformed with approx values of translation and rotation,
   // so this should be approxed enough for the pre transformation. That´s why I
   // can use the rotation matrix for small angles.
-  for (int row = 0; row < locSystem.size() * 3; row++) {
+  for (int row = 0; std::cmp_less(row, locSystem.size() * 3); row++) {
     if ((row + 1) % 3 == 1) {  // x
       a.setAt(row, 0, 0.0);
       a.setAt(row, 1, -locSystem.at(row / 3).getAt(2));
@@ -754,7 +756,7 @@ OiMat Helmert7Param::p6_fillAMatrix(OiVec x0) {
  */
 OiVec Helmert7Param::p6_fillLVector() {
   OiVec l(this->locSystem.size() * 3);
-  for (int row = 0; row < this->locSystem.size() * 3; row++) {
+  for (int row = 0; std::cmp_less(row, this->locSystem.size() * 3); row++) {
     if ((row + 1) % 3 == 1) {  // x observation
       l.setAt(row, this->locSystem.at(row / 3).getAt(0));
     }
@@ -775,7 +777,7 @@ OiVec Helmert7Param::p6_fillLVector() {
  */
 OiVec Helmert7Param::p6_fillL0Vector(OiVec x0) {
   OiVec l(this->locSystem.size() * 3);
-  for (int row = 0; row < this->locSystem.size() * 3; row++) {
+  for (int row = 0; std::cmp_less(row, this->locSystem.size() * 3); row++) {
     if ((row + 1) % 3 == 1) {  // x observation
       l.setAt(row, this->locSystem.at(row / 3).getAt(0));
     }

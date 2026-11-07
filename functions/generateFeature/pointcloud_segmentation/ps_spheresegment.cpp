@@ -144,7 +144,7 @@ PS_SphereSegment* PS_SphereSegment::detectSphere(
 
         // if the sphere contains mostly all points of the voxel then break the
         // search
-        if (result->myState->myPoints.size() >= points.size() - 4) {
+        if (result->myState->myPoints.size() + 4 >= points.size()) {
           break;
         }
       }

@@ -7,6 +7,8 @@
 #include "containers.h"
 
 const char* jsonData =
+#include <utility>
+
 #include "cfconfig.res"
     ;
 
@@ -109,7 +111,7 @@ FunctionConfigParser::inputElementsMapping(ConfiguredFunctionConfig config,
 
     QString fromNeededElementName =
         object["from"].toObject()["neededElement"].toString();
-    for (int i = 0; i < config.neededElements.size(); i++) {
+    for (int i = 0; std::cmp_less(i, config.neededElements.size()); i++) {
       if (config.neededElements[i].first.compare(fromNeededElementName) == 0) {
         mapping.srcInputElementIndex = i;
         break;

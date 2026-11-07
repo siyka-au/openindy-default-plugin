@@ -1,5 +1,6 @@
 #include "p_pointfrompoints.h"
 
+#include <utility>
 #include <vector>
 
 /*!
@@ -113,7 +114,7 @@ bool PointFromPoints::setUpResult(Point& point) {
 
   // calculate point based corrections
   OiVec corr;
-  for (int i = 0; i < inputPoints.size(); i++) {
+  for (int i = 0; std::cmp_less(i, inputPoints.size()); i++) {
     corr.add(qSqrt(v.getAt(3 * i) * v.getAt(3 * i) +
                    v.getAt(3 * i + 1) * v.getAt(3 * i + 1) +
                    v.getAt(3 * i + 2) * v.getAt(3 * i + 2)));

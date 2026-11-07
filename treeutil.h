@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QPointer>
 #include <QString>
+#include <utility>
 #include <vector>
 
 class Node : public QObject {
@@ -71,7 +72,7 @@ class TreeUtil {
                         int level = 0) {
     h.pre(node, index, level);
 
-    for (int idx = 0; idx < node->getSubnodes().size(); idx++) {
+    for (int idx = 0; std::cmp_less(idx, node->getSubnodes().size()); idx++) {
       int lvl = level;
       traversal(node->getSubnodes()[idx], h, idx, ++lvl);
     }

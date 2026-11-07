@@ -1,5 +1,6 @@
 #include "p_bestfitsphere.h"
 
+#include <utility>
 #include <vector>
 
 /*!
@@ -202,7 +203,7 @@ bool BestFitSphere::fit(
     OiMat A(inputPoints.size(), 4);
     OiMat B(inputPoints.size(), inputPoints.size() * 3);
     OiVec w(inputPoints.size());
-    for (int i = 0; i < inputPoints.size(); i++) {
+    for (int i = 0; std::cmp_less(i, inputPoints.size()); i++) {
       const OiVec x = inputPoints.at(i)->getPosition().getVector();
 
       double r0 = qSqrt((x.getAt(0) + verb.getAt(i * 3) - xm) *
@@ -233,13 +234,13 @@ bool BestFitSphere::fit(
         N.setAt(i, j, BBT.getAt(i, j));
       }
     }
-    for (int i = 0; i < inputPoints.size(); i++) {
+    for (int i = 0; std::cmp_less(i, inputPoints.size()); i++) {
       for (int j = 0; j < 4; j++) {
         N.setAt(i, j + inputPoints.size(), A.getAt(i, j));
       }
     }
     for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < inputPoints.size(); j++) {
+      for (int j = 0; std::cmp_less(j, inputPoints.size()); j++) {
         N.setAt(i + inputPoints.size(), j, AT.getAt(i, j));
       }
     }
@@ -259,7 +260,7 @@ bool BestFitSphere::fit(
     OiVec res = -1.0 * Q * w;
 
     OiVec k(inputPoints.size());
-    for (int i = 0; i < inputPoints.size(); i++) {
+    for (int i = 0; std::cmp_less(i, inputPoints.size()); i++) {
       k.setAt(i, res.getAt(i));
     }
     for (int i = 0; i < 4; i++) {

@@ -1,6 +1,7 @@
 #include "simplepolarmeasurement.h"
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 #include "containers.h"
@@ -541,7 +542,7 @@ bool SimplePolarMeasurement::analyseSimulationData(UncertaintyData& d) {
     d.maxValue = d.values.at(0);
     d.minValue = d.values.at(0);
 
-    for (int i = 0; i < d.values.size(); i++) {
+    for (int i = 0; std::cmp_less(i, d.values.size()); i++) {
       if (d.values.at(i) > d.maxValue) {
         d.maxValue = d.values.at(i);
       }
@@ -590,7 +591,7 @@ double SimplePolarMeasurement::getCorrelationCoefficient(
   double sumXX = 0.0;
   double sumYY = 0.0;
 
-  for (int i = 0; i < x.size(); i++) {
+  for (int i = 0; std::cmp_less(i, x.size()); i++) {
     sumXX += x.at(i);
     sumYY += y.at(i);
   }
@@ -602,7 +603,7 @@ double SimplePolarMeasurement::getCorrelationCoefficient(
   double sumYi2 = 0.0;
   double sumXY = 0.0;
 
-  for (int i = 0; i < x.size(); i++) {
+  for (int i = 0; std::cmp_less(i, x.size()); i++) {
     sumXi2 += (x.at(i) - mX) * (x.at(i) - mX);
     sumYi2 += (y.at(i) - mY) * (y.at(i) - mY);
     sumXY += (x.at(i) - mX) * (y.at(i) - mY);

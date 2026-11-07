@@ -97,7 +97,7 @@ PS_CylinderSegment* PS_CylinderSegment::detectCylinder(
 
         // if the cylinder contains mostly all points of the voxel then break
         // the search
-        if (result->getPoints().size() >= points.size() - 5) {
+        if (result->getPoints().size() + 5 >= points.size()) {
           break;
         }
       }

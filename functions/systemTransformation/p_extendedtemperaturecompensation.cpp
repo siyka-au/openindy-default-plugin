@@ -154,7 +154,9 @@ bool ExtendedTemperatureCompensation::calc(TrafoParam& tp) {
 
   OiVec v = a * x - l_diff;
   OiVec vtv = v.t() * v;
-  double s0_post = sqrt(vtv.getAt(0) / (3 * this->locSystem.length() - 9));
+  double s0_post =
+      sqrt(vtv.getAt(0) /
+           (3.0 * static_cast<double>(this->locSystem.length()) - 9.0));
   OiMat sxx = s0_post * s0_post * qxx;
 
   // tp.getStatistic()->stdev = s0_post;

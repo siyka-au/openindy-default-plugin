@@ -1,6 +1,7 @@
 #include "p_oiexchangeascii.h"
 
 #include <map>
+#include <utility>
 #include <vector>
 
 #include "containers.h"
@@ -74,7 +75,7 @@ OiExchangeAscii::getDefaultColumnOrder(const GeometryTypes& typeOfGeometry) {
       // found before
       std::vector<QString> columns =
           oi::toVector(line.split(this->getDelimiter(this->usedDelimiter)));
-      if (columns.size() > numColumns) {
+      if (std::cmp_greater(columns.size(), numColumns)) {
         numColumns = columns.size();
       }
     }
@@ -186,9 +187,9 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
           oi::toVector(line.split(this->getDelimiter(this->usedDelimiter)));
 
       // insert the column entries
-      for (int i = 0; i < defaultColumnOrder.size(); i++) {
+      for (int i = 0; std::cmp_less(i, defaultColumnOrder.size()); i++) {
         // add an empty entry if the current row has not enough columns
-        if (columns.size() <= i) {
+        if (std::cmp_less_equal(columns.size(), i)) {
           std::vector<QVariant> rows =
               oi::value(filePreview, defaultColumnOrder.at(i));
           rows.push_back(QString());
@@ -312,9 +313,9 @@ void OiExchangeAscii::importOiData() {
 
       ColumnData columnData = {"", "", "", "", OiVec(3), OiVec(3)};
 
-      for (int i = 0; i < columns.size(); i++) {
+      for (int i = 0; std::cmp_less(i, columns.size()); i++) {
         // stop parsing if the current line has too many columns
-        if (this->userDefinedColumns.size() <= i) {
+        if (std::cmp_less_equal(this->userDefinedColumns.size(), i)) {
           break;
         }
 
@@ -554,7 +555,8 @@ void OiExchangeAscii::exportOiData() {
           // write to file
           QString line = "";
           // QString delimiter = this->getDelimiter(this->usedDelimiter);
-          for (int i = 0; i < this->userDefinedColumns.size(); i++) {
+          for (int i = 0; std::cmp_less(i, this->userDefinedColumns.size());
+               i++) {
             if (i > 0) {
               line.append("\t");
             }

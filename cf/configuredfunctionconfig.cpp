@@ -1,11 +1,12 @@
 #include "configuredfunctionconfig.h"
 
+#include <utility>
 #include <vector>
 
 ConfiguredFunctionConfig::ConfiguredFunctionConfig() {}
 
 bool ConfiguredFunctionConfig::isNeededElement(QString name) {
-  for (int i = 0; i < this->neededElements.size(); i++) {
+  for (int i = 0; std::cmp_less(i, this->neededElements.size()); i++) {
     if (neededElements[i].first.compare(name) == 0) {
       return true;
     }

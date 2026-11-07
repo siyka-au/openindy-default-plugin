@@ -2,6 +2,7 @@
 
 #include <math.h>
 
+#include <utility>
 #include <vector>
 
 void BestFitLine::init() {
@@ -89,7 +90,7 @@ bool BestFitLine::setUpResult(Line& line) {
 
   // principle component analysis
   OiMat a(inputPoints.size(), 3);
-  for (int i = 0; i < inputPoints.size(); i++) {
+  for (int i = 0; std::cmp_less(i, inputPoints.size()); i++) {
     const OiVec pos = inputPoints.at(i)->getPosition().getVector();
     a.setAt(i, 0, pos.getAt(0) - centroid.getAt(0));
     a.setAt(i, 1, pos.getAt(1) - centroid.getAt(1));
