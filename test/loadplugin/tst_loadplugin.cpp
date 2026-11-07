@@ -6,6 +6,7 @@
 
 #include "chooselalib.h"
 #include "plugin.h"
+#include "pluginloader.h"
 
 using namespace oi;
 
@@ -49,13 +50,14 @@ void LoadPluginTest::testLoadPlugin() {
   const QString pluginPath = PLUGIN_PATH;
 
   QVERIFY2(QFile::exists(pluginPath), pluginPath.toUtf8().constData());
-  QPluginLoader pluginLoader(pluginPath);
+  oi::PluginLoadResult loaded =
+      oi::PluginLoader::load(pluginPath.toStdString());
+  QVERIFY2(loaded, loaded.error.c_str());
 
-  QObject* plugin = pluginLoader.instance();
-  QVERIFY2(plugin, pluginLoader.errorString().toUtf8().constData());
-
-  Plugin* oiPlugin = qobject_cast<Plugin*>(plugin);
-  QVERIFY2(oiPlugin, "qobject_cast");
+  Plugin* oiPlugin = loaded.plugin.get();
+  QVERIFY2(
+      loaded.plugin.metadataJson().find("\"isOiPlugin\"") != std::string::npos,
+      "plugin metadata missing");
 
   std::vector<oi::Guarded<Function> > functions = oiPlugin->createFunctions();
   QVERIFY2(functions.size() > 0, "no functions found");
@@ -64,13 +66,11 @@ void LoadPluginTest::testPseudoTracker_eCartesianReading() {
   const QString pluginPath = PLUGIN_PATH;
 
   QVERIFY2(QFile::exists(pluginPath), pluginPath.toUtf8().constData());
-  QPluginLoader pluginLoader(pluginPath);
+  oi::PluginLoadResult loaded =
+      oi::PluginLoader::load(pluginPath.toStdString());
+  QVERIFY2(loaded, loaded.error.c_str());
 
-  QObject* plugin = pluginLoader.instance();
-  QVERIFY2(plugin, pluginLoader.errorString().toUtf8().constData());
-
-  Plugin* oiPlugin = qobject_cast<Plugin*>(plugin);
-  QVERIFY2(oiPlugin, "qobject_cast");
+  Plugin* oiPlugin = loaded.plugin.get();
 
   oi::Guarded<Sensor> sensor = oiPlugin->createSensor("PseudoTracker");
 

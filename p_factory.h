@@ -1,7 +1,5 @@
 #ifndef P_FACTORY_H
 #define P_FACTORY_H
-#include <QObject>
-#include <QtGlobal>
 #include <string>
 #include <vector>
 
@@ -54,13 +52,9 @@
 
 using namespace oi;
 
-class OiTemplatePlugin : public QObject, Plugin {
-  Q_OBJECT
-  Q_PLUGIN_METADATA(IID Plugin_iidd FILE "metaInfo.json")
-  Q_INTERFACES(Plugin)
-
+class OiTemplatePlugin : public Plugin {
  public:
-  OiTemplatePlugin(QObject* parent = 0);
+  OiTemplatePlugin();
 
   // ##########################################################
   // create instances of all available plugin types in a plugin

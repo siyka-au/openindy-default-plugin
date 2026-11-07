@@ -4,9 +4,11 @@
 #include <format>
 #include <vector>
 
+#include "metaInfo.h"
+
 using namespace oi;
 
-OiTemplatePlugin::OiTemplatePlugin(QObject* parent) : QObject(parent) {}
+OiTemplatePlugin::OiTemplatePlugin() {}
 
 /*!
  * \brief OiTemplatePlugin::createSensors
@@ -294,3 +296,5 @@ OiTemplatePlugin::createDefinedFormatExchange(const std::string& name) {
   oi::Guarded<ExchangeDefinedFormat> result(nullptr);
   return result;
 }
+
+OI_DECLARE_PLUGIN_WITH_METADATA(OiTemplatePlugin, kOiPluginMetadataJson)

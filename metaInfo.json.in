@@ -1,7 +1,7 @@
 {
     "isOiPlugin": true,
 
-    "_comment": "abiVersion lets the app reject a mismatched plugin by reading metadata, instead of silently failing a qobject_cast after load. Generated from openindy-core/include/plugin/pluginabi.h - do not edit by hand.",
+    "_comment": "abiVersion lets the app reject a mismatched plugin by reading metadata, instead of discovering it after a failed load. Generated from openindy-core/include/plugin/pluginabi.h - do not edit by hand.",
     "abiVersion" : @OI_PLUGIN_ABI_VERSION@,
 
     "name"  : "OpenIndy Default Plugin",

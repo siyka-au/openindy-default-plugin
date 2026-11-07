@@ -71,7 +71,17 @@ set(OS "${OI_PLUGIN_OS}")
 
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/metaInfo.json.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/metaInfo.json"
+    "${CMAKE_CURRENT_BINARY_DIR}/metaInfo.json"
+    @ONLY
+)
+
+# The metadata is compiled into the library as a string and handed out by the
+# oi_plugin_metadata_json() entry point (OI_DECLARE_PLUGIN_WITH_METADATA), so
+# the host can read it once the library is loaded.
+file(READ "${CMAKE_CURRENT_BINARY_DIR}/metaInfo.json" OI_PLUGIN_METADATA_JSON)
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/metaInfo.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/metaInfo.h"
     @ONLY
 )
 
@@ -172,6 +182,7 @@ endif()
 
 target_include_directories(OpenIndyDefaultPlugin
     PRIVATE
+        ${CMAKE_CURRENT_BINARY_DIR}/generated
         ${CMAKE_CURRENT_SOURCE_DIR}
         simulations/simplePolarMeasurement
         sensors/common
