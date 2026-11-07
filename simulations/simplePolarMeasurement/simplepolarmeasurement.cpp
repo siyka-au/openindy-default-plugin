@@ -617,7 +617,7 @@ double SimplePolarMeasurement::getCorrelationCoefficient(
  * \param newIterationStart
  * \return
  */
-bool SimplePolarMeasurement::distort(const QPointer<Reading>& r,
+bool SimplePolarMeasurement::distort(const oi::Guarded<Reading>& r,
                                      const OiMat& objectRelation,
                                      const bool& newIterationStart) {
   newIteration = newIterationStart;

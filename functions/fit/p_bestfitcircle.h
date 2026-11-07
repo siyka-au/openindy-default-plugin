@@ -14,8 +14,6 @@ using namespace oi;
  * \brief The BestFitCircle class
  */
 class BestFitCircle : public FitFunction, public Producer<Circle> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

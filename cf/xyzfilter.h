@@ -13,10 +13,8 @@ using namespace oi;
  * @brief set axis to 0 and keeps others
  */
 class XYZFilter : public ConstructFunction, public Transform<Point> {
-  Q_OBJECT
  public:
-  XYZFilter(QString name, bool removeX, bool removeY, bool removeZ,
-            QObject* parent = nullptr);
+  XYZFilter(QString name, bool removeX, bool removeY, bool removeZ);
 
   void init() override;
 

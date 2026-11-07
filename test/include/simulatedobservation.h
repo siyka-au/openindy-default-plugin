@@ -62,10 +62,9 @@ inline ReadingPolar trueObservationOf(const OiVec& sceneXyz,
 // true polar observation, then reuse Reading's own polar->cartesian
 // propagation (the same Jacobian PseudoTracker now relies on) to get xyz and
 // sigmaXyz consistently, rather than a third hand-rolled conversion
-inline QPointer<Observation> simulateObservation(const OiVec& sceneXyz,
-                                                 const StationPose& pose,
-                                                 const TrackerErrorModel& model,
-                                                 int id) {
+inline oi::Guarded<Observation> simulateObservation(
+    const OiVec& sceneXyz, const StationPose& pose,
+    const TrackerErrorModel& model, int id) {
   const ReadingPolar trueReading = trueObservationOf(sceneXyz, pose);
   const ReadingPolar noisy = model.apply(
       trueReading.azimuth, trueReading.zenith, trueReading.distance);
@@ -87,7 +86,7 @@ inline QPointer<Observation> simulateObservation(const OiVec& sceneXyz,
   worldXyz.setAt(2, worldRelative.getAt(2) + pose.position.getAt(2));
   worldXyz.setAt(3, 1.0);
 
-  QPointer<Observation> observation = new Observation(worldXyz, id, true);
+  oi::Guarded<Observation> observation = new Observation(worldXyz, id, true);
   observation->setIsSolved(true);
 
   // orientation is a pure rotation, so sigma magnitudes carry across

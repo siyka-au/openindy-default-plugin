@@ -14,8 +14,6 @@ using namespace oi;
  * \brief The PointBetweenTwoPoints class
  */
 class PointBetweenTwoPoints : public ConstructFunction, public Producer<Point> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

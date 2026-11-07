@@ -101,7 +101,8 @@ std::expected<Cylinder, QString> RectifyToPoint::exec(const Cylinder& input) {
 bool RectifyToPoint::point(OiVec& point) {
   // 1. get and check position of rectify geometry if available
   if (this->inputElements.contains(0) && this->inputElements[0].size() == 1) {
-    QPointer<Geometry> rectifyGeometry = this->inputElements[0].at(0).geometry;
+    oi::Guarded<Geometry> rectifyGeometry =
+        this->inputElements[0].at(0).geometry;
     if (!rectifyGeometry.isNull() && rectifyGeometry->getIsSolved() &&
         rectifyGeometry->hasPosition()) {
       point = rectifyGeometry->getPosition().getVector();
@@ -109,7 +110,8 @@ bool RectifyToPoint::point(OiVec& point) {
     }
   } else {  // 2. get and check position of rectify station if available
     if (this->inputElements.contains(1) && this->inputElements[1].size() == 1) {
-      QPointer<Station> rectifyStation = this->inputElements[1].at(0).station;
+      oi::Guarded<Station> rectifyStation =
+          this->inputElements[1].at(0).station;
       if (!rectifyStation.isNull() && !rectifyStation->getPosition().isNull() &&
           rectifyStation->getPosition()->hasPosition()) {
         point = rectifyStation->getPosition()->getPosition().getVector();

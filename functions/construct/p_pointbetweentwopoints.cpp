@@ -63,8 +63,8 @@ bool PointBetweenTwoPoints::setUpResult(Point& point) {
     return false;
   }
 
-  QPointer<Point> point1 = this->inputElements[0].at(0).point;
-  QPointer<Point> point2 = this->inputElements[1].at(0).point;
+  oi::Guarded<Point> point1 = this->inputElements[0].at(0).point;
+  oi::Guarded<Point> point2 = this->inputElements[1].at(0).point;
   if (point1.isNull() || point2.isNull() || !point1->getIsSolved() ||
       !point2->getIsSolved()) {
     return false;

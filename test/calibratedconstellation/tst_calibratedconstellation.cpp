@@ -153,7 +153,7 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
   for (const LocalPoint& local : board.measuredPoints()) {
     const OiVec trueWorld =
         toWorld(local.position(), trueBoardRotation, trueBoardTranslation);
-    QPointer<Observation> observation =
+    oi::Guarded<Observation> observation =
         simulateObservation(trueWorld, station, model, id++);
 
     Point localPoint(false, Position(local.position()));
@@ -167,7 +167,7 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
   // observations as the destination system - exactly the "known points in
   // one frame + observed counterparts in another -> rigid transform"
   // problem Helmert6Param already solves
-  QPointer<Helmert6Param> solver = new Helmert6Param();
+  oi::Guarded<Helmert6Param> solver = new Helmert6Param();
   solver->init();
 
   ScalarInputParams params;
@@ -177,17 +177,17 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
 
   solver->setInputPoint(localFramePoints, observedWorldPoints);
 
-  QPointer<TrafoParam> trafoParam = new TrafoParam();
-  QPointer<FeatureWrapper> trafoFeature = new FeatureWrapper();
+  oi::Guarded<TrafoParam> trafoParam = new TrafoParam();
+  oi::Guarded<FeatureWrapper> trafoFeature = new FeatureWrapper();
   trafoFeature->setTrafoParam(trafoParam);
 
   // Helmert6Param/SystemTransformation both redeclare exec(TrafoParam&) as
   // protected (the "methods that cannot be reimplemented" block in
   // SystemTransformation), which hides Function's public
-  // exec(QPointer<FeatureWrapper>&) for anything typed as Helmert6Param* -
+  // exec(oi::Guarded<FeatureWrapper>&) for anything typed as Helmert6Param* -
   // go through Function*, same as tst_simulatedscene.cpp does for
   // BestFitPlane
-  QPointer<Function> execTarget = solver;
+  oi::Guarded<Function> execTarget = solver;
   QVERIFY2(execTarget->exec(trafoFeature), "pose solve did not converge");
 
   const double stdevMeters = trafoParam->getStatistic().getStdev();

@@ -17,8 +17,6 @@ using namespace oi;
 class BestFitPlane : public FitFunction,
                      public BestFitPlaneUtil,
                      public Producer<Plane> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

@@ -47,7 +47,7 @@ bool PlaneFromPlane::setUpResult(Plane& plane) {
     return false;
   }
 
-  QPointer<Plane> inputPlane = this->inputElements[0].at(0).plane;
+  oi::Guarded<Plane> inputPlane = this->inputElements[0].at(0).plane;
   if (inputPlane.isNull() || !inputPlane->getIsSolved()) {
     emit this->sendMessage(
         QString("Not enough valid input to copy the plane %1")

@@ -1,7 +1,7 @@
 #include "cfcparameter.h"
 
 CFCParameter::CFCParameter(QString name, QString comment, QString feature,
-                           QList<QPointer<Node> > subnodes, QObject* parent)
+                           QList<QPointer<Node> > subnodes)
     : name(name), comment(comment), feature(feature), subnodes(subnodes) {}
 
 QList<QPointer<Node> >& CFCParameter::getSubnodes() { return subnodes; }

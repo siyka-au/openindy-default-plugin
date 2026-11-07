@@ -38,9 +38,8 @@ Direction dir(double i, double j, double k) {
  * mutable so a test can simulate re-measuring the plane between recalcs.
  */
 class SetPlaneFunction : public ConstructFunction, public Producer<Plane> {
-  Q_OBJECT
  public:
-  SetPlaneFunction(QObject* parent = 0) : ConstructFunction(parent) {
+  SetPlaneFunction() : ConstructFunction() {
     this->metaData.name = "SetPlaneFunction";
     this->applicableFor.append(FeatureTypes::ePlaneFeature);
   }
@@ -81,29 +80,29 @@ class OwnedPlaneAccessorsTest : public QObject {
   void deletingThePlaneDeletesItsOwnedAccessors();
 
  private:
-  QPointer<OiJob> makeJobWithPlane(QPointer<FeatureWrapper>& outPlaneWrapper,
-                                   QPointer<SetPlaneFunction>& outPlaneFn,
-                                   const Position& position,
-                                   const Direction& normal);
+  oi::Guarded<OiJob> makeJobWithPlane(
+      oi::Guarded<FeatureWrapper>& outPlaneWrapper,
+      oi::Guarded<SetPlaneFunction>& outPlaneFn, const Position& position,
+      const Direction& normal);
 };
 
 void OwnedPlaneAccessorsTest::initTestCase() {
   ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
-QPointer<OiJob> OwnedPlaneAccessorsTest::makeJobWithPlane(
-    QPointer<FeatureWrapper>& outPlaneWrapper,
-    QPointer<SetPlaneFunction>& outPlaneFn, const Position& position,
+oi::Guarded<OiJob> OwnedPlaneAccessorsTest::makeJobWithPlane(
+    oi::Guarded<FeatureWrapper>& outPlaneWrapper,
+    oi::Guarded<SetPlaneFunction>& outPlaneFn, const Position& position,
     const Direction& normal) {
-  QPointer<OiJob> job = new OiJob();
+  oi::Guarded<OiJob> job = new OiJob();
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeWrapper = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeWrapper = new FeatureWrapper();
   planeWrapper->setPlane(plane);
   plane->setFeatureName("Plane1");
   job->addFeature(planeWrapper);
 
-  QPointer<SetPlaneFunction> planeFn = new SetPlaneFunction();
+  oi::Guarded<SetPlaneFunction> planeFn = new SetPlaneFunction();
   planeFn->position = position;
   planeFn->direction = normal;
   plane->addFunction(planeFn);
@@ -116,18 +115,18 @@ QPointer<OiJob> OwnedPlaneAccessorsTest::makeJobWithPlane(
 
 void OwnedPlaneAccessorsTest::
     generatedNormalLineIsBoundReadOnlyAndComputesTheNormal() {
-  QPointer<FeatureWrapper> planeWrapper;
-  QPointer<SetPlaneFunction> planeFn;
-  QPointer<OiJob> job = this->makeJobWithPlane(
+  oi::Guarded<FeatureWrapper> planeWrapper;
+  oi::Guarded<SetPlaneFunction> planeFn;
+  oi::Guarded<OiJob> job = this->makeJobWithPlane(
       planeWrapper, planeFn, pos(1.0, 2.0, 3.0), dir(0.0, 0.0, 1.0));
 
-  QPointer<Line> line = new Line();
-  QPointer<FeatureWrapper> lineWrapper = new FeatureWrapper();
+  oi::Guarded<Line> line = new Line();
+  oi::Guarded<FeatureWrapper> lineWrapper = new FeatureWrapper();
   lineWrapper->setLine(line);
   line->setFeatureName("Plane1.NormalLine");
   job->addFeature(lineWrapper);
 
-  QPointer<LineFromPlaneNormal> function = new LineFromPlaneNormal();
+  oi::Guarded<LineFromPlaneNormal> function = new LineFromPlaneNormal();
   function->init();
   QVERIFY(job->addOwnedSubGeometry(planeWrapper, lineWrapper, function, 0));
 
@@ -145,18 +144,18 @@ void OwnedPlaneAccessorsTest::
 
 void OwnedPlaneAccessorsTest::
     generatedPointOnPlaneIsBoundReadOnlyAndComputesTheOrigin() {
-  QPointer<FeatureWrapper> planeWrapper;
-  QPointer<SetPlaneFunction> planeFn;
-  QPointer<OiJob> job = this->makeJobWithPlane(
+  oi::Guarded<FeatureWrapper> planeWrapper;
+  oi::Guarded<SetPlaneFunction> planeFn;
+  oi::Guarded<OiJob> job = this->makeJobWithPlane(
       planeWrapper, planeFn, pos(4.0, 5.0, 6.0), dir(0.0, 1.0, 0.0));
 
-  QPointer<Point> point = new Point();
-  QPointer<FeatureWrapper> pointWrapper = new FeatureWrapper();
+  oi::Guarded<Point> point = new Point();
+  oi::Guarded<FeatureWrapper> pointWrapper = new FeatureWrapper();
   pointWrapper->setPoint(point);
   point->setFeatureName("Plane1.PointOnPlane");
   job->addFeature(pointWrapper);
 
-  QPointer<PointFromPlaneOrigin> function = new PointFromPlaneOrigin();
+  oi::Guarded<PointFromPlaneOrigin> function = new PointFromPlaneOrigin();
   function->init();
   QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper, function, 0));
 
@@ -171,26 +170,26 @@ void OwnedPlaneAccessorsTest::
 }
 
 void OwnedPlaneAccessorsTest::movingThePlaneRegeneratesItsOwnedAccessors() {
-  QPointer<FeatureWrapper> planeWrapper;
-  QPointer<SetPlaneFunction> planeFn;
-  QPointer<OiJob> job = this->makeJobWithPlane(
+  oi::Guarded<FeatureWrapper> planeWrapper;
+  oi::Guarded<SetPlaneFunction> planeFn;
+  oi::Guarded<OiJob> job = this->makeJobWithPlane(
       planeWrapper, planeFn, pos(0.0, 0.0, 0.0), dir(0.0, 0.0, 1.0));
 
-  QPointer<Line> line = new Line();
-  QPointer<FeatureWrapper> lineWrapper = new FeatureWrapper();
+  oi::Guarded<Line> line = new Line();
+  oi::Guarded<FeatureWrapper> lineWrapper = new FeatureWrapper();
   lineWrapper->setLine(line);
   line->setFeatureName("Plane1.NormalLine");
   job->addFeature(lineWrapper);
-  QPointer<LineFromPlaneNormal> lineFn = new LineFromPlaneNormal();
+  oi::Guarded<LineFromPlaneNormal> lineFn = new LineFromPlaneNormal();
   lineFn->init();
   QVERIFY(job->addOwnedSubGeometry(planeWrapper, lineWrapper, lineFn, 0));
 
-  QPointer<Point> point = new Point();
-  QPointer<FeatureWrapper> pointWrapper = new FeatureWrapper();
+  oi::Guarded<Point> point = new Point();
+  oi::Guarded<FeatureWrapper> pointWrapper = new FeatureWrapper();
   pointWrapper->setPoint(point);
   point->setFeatureName("Plane1.PointOnPlane");
   job->addFeature(pointWrapper);
-  QPointer<PointFromPlaneOrigin> pointFn = new PointFromPlaneOrigin();
+  oi::Guarded<PointFromPlaneOrigin> pointFn = new PointFromPlaneOrigin();
   pointFn->init();
   QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper, pointFn, 0));
 
@@ -221,17 +220,17 @@ void OwnedPlaneAccessorsTest::movingThePlaneRegeneratesItsOwnedAccessors() {
 }
 
 void OwnedPlaneAccessorsTest::editingAGeneratedAccessorIsRejected() {
-  QPointer<FeatureWrapper> planeWrapper;
-  QPointer<SetPlaneFunction> planeFn;
-  QPointer<OiJob> job = this->makeJobWithPlane(
+  oi::Guarded<FeatureWrapper> planeWrapper;
+  oi::Guarded<SetPlaneFunction> planeFn;
+  oi::Guarded<OiJob> job = this->makeJobWithPlane(
       planeWrapper, planeFn, pos(1.0, 1.0, 1.0), dir(0.0, 0.0, 1.0));
 
-  QPointer<Point> point = new Point();
-  QPointer<FeatureWrapper> pointWrapper = new FeatureWrapper();
+  oi::Guarded<Point> point = new Point();
+  oi::Guarded<FeatureWrapper> pointWrapper = new FeatureWrapper();
   pointWrapper->setPoint(point);
   point->setFeatureName("Plane1.PointOnPlane");
   job->addFeature(pointWrapper);
-  QPointer<PointFromPlaneOrigin> function = new PointFromPlaneOrigin();
+  oi::Guarded<PointFromPlaneOrigin> function = new PointFromPlaneOrigin();
   function->init();
   QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper, function, 0));
 
@@ -248,26 +247,26 @@ void OwnedPlaneAccessorsTest::editingAGeneratedAccessorIsRejected() {
 }
 
 void OwnedPlaneAccessorsTest::deletingThePlaneDeletesItsOwnedAccessors() {
-  QPointer<FeatureWrapper> planeWrapper;
-  QPointer<SetPlaneFunction> planeFn;
-  QPointer<OiJob> job = this->makeJobWithPlane(
+  oi::Guarded<FeatureWrapper> planeWrapper;
+  oi::Guarded<SetPlaneFunction> planeFn;
+  oi::Guarded<OiJob> job = this->makeJobWithPlane(
       planeWrapper, planeFn, pos(0.0, 0.0, 0.0), dir(0.0, 0.0, 1.0));
 
-  QPointer<Line> line = new Line();
-  QPointer<FeatureWrapper> lineWrapper = new FeatureWrapper();
+  oi::Guarded<Line> line = new Line();
+  oi::Guarded<FeatureWrapper> lineWrapper = new FeatureWrapper();
   lineWrapper->setLine(line);
   line->setFeatureName("Plane1.NormalLine");
   job->addFeature(lineWrapper);
-  QPointer<LineFromPlaneNormal> lineFn = new LineFromPlaneNormal();
+  oi::Guarded<LineFromPlaneNormal> lineFn = new LineFromPlaneNormal();
   lineFn->init();
   QVERIFY(job->addOwnedSubGeometry(planeWrapper, lineWrapper, lineFn, 0));
 
-  QPointer<Point> point = new Point();
-  QPointer<FeatureWrapper> pointWrapper = new FeatureWrapper();
+  oi::Guarded<Point> point = new Point();
+  oi::Guarded<FeatureWrapper> pointWrapper = new FeatureWrapper();
   pointWrapper->setPoint(point);
   point->setFeatureName("Plane1.PointOnPlane");
   job->addFeature(pointWrapper);
-  QPointer<PointFromPlaneOrigin> pointFn = new PointFromPlaneOrigin();
+  oi::Guarded<PointFromPlaneOrigin> pointFn = new PointFromPlaneOrigin();
   pointFn->init();
   QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper, pointFn, 0));
 

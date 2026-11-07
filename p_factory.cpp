@@ -9,9 +9,9 @@ OiTemplatePlugin::OiTemplatePlugin(QObject* parent) : QObject(parent) {}
  * Returns a list with all sensors
  * \return
  */
-QList<QPointer<Sensor> > OiTemplatePlugin::createSensors() {
-  QList<QPointer<Sensor> > resultSet;
-  QPointer<Sensor> pTracker = new PseudoTracker();
+QList<oi::Guarded<Sensor> > OiTemplatePlugin::createSensors() {
+  QList<oi::Guarded<Sensor> > resultSet;
+  oi::Guarded<Sensor> pTracker = new PseudoTracker();
   resultSet.append(pTracker);
   return resultSet;
 }
@@ -21,8 +21,8 @@ QList<QPointer<Sensor> > OiTemplatePlugin::createSensors() {
  * Returns a list with all functions
  * \return
  */
-QList<QPointer<Function> > OiTemplatePlugin::createFunctions() {
-  QList<QPointer<Function> > resultSet;
+QList<oi::Guarded<Function> > OiTemplatePlugin::createFunctions() {
+  QList<oi::Guarded<Function> > resultSet;
 
   resultSet.append(new NominalPoint());
 
@@ -55,7 +55,7 @@ QList<QPointer<Function> > OiTemplatePlugin::createFunctions() {
 
   FunctionConfigParser parser;
   foreach (ConfiguredFunctionConfig config, parser.readConfigFromJson()) {
-    QList<QPointer<Function> > functions;
+    QList<oi::Guarded<Function> > functions;
     if (config.version == 2) {
       resultSet.append(new ConfiguredFunction(
           config, functions));  // this instance contains only function name!
@@ -70,8 +70,9 @@ QList<QPointer<Function> > OiTemplatePlugin::createFunctions() {
  * Returns a list with all network adjustments
  * \return
  */
-QList<QPointer<BundleAdjustment> > OiTemplatePlugin::createBundleAdjustments() {
-  QList<QPointer<BundleAdjustment> > resultSet;
+QList<oi::Guarded<BundleAdjustment> >
+OiTemplatePlugin::createBundleAdjustments() {
+  QList<oi::Guarded<BundleAdjustment> > resultSet;
   return resultSet;
 }
 
@@ -80,18 +81,9 @@ QList<QPointer<BundleAdjustment> > OiTemplatePlugin::createBundleAdjustments() {
  * Returns a list with all simulations
  * \return
  */
-QList<QPointer<SimulationModel> > OiTemplatePlugin::createSimulations() {
-  QList<QPointer<SimulationModel> > resultSet;
+QList<oi::Guarded<SimulationModel> > OiTemplatePlugin::createSimulations() {
+  QList<oi::Guarded<SimulationModel> > resultSet;
   resultSet.append(new SimplePolarMeasurement());
-  return resultSet;
-}
-
-/*!
- * \brief OiTemplatePlugin::createTools
- * \return
- */
-QList<QPointer<Tool> > OiTemplatePlugin::createTools() {
-  QList<QPointer<Tool> > resultSet;
   return resultSet;
 }
 
@@ -99,9 +91,9 @@ QList<QPointer<Tool> > OiTemplatePlugin::createTools() {
  * \brief OiTemplatePlugin::createSimpleAsciiExchanges
  * \return
  */
-QList<QPointer<ExchangeSimpleAscii> >
+QList<oi::Guarded<ExchangeSimpleAscii> >
 OiTemplatePlugin::createSimpleAsciiExchanges() {
-  QList<QPointer<ExchangeSimpleAscii> > resultSet;
+  QList<oi::Guarded<ExchangeSimpleAscii> > resultSet;
   resultSet.append(new OiExchangeAscii());
   return resultSet;
 }
@@ -110,9 +102,9 @@ OiTemplatePlugin::createSimpleAsciiExchanges() {
  * \brief OiTemplatePlugin::createDefinedFormatExchanges
  * \return
  */
-QList<QPointer<ExchangeDefinedFormat> >
+QList<oi::Guarded<ExchangeDefinedFormat> >
 OiTemplatePlugin::createDefinedFormatExchanges() {
-  QList<QPointer<ExchangeDefinedFormat> > resultSet;
+  QList<oi::Guarded<ExchangeDefinedFormat> > resultSet;
   return resultSet;
 }
 
@@ -122,8 +114,8 @@ OiTemplatePlugin::createDefinedFormatExchanges() {
  * \param name
  * \return
  */
-QPointer<Sensor> OiTemplatePlugin::createSensor(const QString& name) {
-  QPointer<Sensor> result(nullptr);
+oi::Guarded<Sensor> OiTemplatePlugin::createSensor(const QString& name) {
+  oi::Guarded<Sensor> result(nullptr);
   if (name.compare("PseudoTracker") == 0) {
     result = new PseudoTracker();
   }
@@ -136,8 +128,8 @@ QPointer<Sensor> OiTemplatePlugin::createSensor(const QString& name) {
  * \param name
  * \return
  */
-QPointer<Function> OiTemplatePlugin::createFunction(const QString& name) {
-  QPointer<Function> result(nullptr);
+oi::Guarded<Function> OiTemplatePlugin::createFunction(const QString& name) {
+  oi::Guarded<Function> result(nullptr);
   if (name.compare("NominalPoint") == 0) {
     result = new NominalPoint();
   } else if (name.compare("BestFitPoint") == 0) {
@@ -198,7 +190,7 @@ QPointer<Function> OiTemplatePlugin::createFunction(const QString& name) {
   return result;
 }
 
-QPointer<Function> OiTemplatePlugin::createFunctionFromConfig(
+oi::Guarded<Function> OiTemplatePlugin::createFunctionFromConfig(
     const QString& functionName) {
   // internal functions
   if (functionName.compare("DistanceBetweenTwoPoints") == 0) {
@@ -211,14 +203,14 @@ QPointer<Function> OiTemplatePlugin::createFunctionFromConfig(
     return new XYZFilter("YZFilter", false, true, true);  // keep X
   }
 
-  QPointer<Function> function(nullptr);
+  oi::Guarded<Function> function(nullptr);
 
   FunctionConfigParser parser;
   foreach (ConfiguredFunctionConfig config, parser.readConfigFromJson()) {
     if (config.name.compare(functionName) == 0) {
-      QList<QPointer<Function> > functions;
+      QList<oi::Guarded<Function> > functions;
       foreach (QString name, config.getFunctionNames()) {
-        QPointer<Function> f = createFunction(name);
+        oi::Guarded<Function> f = createFunction(name);
         if (f.isNull()) {
           throw logic_error(
               QString("no function found: %1").arg(name).toLocal8Bit().data());
@@ -248,9 +240,9 @@ QPointer<Function> OiTemplatePlugin::createFunctionFromConfig(
  * \param name
  * \return
  */
-QPointer<BundleAdjustment> OiTemplatePlugin::createBundleAdjustment(
+oi::Guarded<BundleAdjustment> OiTemplatePlugin::createBundleAdjustment(
     const QString& name) {
-  QPointer<BundleAdjustment> result(nullptr);
+  oi::Guarded<BundleAdjustment> result(nullptr);
   return result;
 }
 
@@ -260,9 +252,9 @@ QPointer<BundleAdjustment> OiTemplatePlugin::createBundleAdjustment(
  * \param name
  * \return
  */
-QPointer<SimulationModel> OiTemplatePlugin::createSimulation(
+oi::Guarded<SimulationModel> OiTemplatePlugin::createSimulation(
     const QString& name) {
-  QPointer<SimulationModel> result(nullptr);
+  oi::Guarded<SimulationModel> result(nullptr);
 
   if (name.compare("SimplePolarMeasurement") == 0) {
     result = new SimplePolarMeasurement();
@@ -272,23 +264,13 @@ QPointer<SimulationModel> OiTemplatePlugin::createSimulation(
 }
 
 /*!
- * \brief OiTemplatePlugin::createTool
- * \param name
- * \return
- */
-QPointer<Tool> OiTemplatePlugin::createTool(const QString& name) {
-  QPointer<Tool> result(nullptr);
-  return result;
-}
-
-/*!
  * \brief OiTemplatePlugin::createSimpleAsciiExchange
  * \param name
  * \return
  */
-QPointer<ExchangeSimpleAscii> OiTemplatePlugin::createSimpleAsciiExchange(
+oi::Guarded<ExchangeSimpleAscii> OiTemplatePlugin::createSimpleAsciiExchange(
     const QString& name) {
-  QPointer<ExchangeSimpleAscii> result(nullptr);
+  oi::Guarded<ExchangeSimpleAscii> result(nullptr);
 
   if (name.compare("OiExchangeAscii") == 0) {
     result = new OiExchangeAscii();
@@ -302,8 +284,8 @@ QPointer<ExchangeSimpleAscii> OiTemplatePlugin::createSimpleAsciiExchange(
  * \param name
  * \return
  */
-QPointer<ExchangeDefinedFormat> OiTemplatePlugin::createDefinedFormatExchange(
-    const QString& name) {
-  QPointer<ExchangeDefinedFormat> result(nullptr);
+oi::Guarded<ExchangeDefinedFormat>
+OiTemplatePlugin::createDefinedFormatExchange(const QString& name) {
+  oi::Guarded<ExchangeDefinedFormat> result(nullptr);
   return result;
 }

@@ -5,9 +5,8 @@
 #include "types.h"
 
 ConfiguredFunction::ConfiguredFunction(ConfiguredFunctionConfig config,
-                                       QList<QPointer<Function> > functions,
-                                       QObject* parent)
-    : SpecialFunction(parent), functions(functions), config(config) {}
+                                       QList<oi::Guarded<Function> > functions)
+    : SpecialFunction(), functions(functions), config(config) {}
 
 void ConfiguredFunction::init() {
   this->metaData.name = this->config.name;
@@ -21,7 +20,7 @@ void ConfiguredFunction::init() {
 }
 
 std::expected<void, QString> ConfiguredFunction::execChecked(
-    const QPointer<FeatureWrapper>& feature) {
+    const oi::Guarded<FeatureWrapper>& feature) {
   try {
     ListVisitor visitors;
 
@@ -62,9 +61,9 @@ std::expected<void, QString> ConfiguredFunction::execChecked(
 QString ConfiguredFunction::prettyPrint() {
   QString s;
   s += "function: '" + this->getMetaData().name + "', featureFunctions: [ ";
-  foreach (QPointer<Function> f, this->functions) {
-    if (f->inherits("ConfiguredFunction")) {
-      s += "'" + qobject_cast<ConfiguredFunction*>(f)->prettyPrint() + "', ";
+  foreach (oi::Guarded<Function> f, this->functions) {
+    if (auto* configured = dynamic_cast<ConfiguredFunction*>(f.data())) {
+      s += "'" + configured->prettyPrint() + "', ";
     } else {
       s += "'" + f->getMetaData().name + "', ";
     }

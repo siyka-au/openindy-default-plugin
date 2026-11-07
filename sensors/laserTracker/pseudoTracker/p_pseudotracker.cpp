@@ -296,9 +296,9 @@ bool PseudoTracker::compensation() {
  * \param mConfig
  * \return
  */
-QList<QPointer<Reading> > PseudoTracker::measure(
+QList<oi::Guarded<Reading> > PseudoTracker::measure(
     const MeasurementConfig& mConfig) {
-  QList<QPointer<Reading> > readings;
+  QList<oi::Guarded<Reading> > readings;
 
   if (!this->returnReading) {
     return readings;
@@ -363,7 +363,7 @@ QList<QPointer<Reading> > PseudoTracker::measure(
     }
 
     this->lastReading.first = readings.last()->getTypeOfReading();
-    QPointer<Reading> r = new Reading(*readings.last().data());
+    oi::Guarded<Reading> r = new Reading(*readings.last().data());
     this->lastReading.second = r;
   }
 
@@ -385,7 +385,7 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
   QVariantMap m;
 
-  QPointer<Reading> r(nullptr);
+  oi::Guarded<Reading> r(nullptr);
 
   switch (streamFormat) {
     case ReadingTypes::ePolarReading: {
@@ -509,13 +509,13 @@ bool PseudoTracker::getIsBusy() { return false; }
  * \param mConfig
  * \return
  */
-QList<QPointer<Reading> > PseudoTracker::measurePolar(
+QList<oi::Guarded<Reading> > PseudoTracker::measurePolar(
     const MeasurementConfig& mConfig) {
-  QList<QPointer<Reading> > readings;
+  QList<oi::Guarded<Reading> > readings;
 
   const ReadingPolar rPolar = this->simulateAim();
 
-  QPointer<Reading> p = new Reading(rPolar);
+  oi::Guarded<Reading> p = new Reading(rPolar);
 
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
@@ -524,9 +524,9 @@ QList<QPointer<Reading> > PseudoTracker::measurePolar(
 
   QVariant td = mConfig.getTransientData("isDummyPoint");
   if (td.isValid()) {
-    p->setProperty("isDummyPoint", td);
+    p->setTransientAttribute("isDummyPoint", td);
   } else {
-    p->setProperty("isDummyPoint", false);
+    p->setTransientAttribute("isDummyPoint", false);
   }
 
   QThread::msleep(this->measureTime);
@@ -541,11 +541,11 @@ QList<QPointer<Reading> > PseudoTracker::measurePolar(
  * \param mConfig
  * \return
  */
-QList<QPointer<Reading> > PseudoTracker::measureDistance(
+QList<oi::Guarded<Reading> > PseudoTracker::measureDistance(
     const MeasurementConfig& mConfig) {
   Q_UNUSED(mConfig)
 
-  QList<QPointer<Reading> > readings;
+  QList<oi::Guarded<Reading> > readings;
 
   // share the same modelled polar draw as every other reading type instead
   // of an independent, unmodelled noise stub - distance-only readings
@@ -558,7 +558,7 @@ QList<QPointer<Reading> > PseudoTracker::measureDistance(
   rDistance.sigmaDistance = rPolar.sigmaDistance;
   rDistance.isValid = true;
 
-  QPointer<Reading> p = new Reading(rDistance);
+  oi::Guarded<Reading> p = new Reading(rDistance);
 
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
@@ -577,11 +577,11 @@ QList<QPointer<Reading> > PseudoTracker::measureDistance(
  * \param mConfig
  * \return
  */
-QList<QPointer<Reading> > PseudoTracker::measureDirection(
+QList<oi::Guarded<Reading> > PseudoTracker::measureDirection(
     const MeasurementConfig& mConfig) {
   Q_UNUSED(mConfig)
 
-  QList<QPointer<Reading> > readings;
+  QList<oi::Guarded<Reading> > readings;
 
   const ReadingPolar rPolar = this->simulateAim();
 
@@ -593,7 +593,7 @@ QList<QPointer<Reading> > PseudoTracker::measureDirection(
   rDirection.sigmaZenith = rPolar.sigmaZenith;
   rDirection.isValid = true;
 
-  QPointer<Reading> p = new Reading(rDirection);
+  oi::Guarded<Reading> p = new Reading(rDirection);
 
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
@@ -612,9 +612,9 @@ QList<QPointer<Reading> > PseudoTracker::measureDirection(
  * \param mConfig
  * \return
  */
-QList<QPointer<Reading> > PseudoTracker::measureCartesian(
+QList<oi::Guarded<Reading> > PseudoTracker::measureCartesian(
     const MeasurementConfig& mConfig) {
-  QList<QPointer<Reading> > readings;
+  QList<oi::Guarded<Reading> > readings;
 
   // build from a noisy polar draw and let Reading's own polar->cartesian
   // propagation (Reading::errorPropagationPolarToCartesian, a proper
@@ -623,7 +623,7 @@ QList<QPointer<Reading> > PseudoTracker::measureCartesian(
   const Reading polarReading(this->simulateAim());
   const ReadingCartesian rCartesian = polarReading.getCartesianReading();
 
-  QPointer<Reading> p = new Reading(rCartesian);
+  oi::Guarded<Reading> p = new Reading(rCartesian);
 
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
@@ -632,9 +632,9 @@ QList<QPointer<Reading> > PseudoTracker::measureCartesian(
 
   QVariant td = mConfig.getTransientData("isDummyPoint");
   if (td.isValid()) {
-    p->setProperty("isDummyPoint", td);
+    p->setTransientAttribute("isDummyPoint", td);
   } else {
-    p->setProperty("isDummyPoint", false);
+    p->setTransientAttribute("isDummyPoint", false);
   }
 
   QThread::msleep(this->measureTime);
@@ -686,9 +686,9 @@ bool PseudoTracker::search() {
   return true;
 }
 
-QList<QPointer<Reading> > PseudoTracker::measureLevel(
+QList<oi::Guarded<Reading> > PseudoTracker::measureLevel(
     const MeasurementConfig& mConfig) {
-  QList<QPointer<Reading> > readings;
+  QList<oi::Guarded<Reading> > readings;
 
   ReadingLevel rLevel;
   rLevel.i = ((double)rand() / RAND_MAX) / 1000.;
@@ -700,7 +700,7 @@ QList<QPointer<Reading> > PseudoTracker::measureLevel(
   rLevel.sigmaK = defaultAccuracy.sigmaK;
   rLevel.isValid = true;
 
-  QPointer<Reading> p = new Reading(rLevel);
+  oi::Guarded<Reading> p = new Reading(rLevel);
 
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but

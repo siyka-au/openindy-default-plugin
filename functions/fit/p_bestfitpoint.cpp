@@ -83,8 +83,8 @@ bool BestFitPoint::setUpResult(Point& point) {
     }
   }
 
-  QList<QPointer<Observation> > allUsableObservations;
-  QList<QPointer<Observation> > inputObservations;
+  QList<oi::Guarded<Observation> > allUsableObservations;
+  QList<oi::Guarded<Observation> > inputObservations;
   filterObservations(allUsableObservations, inputObservations);
   if (inputObservations.size() < 1) {
     emit this->sendMessage(
@@ -96,7 +96,7 @@ bool BestFitPoint::setUpResult(Point& point) {
 
   // fill l vector
   OiVec l;
-  foreach (const QPointer<Observation>& obs, inputObservations) {
+  foreach (const oi::Guarded<Observation>& obs, inputObservations) {
     l.add(obs->getXYZ().getAt(0));
     l.add(obs->getXYZ().getAt(1));
     l.add(obs->getXYZ().getAt(2));
@@ -134,7 +134,7 @@ bool BestFitPoint::setUpResult(Point& point) {
   // calculate point based corrections
   OiVec corr;
 
-  foreach (const QPointer<Observation>& observation, allUsableObservations) {
+  foreach (const oi::Guarded<Observation>& observation, allUsableObservations) {
     double _vx = x.getAt(0) - observation->getXYZ().getAt(0);
     double _vy = x.getAt(1) - observation->getXYZ().getAt(1);
     double _vz = x.getAt(2) - observation->getXYZ().getAt(2);

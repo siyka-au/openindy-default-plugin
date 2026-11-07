@@ -16,8 +16,6 @@ using namespace std;
  * \brief The PointFromPoints class
  */
 class PointFromPoints : public ConstructFunction, public Producer<Point> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

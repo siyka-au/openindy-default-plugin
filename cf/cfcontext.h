@@ -22,7 +22,7 @@ class CFContext {
    * @param name
    * @return function instance and removes function from list
    */
-  QPointer<Function> getFunction(QString name);
+  oi::Guarded<Function> getFunction(QString name);
 
   InputElement getInputElement(QString name);
 
@@ -31,20 +31,20 @@ class CFContext {
    * @param featureType
    * @return feature for element of featuresTypes
    */
-  QPointer<FeatureWrapper> createApplicableFeature(FeatureTypes featureType);
-  InputElement createInputElement(QPointer<FeatureWrapper> feature);
+  oi::Guarded<FeatureWrapper> createApplicableFeature(FeatureTypes featureType);
+  InputElement createInputElement(oi::Guarded<FeatureWrapper> feature);
 
  public:
   ConfiguredFunctionConfig config;
   QMap<int, QList<InputElement> > inputElements;
   // all necessary funktions
-  QList<QPointer<Function> > functions;
+  QList<oi::Guarded<Function> > functions;
 
-  QPointer<Function> baseFunction;
-  QPointer<FeatureWrapper> baseFeature;
+  oi::Guarded<Function> baseFunction;
+  oi::Guarded<FeatureWrapper> baseFeature;
 
   QMap<int, QList<InputElement> > global_inputElements;
-  QPointer<FeatureWrapper> global_feature;
+  oi::Guarded<FeatureWrapper> global_feature;
 };
 
 #endif  // CFCONTEXT_H

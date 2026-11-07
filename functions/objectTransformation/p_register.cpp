@@ -77,7 +77,7 @@ bool Register::setUpResult(Point& point) {
   if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
     return false;
   }
-  QPointer<Plane> plane = this->inputElements[0].at(0).plane;
+  oi::Guarded<Plane> plane = this->inputElements[0].at(0).plane;
   if (plane.isNull() || !plane->getIsSolved()) {
     return false;
   }
@@ -108,7 +108,7 @@ bool Register::setUpResult(Sphere& sphere) {
   if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
     return false;
   }
-  QPointer<Plane> plane = this->inputElements[0].at(0).plane;
+  oi::Guarded<Plane> plane = this->inputElements[0].at(0).plane;
   if (plane.isNull() || !plane->getIsSolved()) {
     return false;
   }
@@ -154,7 +154,7 @@ bool Register::setUpResult(Circle& circle) {
   if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
     return false;
   }
-  QPointer<Plane> plane = this->inputElements[0].at(0).plane;
+  oi::Guarded<Plane> plane = this->inputElements[0].at(0).plane;
   if (plane.isNull() || !plane->getIsSolved()) {
     return false;
   }

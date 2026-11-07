@@ -1,8 +1,7 @@
 #include "xyzfilter.h"
 
-XYZFilter::XYZFilter(QString name, bool removeX, bool removeY, bool removeZ,
-                     QObject* parent)
-    : ConstructFunction(parent),
+XYZFilter::XYZFilter(QString name, bool removeX, bool removeY, bool removeZ)
+    : ConstructFunction(),
       removeX(removeX),
       removeY(removeY),
       removeZ(removeZ) {

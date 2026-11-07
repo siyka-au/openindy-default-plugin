@@ -26,7 +26,7 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
   } else if (ctx.config.isFunction(
                  node->getName())) {  // level 1-n, all other levels
 
-    QPointer<Function> parentFunction = data.top().function;
+    oi::Guarded<Function> parentFunction = data.top().function;
 
     CFFunctionData fd;
     fd.function = this->ctx.getFunction(node->getName());
@@ -40,11 +40,11 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
                 .arg(fd.feature->getFeature()->getFeatureName()),
             level);
     } else if (node->getFeature().compare("global.copy") == 0) {
-      QPointer<FeatureWrapper> copy = new FeatureWrapper();
+      oi::Guarded<FeatureWrapper> copy = new FeatureWrapper();
       switch (ctx.global_feature->getFeatureTypeEnum()) {
         case FeatureTypes::ePointFeature: {
-          QPointer<Point> src = ctx.global_feature->getPoint();
-          QPointer<Point> dest = new Point(src->getPosition());
+          oi::Guarded<Point> src = ctx.global_feature->getPoint();
+          oi::Guarded<Point> dest = new Point(src->getPosition());
           copy->setPoint(dest);
           break;
         }
@@ -64,7 +64,7 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
                 .arg(fd.feature->getFeature()->getFeatureName()),
             level);
     } else {
-      QPointer<FeatureWrapper> feature = this->ctx.createApplicableFeature(
+      oi::Guarded<FeatureWrapper> feature = this->ctx.createApplicableFeature(
           CFUtil::featureTypesForName(node->getFeature()));
       fd.feature = feature;
       debug(pre,
@@ -94,7 +94,7 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
 
   } else if (ctx.config.isNeededElement(node->getName())) {
     CFFunctionData parentFd = data.top();
-    QPointer<Function> parentFunction = parentFd.function;
+    oi::Guarded<Function> parentFunction = parentFd.function;
 
     InputElement ie = ctx.getInputElement(node->getName());
 
@@ -119,8 +119,8 @@ void CFVisitor::post(QPointer<Node> n, int index, int level) {
       level > 0 /* skip level 0 because this is the base function */) {
     CFFunctionData fd = data.pop();
 
-    ConfiguredFunction* cf = qobject_cast<ConfiguredFunction*>(
-        fd.function);  // inner ConfiguredFunction
+    ConfiguredFunction* cf = dynamic_cast<ConfiguredFunction*>(
+        static_cast<oi::Function*>(fd.function));  // inner ConfiguredFunction
     if (cf) {
       cf->global_inputElements = ctx.global_inputElements;
       // maybe later there is a need for "global.global"

@@ -15,8 +15,6 @@ using namespace oi;
  * \brief The BestFitSphere class
  */
 class BestFitSphere : public FitFunction, public Producer<Sphere> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method
@@ -36,9 +34,10 @@ class BestFitSphere : public FitFunction, public Producer<Sphere> {
   // ##############
 
   bool setUpResult(Sphere& sphere);
-  bool approximate(Sphere& sphere, const QList<QPointer<Point> >& inputPoints);
-  bool fit(Sphere& sphere, const QList<QPointer<Point> >& inputPoints,
-           const QList<QPointer<Point> >& allUsablePoints);
+  bool approximate(Sphere& sphere,
+                   const QList<oi::Guarded<Point> >& inputPoints);
+  bool fit(Sphere& sphere, const QList<oi::Guarded<Point> >& inputPoints,
+           const QList<oi::Guarded<Point> >& allUsablePoints);
 };
 
 #endif  // P_BESTFITSPHERE_H

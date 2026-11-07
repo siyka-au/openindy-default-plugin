@@ -3,7 +3,7 @@
 #include "ui_ps_loadingdialog.h"
 
 PS_LoadingDialog::PS_LoadingDialog(QWidget* parent)
-    : QDialog(parent), ui(new Ui::PS_LoadingDialog) {
+    : QDialog(), ui(new Ui::PS_LoadingDialog) {
   ui->setupUi(this);
 }
 

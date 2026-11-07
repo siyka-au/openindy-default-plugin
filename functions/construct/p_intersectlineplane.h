@@ -14,8 +14,6 @@ using namespace oi;
  * \brief The IntersectLinePlane class
  */
 class IntersectLinePlane : public ConstructFunction, public Producer<Point> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method
@@ -35,7 +33,8 @@ class IntersectLinePlane : public ConstructFunction, public Producer<Point> {
   // ##############
 
   bool setUpResult(Point& point);
-  bool isIntersection(const QPointer<Line>& line, const QPointer<Plane>& plane);
+  bool isIntersection(const oi::Guarded<Line>& line,
+                      const oi::Guarded<Plane>& plane);
 };
 
 #endif  // P_INTERSECTLINEPLANE_H

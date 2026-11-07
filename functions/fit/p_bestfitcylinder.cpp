@@ -74,8 +74,8 @@ bool BestFitCylinder::setUpResult(Cylinder& cylinder) {
   QList<IdPoint> usablePoints;
   QList<IdPoint> points;
   {
-    QList<QPointer<Point> > allUsablePoints;
-    QList<QPointer<Point> > inputPoints;
+    QList<oi::Guarded<Point> > allUsablePoints;
+    QList<oi::Guarded<Point> > inputPoints;
     foreach (const InputElement& element, this->inputElements[0]) {
       if (element.point.isNull() || !element.point->getIsSolved()) {
         this->setIsUsed(0, element.id, false);
@@ -99,13 +99,13 @@ bool BestFitCylinder::setUpResult(Cylinder& cylinder) {
       return false;
     }
 
-    foreach (const QPointer<Point>& p, allUsablePoints) {
+    foreach (const oi::Guarded<Point>& p, allUsablePoints) {
       IdPoint point;
       point.id = p->getId();
       point.xyz = p->getPosition().getVectorH();
       usablePoints.append(point);
     }
-    foreach (const QPointer<Point>& p, inputPoints) {
+    foreach (const oi::Guarded<Point>& p, inputPoints) {
       IdPoint point;
       point.id = p->getId();
       point.xyz = p->getPosition().getVectorH();

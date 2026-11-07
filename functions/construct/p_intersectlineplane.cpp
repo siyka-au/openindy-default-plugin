@@ -54,8 +54,8 @@ bool IntersectLinePlane::setUpResult(Point& point) {
       !this->inputElements.contains(1) || this->inputElements[1].size() != 1) {
     return false;
   }
-  QPointer<Line> line = this->inputElements[0].at(0).line;
-  QPointer<Plane> plane = this->inputElements[1].at(0).plane;
+  oi::Guarded<Line> line = this->inputElements[0].at(0).line;
+  oi::Guarded<Plane> plane = this->inputElements[1].at(0).plane;
   if (line.isNull() || plane.isNull() || !line->getIsSolved() ||
       !plane->getIsSolved()) {
     return false;
@@ -99,8 +99,8 @@ bool IntersectLinePlane::setUpResult(Point& point) {
  * \param plane
  * \return
  */
-bool IntersectLinePlane::isIntersection(const QPointer<Line>& line,
-                                        const QPointer<Plane>& plane) {
+bool IntersectLinePlane::isIntersection(const oi::Guarded<Line>& line,
+                                        const oi::Guarded<Plane>& plane) {
   // scalar product of the lines's direction vector and the plane's normal
   // vector
   double dot = 0.0;

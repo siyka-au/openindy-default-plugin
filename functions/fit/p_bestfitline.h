@@ -18,8 +18,6 @@ using namespace std;
 class BestFitLine : public FitFunction,
                     public FunctionUtil,
                     public Producer<Line> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

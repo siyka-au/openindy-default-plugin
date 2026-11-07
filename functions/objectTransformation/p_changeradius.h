@@ -17,8 +17,6 @@ class ChangeRadius : public ObjectTransformation,
                      public Transform<Sphere>,
                      public Transform<Circle>,
                      public Transform<Cylinder> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

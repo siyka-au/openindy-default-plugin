@@ -18,8 +18,6 @@ class Register : public ObjectTransformation,
                  public Transform<Point>,
                  public Transform<Sphere>,
                  public Transform<Circle> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

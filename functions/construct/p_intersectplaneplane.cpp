@@ -65,8 +65,8 @@ bool IntersectPlanePlane::setUpResult(Line& line) {
     return false;
   }
 
-  QPointer<Plane> plane1 = this->inputElements[0].at(0).plane;
-  QPointer<Plane> plane2 = this->inputElements[1].at(0).plane;
+  oi::Guarded<Plane> plane1 = this->inputElements[0].at(0).plane;
+  oi::Guarded<Plane> plane2 = this->inputElements[1].at(0).plane;
   if (plane1.isNull() || plane2.isNull() || !plane1->getIsSolved() ||
       !plane2->getIsSolved()) {
     return false;
@@ -118,8 +118,8 @@ bool IntersectPlanePlane::setUpResult(Line& line) {
  * \param plane2
  * \return
  */
-bool IntersectPlanePlane::isIntersection(const QPointer<Plane>& plane1,
-                                         const QPointer<Plane>& plane2) {
+bool IntersectPlanePlane::isIntersection(const oi::Guarded<Plane>& plane1,
+                                         const oi::Guarded<Plane>& plane2) {
   // scalar product of the normal vectors
   double dot = 0.0;
   OiVec::dot(dot, plane1->getDirection().getVector(),

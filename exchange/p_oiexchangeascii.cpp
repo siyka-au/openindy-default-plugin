@@ -445,11 +445,11 @@ void OiExchangeAscii::importOiData() {
       if (!errorWhileParsing) {
         switch (this->typeOfGeometry) {
           case GeometryTypes::ePointGeometry: {
-            QPointer<Point> myNominal = new Point();
+            oi::Guarded<Point> myNominal = new Point();
             // I use QT property system for transportation, because "common" is
             // not "common" of nominal point but actual point!
-            myNominal->setProperty("OI_FEATURE_COMMONSTATE",
-                                   columnData.oiFeatureCommonState);
+            myNominal->setTransientAttribute("OI_FEATURE_COMMONSTATE",
+                                             columnData.oiFeatureCommonState);
 
             myNominal->setFeatureName(columnData.featureName);
             myNominal->setGroupName(columnData.groupName);
@@ -464,7 +464,7 @@ void OiExchangeAscii::importOiData() {
             // set nominal system
             myNominal->setNominalSystem(this->nominalSystem);
 
-            QPointer<FeatureWrapper> myGeometry = new FeatureWrapper();
+            oi::Guarded<FeatureWrapper> myGeometry = new FeatureWrapper();
             myGeometry->setPoint(myNominal);
             this->features.append(myGeometry);
 
@@ -472,10 +472,10 @@ void OiExchangeAscii::importOiData() {
           }
           case GeometryTypes::ePlaneGeometry:
           case GeometryTypes::ePlaneLevelGeometry: {
-            QPointer<Plane> plane = new Plane();
+            oi::Guarded<Plane> plane = new Plane();
             // I use QT property system for transportation, because level is a
             // special plane
-            plane->setProperty(
+            plane->setTransientAttribute(
                 "OI_FEATURE_PLANE_LEVEL",
                 this->typeOfGeometry == GeometryTypes::ePlaneLevelGeometry);
 
@@ -495,7 +495,7 @@ void OiExchangeAscii::importOiData() {
             // set nominal system
             plane->setNominalSystem(this->nominalSystem);
 
-            QPointer<FeatureWrapper> geometry = new FeatureWrapper();
+            oi::Guarded<FeatureWrapper> geometry = new FeatureWrapper();
             geometry->setPlane(plane);
             this->features.append(geometry);
 
@@ -536,7 +536,7 @@ void OiExchangeAscii::exportOiData() {
       this->device->open(QIODevice::WriteOnly);
       QTextStream out(this->device);
 
-      foreach (QPointer<FeatureWrapper> fw,
+      foreach (oi::Guarded<FeatureWrapper> fw,
                this->currentJob->getGeometriesList()) {
         if (fw->getGeometry()->getIsSolved() &&
             fw->getGeometry()->getOwnerDescription().has_value()) {

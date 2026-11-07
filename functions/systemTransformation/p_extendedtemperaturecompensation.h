@@ -18,8 +18,6 @@ using namespace std;
  * calculates the scales (x,y,z) , translation and rotation
  */
 class ExtendedTemperatureCompensation : public SystemTransformation {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

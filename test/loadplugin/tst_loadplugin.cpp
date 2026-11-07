@@ -56,7 +56,7 @@ void LoadPluginTest::testLoadPlugin() {
   Plugin* oiPlugin = qobject_cast<Plugin*>(plugin);
   QVERIFY2(oiPlugin, "qobject_cast");
 
-  QList<QPointer<Function> > functions = oiPlugin->createFunctions();
+  QList<oi::Guarded<Function> > functions = oiPlugin->createFunctions();
   QVERIFY2(functions.size() > 0, "no functions found");
 }
 void LoadPluginTest::testPseudoTracker_eCartesianReading() {
@@ -71,7 +71,7 @@ void LoadPluginTest::testPseudoTracker_eCartesianReading() {
   Plugin* oiPlugin = qobject_cast<Plugin*>(plugin);
   QVERIFY2(oiPlugin, "qobject_cast");
 
-  QPointer<Sensor> sensor = oiPlugin->createSensor("PseudoTracker");
+  oi::Guarded<Sensor> sensor = oiPlugin->createSensor("PseudoTracker");
 
   sensor->init();
 
@@ -82,7 +82,7 @@ void LoadPluginTest::testPseudoTracker_eCartesianReading() {
   sp.insert("reading type", "cartesian");
   sc.setStringParameter(sp);
   sensor->setSensorConfiguration(sc);
-  QList<QPointer<Reading> > readings = sensor->measure(config);
+  QList<oi::Guarded<Reading> > readings = sensor->measure(config);
   QVERIFY2(readings.size() > 0, "no readings");
 }
 

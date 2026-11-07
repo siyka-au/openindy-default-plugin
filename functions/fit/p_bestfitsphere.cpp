@@ -60,8 +60,8 @@ bool BestFitSphere::setUpResult(Sphere& sphere) {
     return false;
   }
 
-  QList<QPointer<Point> > allUsablePoints;
-  QList<QPointer<Point> > inputPoints;
+  QList<oi::Guarded<Point> > allUsablePoints;
+  QList<oi::Guarded<Point> > inputPoints;
   foreach (const InputElement& element, this->inputElements[0]) {
     if (element.point.isNull() || !element.point->getIsSolved()) {
       this->setIsUsed(0, element.id, false);
@@ -95,7 +95,7 @@ bool BestFitSphere::setUpResult(Sphere& sphere) {
  * \return
  */
 bool BestFitSphere::approximate(Sphere& sphere,
-                                const QList<QPointer<Point> >& inputPoints) {
+                                const QList<oi::Guarded<Point> >& inputPoints) {
   // calculate centroid coordinates
   OiVec centroid(3);
   for (const auto& inputPoint : inputPoints) {
@@ -183,8 +183,8 @@ bool BestFitSphere::approximate(Sphere& sphere,
  * \return
  */
 bool BestFitSphere::fit(Sphere& sphere,
-                        const QList<QPointer<Point> >& inputPoints,
-                        const QList<QPointer<Point> >& allUsablePoints) {
+                        const QList<oi::Guarded<Point> >& inputPoints,
+                        const QList<oi::Guarded<Point> >& allUsablePoints) {
   int numIterations = 0;
 
   // set approximation values

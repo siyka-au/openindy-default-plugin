@@ -148,39 +148,43 @@ class FunctionTest : public QObject, public MessageSink {
                         MessageDestinations::eConsoleMessage);
 
  private:
-  QPointer<Function> createFunction(QString name);
+  oi::Guarded<Function> createFunction(QString name);
 
-  void addInputObservations(QString data, QPointer<Function> function, int id,
-                            int inputElementKey, bool shouldBeUsed);
+  void addInputObservations(QString data, oi::Guarded<Function> function,
+                            int id, int inputElementKey, bool shouldBeUsed);
 
   void addInputLine(double x, double y, double z, double i, double j, double k,
-                    QPointer<Function> function, int id, int inputElementKey);
+                    oi::Guarded<Function> function, int id,
+                    int inputElementKey);
   void addInputStation(double x, double y, double z, double i, double j,
-                       double k, QPointer<Function> function, int id,
+                       double k, oi::Guarded<Function> function, int id,
                        int inputElementKey);
   void addInputCoordinateSystem(double x, double y, double z, double i,
-                                double j, double k, QPointer<Function> function,
+                                double j, double k,
+                                oi::Guarded<Function> function, int id,
+                                int inputElementKey);
+  void addInputCoordinateSystem(OiMat trafo, oi::Guarded<Function> function,
                                 int id, int inputElementKey);
-  void addInputCoordinateSystem(OiMat trafo, QPointer<Function> function,
-                                int id, int inputElementKey);
-  void addInputPoint(double x, double y, double z, QPointer<Function> function,
-                     int id, int inputElementKey);
-  void addInputPoints(QString data, QPointer<Function> function, int id,
+  void addInputPoint(double x, double y, double z,
+                     oi::Guarded<Function> function, int id,
+                     int inputElementKey);
+  void addInputPoints(QString data, oi::Guarded<Function> function, int id,
                       int inputElementKey, bool shouldBeUsed);
   void addInputPlane(double x, double y, double z, double i, double j, double k,
-                     QPointer<Function> function, int id, int inputElementKey);
+                     oi::Guarded<Function> function, int id,
+                     int inputElementKey);
   void addInputCircle(double x, double y, double z, double i, double j,
-                      double k, double radius, QPointer<Function> function,
+                      double k, double radius, oi::Guarded<Function> function,
                       int id, int inputElementKey);
 
-  QPointer<Plane> createPlane(double x, double y, double z, double i, double j,
-                              double k);
-  QPointer<Cylinder> createCylinder(double x, double y, double z, double i,
-                                    double j, double k, double r);
-  QPointer<Circle> createCircle(double x, double y, double z, double i,
-                                double j, double k, double r);
-  QPointer<Line> createLine(double x, double y, double z, double i, double j,
-                            double k);
+  oi::Guarded<Plane> createPlane(double x, double y, double z, double i,
+                                 double j, double k);
+  oi::Guarded<Cylinder> createCylinder(double x, double y, double z, double i,
+                                       double j, double k, double r);
+  oi::Guarded<Circle> createCircle(double x, double y, double z, double i,
+                                   double j, double k, double r);
+  oi::Guarded<Line> createLine(double x, double y, double z, double i, double j,
+                               double k);
 };
 
 FunctionTest::FunctionTest() {}
@@ -195,7 +199,7 @@ void FunctionTest::printMessage(const QString& msg, const MessageTypes& msgType,
 }
 
 void FunctionTest::addInputObservations(QString data,
-                                        QPointer<Function> function,
+                                        oi::Guarded<Function> function,
                                         int id = 1000, int inputElementKey = 0,
                                         bool shouldBeUsed = true) {
   QTextStream stream(data.toUtf8());
@@ -239,7 +243,7 @@ void FunctionTest::addInputObservations(QString data,
   }
 }
 
-void FunctionTest::addInputPoints(QString data, QPointer<Function> function,
+void FunctionTest::addInputPoints(QString data, oi::Guarded<Function> function,
                                   int id = 1000, int inputElementKey = 0,
                                   bool shouldBeUsed = true) {
   QTextStream stream(data.toUtf8());
@@ -249,7 +253,7 @@ void FunctionTest::addInputPoints(QString data, QPointer<Function> function,
       continue;
     }
 
-    QPointer<Point> feature =
+    oi::Guarded<Point> feature =
         new Point(id, Position(xyz.at(0).toDouble(), xyz.at(1).toDouble(),
                                xyz.at(2).toDouble()));
     feature->setIsSolved(true);
@@ -268,8 +272,9 @@ void FunctionTest::addInputPoints(QString data, QPointer<Function> function,
 }
 
 void FunctionTest::addInputLine(double x, double y, double z, double i,
-                                double j, double k, QPointer<Function> function,
-                                int id = 2000, int inputElementKey = 0) {
+                                double j, double k,
+                                oi::Guarded<Function> function, int id = 2000,
+                                int inputElementKey = 0) {
   OiVec* p = new OiVec(4);
   p->setAt(0, x);
   p->setAt(1, y);
@@ -298,8 +303,8 @@ void FunctionTest::addInputLine(double x, double y, double z, double i,
 
 void FunctionTest::addInputStation(double x, double y, double z, double i,
                                    double j, double k,
-                                   QPointer<Function> function, int id = 2000,
-                                   int inputElementKey = 0) {
+                                   oi::Guarded<Function> function,
+                                   int id = 2000, int inputElementKey = 0) {
   OiVec* p = new OiVec(4);
   p->setAt(0, x);
   p->setAt(1, y);
@@ -314,7 +319,7 @@ void FunctionTest::addInputStation(double x, double y, double z, double i,
   a->setAt(3, 1.0);
   Direction* ijk = new Direction(*a);
 
-  QPointer<Station> station = new Station(QString("station_%1").arg(id));
+  oi::Guarded<Station> station = new Station(QString("station_%1").arg(id));
   station->setCoordinateSystem(*xyz, Direction(0, 0, 0), Direction(0, 0, 0),
                                *ijk);
   station->setIsSolved(true);
@@ -328,7 +333,7 @@ void FunctionTest::addInputStation(double x, double y, double z, double i,
 
 void FunctionTest::addInputCoordinateSystem(double x, double y, double z,
                                             double i, double j, double k,
-                                            QPointer<Function> function,
+                                            oi::Guarded<Function> function,
                                             int id = 2000,
                                             int inputElementKey = 0) {
   OiVec* p = new OiVec(4);
@@ -345,7 +350,7 @@ void FunctionTest::addInputCoordinateSystem(double x, double y, double z,
   a->setAt(3, 1.0);
   Direction* ijk = new Direction(*a);
 
-  QPointer<CoordinateSystem> coordianteSystem = new CoordinateSystem();
+  oi::Guarded<CoordinateSystem> coordianteSystem = new CoordinateSystem();
   coordianteSystem->setFeatureName(QString("system_%1").arg(id));
   coordianteSystem->setCoordinateSystem(*xyz, Direction(0, 0, 0),
                                         Direction(0, 0, 0), *ijk);
@@ -359,10 +364,10 @@ void FunctionTest::addInputCoordinateSystem(double x, double y, double z,
 }
 
 void FunctionTest::addInputCoordinateSystem(OiMat trafo,
-                                            QPointer<Function> function,
+                                            oi::Guarded<Function> function,
                                             int id = 2000,
                                             int inputElementKey = 0) {
-  QPointer<CoordinateSystem> coordianteSystem = new CoordinateSystem();
+  oi::Guarded<CoordinateSystem> coordianteSystem = new CoordinateSystem();
   coordianteSystem->setFeatureName(QString("system_%1").arg(id));
   coordianteSystem->transformOriginAndAxis(trafo);
   coordianteSystem->setIsSolved(true);
@@ -375,13 +380,13 @@ void FunctionTest::addInputCoordinateSystem(OiMat trafo,
 }
 
 void FunctionTest::addInputPoint(double x, double y, double z,
-                                 QPointer<Function> function, int id = 2000,
+                                 oi::Guarded<Function> function, int id = 2000,
                                  int inputElementKey = 0) {
   OiVec pointPos = OiVec(3);
   pointPos.setAt(0, x);
   pointPos.setAt(1, y);
   pointPos.setAt(2, z);
-  QPointer<Point> feature = new Point(Position(pointPos));
+  oi::Guarded<Point> feature = new Point(Position(pointPos));
   feature->setIsSolved(true);
   feature->setFeatureName(QString("point_%1").arg(id));
 
@@ -395,7 +400,7 @@ void FunctionTest::addInputPoint(double x, double y, double z,
 
 void FunctionTest::addInputCircle(double x, double y, double z, double i,
                                   double j, double k, double radius,
-                                  QPointer<Function> function, int id = 2000,
+                                  oi::Guarded<Function> function, int id = 2000,
                                   int inputElementKey = 0) {
   OiVec* p = new OiVec(4);
   p->setAt(0, x);
@@ -428,7 +433,7 @@ void FunctionTest::addInputCircle(double x, double y, double z, double i,
 
 void FunctionTest::addInputPlane(double x, double y, double z, double i,
                                  double j, double k,
-                                 QPointer<Function> function, int id = 2000,
+                                 oi::Guarded<Function> function, int id = 2000,
                                  int inputElementKey = 0) {
   OiVec* p = new OiVec(4);
   p->setAt(0, x);
@@ -456,8 +461,8 @@ void FunctionTest::addInputPlane(double x, double y, double z, double i,
   function->addInputElement(*element, inputElementKey);
 }
 
-QPointer<Plane> FunctionTest::createPlane(double x, double y, double z,
-                                          double i, double j, double k) {
+oi::Guarded<Plane> FunctionTest::createPlane(double x, double y, double z,
+                                             double i, double j, double k) {
   OiVec* p = new OiVec(4);
   p->setAt(0, x);
   p->setAt(1, y);
@@ -471,13 +476,13 @@ QPointer<Plane> FunctionTest::createPlane(double x, double y, double z,
   d->setAt(2, k);
   d->setAt(3, 1.0);
   Direction* ijk = new Direction(*d);
-  QPointer<Plane> feature = new Plane(*xyz, *ijk);
+  oi::Guarded<Plane> feature = new Plane(*xyz, *ijk);
   return feature;
 }
 
-QPointer<Cylinder> FunctionTest::createCylinder(double x, double y, double z,
-                                                double i, double j, double k,
-                                                double r) {
+oi::Guarded<Cylinder> FunctionTest::createCylinder(double x, double y, double z,
+                                                   double i, double j, double k,
+                                                   double r) {
   OiVec* p = new OiVec(4);
   p->setAt(0, x);
   p->setAt(1, y);
@@ -491,13 +496,13 @@ QPointer<Cylinder> FunctionTest::createCylinder(double x, double y, double z,
   d->setAt(2, k);
   d->setAt(3, 1.0);
   Direction* ijk = new Direction(*d);
-  QPointer<Cylinder> feature = new Cylinder(*xyz, *ijk, Radius(r));
+  oi::Guarded<Cylinder> feature = new Cylinder(*xyz, *ijk, Radius(r));
   return feature;
 }
 
-QPointer<Circle> FunctionTest::createCircle(double x, double y, double z,
-                                            double i, double j, double k,
-                                            double r) {
+oi::Guarded<Circle> FunctionTest::createCircle(double x, double y, double z,
+                                               double i, double j, double k,
+                                               double r) {
   OiVec* p = new OiVec(4);
   p->setAt(0, x);
   p->setAt(1, y);
@@ -511,12 +516,12 @@ QPointer<Circle> FunctionTest::createCircle(double x, double y, double z,
   d->setAt(2, k);
   d->setAt(3, 1.0);
   Direction* ijk = new Direction(*d);
-  QPointer<Circle> feature = new Circle(*xyz, *ijk, Radius(r));
+  oi::Guarded<Circle> feature = new Circle(*xyz, *ijk, Radius(r));
   return feature;
 }
 
-QPointer<Line> FunctionTest::createLine(double x, double y, double z, double i,
-                                        double j, double k) {
+oi::Guarded<Line> FunctionTest::createLine(double x, double y, double z,
+                                           double i, double j, double k) {
   OiVec* p = new OiVec(4);
   p->setAt(0, x);
   p->setAt(1, y);
@@ -530,20 +535,20 @@ QPointer<Line> FunctionTest::createLine(double x, double y, double z, double i,
   d->setAt(2, k);
   d->setAt(3, 1.0);
   Direction* ijk = new Direction(*d);
-  QPointer<Line> feature = new Line(*xyz, *ijk);
+  oi::Guarded<Line> feature = new Line(*xyz, *ijk);
   return feature;
 }
 
 void FunctionTest::testRegisterPoint() {
-  QPointer<Function> function = new Register();
+  oi::Guarded<Function> function = new Register();
   function->init();
 
   OiVec pointPos = OiVec(3);
   pointPos.setAt(0, 999.9927);
   pointPos.setAt(1, 1999.9898);
   pointPos.setAt(2, 2999.9817);
-  QPointer<Point> point = new Point(Position(pointPos));
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<Point> point = new Point(Position(pointPos));
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   addInputPlane(1374.9964, 1624.9982, 1024.7504, 0.100818, -0.097854, 0.990081,
@@ -563,7 +568,7 @@ void FunctionTest::testRegisterPoint() {
 }
 
 void FunctionTest::testRegisterSphere() {
-  QPointer<Function> function = new Register();
+  oi::Guarded<Function> function = new Register();
   function->init();
 
   OiVec spherePos = OiVec(3);
@@ -571,8 +576,8 @@ void FunctionTest::testRegisterSphere() {
   spherePos.setAt(1, -25.0191);
   spherePos.setAt(2, -25.0159);
   Radius radius(1025.6284);
-  QPointer<Sphere> sphere = new Sphere(Position(spherePos), radius);
-  QPointer<FeatureWrapper> sphereFeature = new FeatureWrapper();
+  oi::Guarded<Sphere> sphere = new Sphere(Position(spherePos), radius);
+  oi::Guarded<FeatureWrapper> sphereFeature = new FeatureWrapper();
   sphereFeature->setSphere(sphere);
 
   addInputPlane(1374.9964, 1624.9982, 1024.7504, 0.100818, -0.097854, 0.990081,
@@ -592,13 +597,13 @@ void FunctionTest::testRegisterSphere() {
 }
 
 void FunctionTest::testRegisterCircle() {
-  QPointer<Function> function = new Register();
+  oi::Guarded<Function> function = new Register();
   function->init();
 
-  QPointer<Circle> circle = createCircle(600.0108, 499.9982, 999.9979, 0.000010,
-                                         0.000007, -1.000000, 781.0312);
+  oi::Guarded<Circle> circle = createCircle(
+      600.0108, 499.9982, 999.9979, 0.000010, 0.000007, -1.000000, 781.0312);
 
-  QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
   circleFeature->setCircle(circle);
 
   addInputPlane(1374.9964, 1624.9982, 1024.7504, 0.100818, -0.097854, 0.990081,
@@ -619,12 +624,12 @@ void FunctionTest::testRegisterCircle() {
 
 // OI-494
 void FunctionTest::testVRadial() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -701,12 +706,12 @@ void FunctionTest::testVRadial() {
 // so testVRadial above already covers the point-based path this used to
 // check separately - keeping both would just be the same test twice.
 void FunctionTest::testVRadial3() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -784,12 +789,12 @@ void FunctionTest::testVRadial3() {
 
 // OI-566
 void FunctionTest::testBestFitCylinder1() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -826,12 +831,12 @@ void FunctionTest::testBestFitCylinder1() {
 
 // OI-566
 void FunctionTest::testBestFitCylinder1_modifyX() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -868,12 +873,12 @@ void FunctionTest::testBestFitCylinder1_modifyX() {
 
 // OI-566
 void FunctionTest::testBestFitCylinder1_modifyZ() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -910,12 +915,12 @@ void FunctionTest::testBestFitCylinder1_modifyZ() {
 
 // OI-566
 void FunctionTest::testBestFitCylinder1_modifyY() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -952,12 +957,12 @@ void FunctionTest::testBestFitCylinder1_modifyY() {
 
 // OI-298
 void FunctionTest::testBestFitCylinder2_trafo_guess_axis_3() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -994,12 +999,12 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_3() {
 
 // OI-298
 void FunctionTest::testBestFitCylinder2_trafo_1st_2_pts() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -1032,12 +1037,12 @@ void FunctionTest::testBestFitCylinder2_trafo_1st_2_pts() {
 
 // OI-298
 void FunctionTest::testBestFitCylinder2_trafo_guess_axis_2() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -1074,12 +1079,12 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_2() {
 
 // OI-298
 void FunctionTest::testBestFitCylinder2_trafo_guess_axis_1() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -1116,12 +1121,12 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_1() {
 
 // OI-298
 void FunctionTest::testBestFitCylinder2_guess_axis() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -1158,12 +1163,12 @@ void FunctionTest::testBestFitCylinder2_guess_axis() {
 
 // OI-298 direction
 void FunctionTest::testBestFitCylinder2_1st_2_pts() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -1196,12 +1201,12 @@ void FunctionTest::testBestFitCylinder2_1st_2_pts() {
 
 // OI-627
 void FunctionTest::testBestFitCylinderAproximationDirection1() {
-  QPointer<Function> function = new BestFitCylinderAppxDirection();
+  oi::Guarded<Function> function = new BestFitCylinderAppxDirection();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -1243,7 +1248,7 @@ void FunctionTest::testBestFitCylinderAproximationDirection1() {
 
 // OI-573
 void FunctionTest::testDisableAllObservationsButLastOne_no() {
-  QPointer<Function> function = new BestFitPoint();
+  oi::Guarded<Function> function = new BestFitPoint();
   function->init();
   function->setMessageSink(this);
 
@@ -1252,8 +1257,8 @@ void FunctionTest::testDisableAllObservationsButLastOne_no() {
       "disable all observations but last one", "no");
   function->setScalarInputParams(scalarInputParams);
 
-  QPointer<Point> point = new Point();
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<Point> point = new Point();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   // colum delim: " "
@@ -1283,7 +1288,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_no() {
 
 // OI-573
 void FunctionTest::testDisableAllObservationsButLastOne_yes() {
-  QPointer<Function> function = new BestFitPoint();
+  oi::Guarded<Function> function = new BestFitPoint();
   function->init();
   function->setMessageSink(this);
 
@@ -1292,8 +1297,8 @@ void FunctionTest::testDisableAllObservationsButLastOne_yes() {
       "disable all observations but last one", "yes");
   function->setScalarInputParams(scalarInputParams);
 
-  QPointer<Point> point = new Point();
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<Point> point = new Point();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   // colum delim: " "
@@ -1323,7 +1328,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_yes() {
 
 // OI-573
 void FunctionTest::testDisableAllObservationsButLastOne_2side_yes() {
-  QPointer<Function> function = new BestFitPoint();
+  oi::Guarded<Function> function = new BestFitPoint();
   function->init();
   function->setMessageSink(this);
 
@@ -1332,8 +1337,8 @@ void FunctionTest::testDisableAllObservationsButLastOne_2side_yes() {
       "disable all observations but last one", "yes");
   function->setScalarInputParams(scalarInputParams);
 
-  QPointer<Point> point = new Point();
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<Point> point = new Point();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   // colum delim: " "
@@ -1365,12 +1370,12 @@ void FunctionTest::testDisableAllObservationsButLastOne_2side_yes() {
 
 // OI-577: old behavior
 void FunctionTest::testBestFitPlane() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   // colum delim: " "
@@ -1404,12 +1409,12 @@ void FunctionTest::testBestFitPlane() {
 // OI-557 Test if Dummy Points affect the normal vector accordingly
 
 void FunctionTest::testBestFitPlane_DummyPoint_positive_up() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   // colum delim: " "
@@ -1442,12 +1447,12 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_up() {
 }
 
 void FunctionTest::testBestFitPlane_DummyPoint_positive_down() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   // colum delim: " "
@@ -1480,12 +1485,12 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_down() {
 }
 
 void FunctionTest::testBestFitPlane_DummyPoint_negative_up() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   // colum delim: " "
@@ -1518,12 +1523,12 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_up() {
 }
 
 void FunctionTest::testBestFitPlane_DummyPoint_negative_down() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   // colum delim: " "
@@ -1557,12 +1562,12 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_down() {
 
 // OI-577: old behavior
 void FunctionTest::testBestFitCircleInPlane_left() {
-  QPointer<Function> function = new BestFitCircleInPlane();
+  oi::Guarded<Function> function = new BestFitCircleInPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> circle = new Circle();
-  QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
+  oi::Guarded<Circle> circle = new Circle();
+  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
   circleFeature->setCircle(circle);
 
   // colum delim: " "
@@ -1594,12 +1599,12 @@ void FunctionTest::testBestFitCircleInPlane_left() {
 }
 
 void FunctionTest::testBestFitCircleInPlane_right() {
-  QPointer<Function> function = new BestFitCircleInPlane();
+  oi::Guarded<Function> function = new BestFitCircleInPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> circle = new Circle();
-  QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
+  oi::Guarded<Circle> circle = new Circle();
+  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
   circleFeature->setCircle(circle);
 
   // colum delim: " "
@@ -1630,12 +1635,12 @@ void FunctionTest::testBestFitCircleInPlane_right() {
   delete function.data();
 }
 void FunctionTest::testBestFitCircleInPlane_DummyPoint_positive_up() {
-  QPointer<Function> function = new BestFitCircleInPlane();
+  oi::Guarded<Function> function = new BestFitCircleInPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> circle = new Circle();
-  QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
+  oi::Guarded<Circle> circle = new Circle();
+  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
   circleFeature->setCircle(circle);
 
   // colum delim: " "
@@ -1668,12 +1673,12 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_positive_up() {
 }
 
 void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_up() {
-  QPointer<Function> function = new BestFitCircleInPlane();
+  oi::Guarded<Function> function = new BestFitCircleInPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> circle = new Circle();
-  QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
+  oi::Guarded<Circle> circle = new Circle();
+  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
   circleFeature->setCircle(circle);
 
   // colum delim: " "
@@ -1706,12 +1711,12 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_up() {
 }
 
 void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_down() {
-  QPointer<Function> function = new BestFitCircleInPlane();
+  oi::Guarded<Function> function = new BestFitCircleInPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> circle = new Circle();
-  QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
+  oi::Guarded<Circle> circle = new Circle();
+  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
   circleFeature->setCircle(circle);
 
   // colum delim: " "
@@ -1744,12 +1749,12 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_down() {
 }
 
 void FunctionTest::testBestFitCylinder1__DummyPoint1() {
-  QPointer<Function> function = new BestFitCylinderAppxDummyPoint();
+  oi::Guarded<Function> function = new BestFitCylinderAppxDummyPoint();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -1786,12 +1791,12 @@ void FunctionTest::testBestFitCylinder1__DummyPoint1() {
   delete function.data();
 }
 void FunctionTest::testBestFitCylinder1__DummyPoint2() {
-  QPointer<Function> function = new BestFitCylinderAppxDummyPoint();
+  oi::Guarded<Function> function = new BestFitCylinderAppxDummyPoint();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -1829,15 +1834,15 @@ void FunctionTest::testBestFitCylinder1__DummyPoint2() {
 }
 
 void FunctionTest::testIntersectLineLine_parallel() {
-  QPointer<Function> function = new IntersectLineLine();
+  oi::Guarded<Function> function = new IntersectLineLine();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Point> point = new Point();
+  oi::Guarded<Point> point = new Point();
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   addInputLine(1., 1., 1., 0.5772, 0.5772, 0.5772, function, 2000, 0);
@@ -1849,15 +1854,15 @@ void FunctionTest::testIntersectLineLine_parallel() {
   delete function.data();
 }
 void FunctionTest::testIntersectLineLine_intersect1_atfirstline() {
-  QPointer<Function> function = new IntersectLineLine();
+  oi::Guarded<Function> function = new IntersectLineLine();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Point> point = new Point();
+  oi::Guarded<Point> point = new Point();
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
@@ -1880,15 +1885,15 @@ void FunctionTest::testIntersectLineLine_intersect1_atfirstline() {
 }
 
 void FunctionTest::testIntersectLineLine_intersect1_atsecondline() {
-  QPointer<Function> function = new IntersectLineLine();
+  oi::Guarded<Function> function = new IntersectLineLine();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Point> point = new Point();
+  oi::Guarded<Point> point = new Point();
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
@@ -1911,15 +1916,15 @@ void FunctionTest::testIntersectLineLine_intersect1_atsecondline() {
 }
 
 void FunctionTest::testIntersectLineLine_intersect1_midpoint() {
-  QPointer<Function> function = new IntersectLineLine();
+  oi::Guarded<Function> function = new IntersectLineLine();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Point> point = new Point();
+  oi::Guarded<Point> point = new Point();
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
@@ -1942,15 +1947,15 @@ void FunctionTest::testIntersectLineLine_intersect1_midpoint() {
 }
 
 void FunctionTest::testIntersectLineLine_intersect2_atfirstline() {
-  QPointer<Function> function = new IntersectLineLine();
+  oi::Guarded<Function> function = new IntersectLineLine();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Point> point = new Point();
+  oi::Guarded<Point> point = new Point();
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
@@ -1973,15 +1978,15 @@ void FunctionTest::testIntersectLineLine_intersect2_atfirstline() {
 }
 
 void FunctionTest::testIntersectLineLine_intersect2_atsecondline() {
-  QPointer<Function> function = new IntersectLineLine();
+  oi::Guarded<Function> function = new IntersectLineLine();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Point> point = new Point();
+  oi::Guarded<Point> point = new Point();
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
@@ -2005,15 +2010,15 @@ void FunctionTest::testIntersectLineLine_intersect2_atsecondline() {
 }
 
 void FunctionTest::testIntersectLineLine_intersect2_midpoint() {
-  QPointer<Function> function = new IntersectLineLine();
+  oi::Guarded<Function> function = new IntersectLineLine();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Point> point = new Point();
+  oi::Guarded<Point> point = new Point();
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
@@ -2037,13 +2042,13 @@ void FunctionTest::testIntersectLineLine_intersect2_midpoint() {
 
 // OI-42
 void FunctionTest::testRectifyToPoint_Plane_negative() {
-  QPointer<Function> function = new RectifyToPoint();
+  oi::Guarded<Function> function = new RectifyToPoint();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
+  oi::Guarded<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   const bool sense = false;
@@ -2067,13 +2072,13 @@ void FunctionTest::testRectifyToPoint_Plane_negative() {
 }
 
 void FunctionTest::testRectifyToPoint_Plane_positive() {
-  QPointer<Function> function = new RectifyToPoint();
+  oi::Guarded<Function> function = new RectifyToPoint();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
+  oi::Guarded<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   const bool sense = true;
@@ -2097,13 +2102,13 @@ void FunctionTest::testRectifyToPoint_Plane_positive() {
 }
 
 void FunctionTest::testRectifyToPoint_Plane_Station() {
-  QPointer<Function> function = new RectifyToPoint();
+  oi::Guarded<Function> function = new RectifyToPoint();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
+  oi::Guarded<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   const bool sense = true;
@@ -2128,13 +2133,13 @@ void FunctionTest::testRectifyToPoint_Plane_Station() {
 
 // OI-42
 void FunctionTest::testRectifyToPoint_Circle_negative() {
-  QPointer<Function> function = new RectifyToPoint();
+  oi::Guarded<Function> function = new RectifyToPoint();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> geometry = createCircle(0, 0, 0, 0, 0, 1., 10.);
+  oi::Guarded<Circle> geometry = createCircle(0, 0, 0, 0, 0, 1., 10.);
 
-  QPointer<FeatureWrapper> feature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> feature = new FeatureWrapper();
   feature->setCircle(geometry);
 
   const bool sense = false;
@@ -2159,13 +2164,13 @@ void FunctionTest::testRectifyToPoint_Circle_negative() {
 
 // OI-42
 void FunctionTest::testRectifyToPoint_Line_negative() {
-  QPointer<Function> function = new RectifyToPoint();
+  oi::Guarded<Function> function = new RectifyToPoint();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Line> geometry = createLine(0, 0, 0, 0, 0, 1.);
+  oi::Guarded<Line> geometry = createLine(0, 0, 0, 0, 0, 1.);
 
-  QPointer<FeatureWrapper> feature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> feature = new FeatureWrapper();
   feature->setLine(geometry);
 
   const bool sense = false;
@@ -2190,13 +2195,13 @@ void FunctionTest::testRectifyToPoint_Line_negative() {
 
 // OI-42
 void FunctionTest::testRectifyToPoint_Cylinder_negative() {
-  QPointer<Function> function = new RectifyToPoint();
+  oi::Guarded<Function> function = new RectifyToPoint();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> geometry = createCylinder(0, 0, 0, 0, 0, 1., 10.);
+  oi::Guarded<Cylinder> geometry = createCylinder(0, 0, 0, 0, 0, 1., 10.);
 
-  QPointer<FeatureWrapper> feature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> feature = new FeatureWrapper();
   feature->setCylinder(geometry);
 
   const bool sense = false;
@@ -2221,13 +2226,13 @@ void FunctionTest::testRectifyToPoint_Cylinder_negative() {
 
 // OI-42
 void FunctionTest::testRectifyToVector_PlaneToPlane_negative() {
-  QPointer<Function> function = new RectifyToVector();
+  oi::Guarded<Function> function = new RectifyToVector();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
+  oi::Guarded<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   const bool sense = false;
@@ -2250,13 +2255,13 @@ void FunctionTest::testRectifyToVector_PlaneToPlane_negative() {
   delete function.data();
 }
 void FunctionTest::testRectifyToVector_PlaneToStation() {
-  QPointer<Function> function = new RectifyToVector();
+  oi::Guarded<Function> function = new RectifyToVector();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> feature = createPlane(0, 0, 0, 0, 0, -1.);
+  oi::Guarded<Plane> feature = createPlane(0, 0, 0, 0, 0, -1.);
 
-  QPointer<FeatureWrapper> featureWrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
   featureWrapper->setPlane(feature);
 
   const bool sense = false;
@@ -2280,13 +2285,13 @@ void FunctionTest::testRectifyToVector_PlaneToStation() {
 }
 
 void FunctionTest::testRectifyToVector_CircleToStation() {
-  QPointer<Function> function = new RectifyToVector();
+  oi::Guarded<Function> function = new RectifyToVector();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> feature = createCircle(0, 0, 0, 0, 0, -1., 10.);
+  oi::Guarded<Circle> feature = createCircle(0, 0, 0, 0, 0, -1., 10.);
 
-  QPointer<FeatureWrapper> featureWrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
   featureWrapper->setCircle(feature);
 
   const bool sense = false;
@@ -2310,13 +2315,13 @@ void FunctionTest::testRectifyToVector_CircleToStation() {
 }
 
 void FunctionTest::testRectifyToVector_LineToStation() {
-  QPointer<Function> function = new RectifyToVector();
+  oi::Guarded<Function> function = new RectifyToVector();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Line> feature = createLine(0, 0, 0, 0, 0, -1.);
+  oi::Guarded<Line> feature = createLine(0, 0, 0, 0, 0, -1.);
 
-  QPointer<FeatureWrapper> featureWrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
   featureWrapper->setLine(feature);
 
   const bool sense = false;
@@ -2340,13 +2345,13 @@ void FunctionTest::testRectifyToVector_LineToStation() {
 }
 
 void FunctionTest::testRectifyToVector_CylinderToStation() {
-  QPointer<Function> function = new RectifyToVector();
+  oi::Guarded<Function> function = new RectifyToVector();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> feature = createCylinder(0, 0, 0, 0, 0, -1., 10.);
+  oi::Guarded<Cylinder> feature = createCylinder(0, 0, 0, 0, 0, -1., 10.);
 
-  QPointer<FeatureWrapper> featureWrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
   featureWrapper->setCylinder(feature);
 
   const bool sense = false;
@@ -2371,13 +2376,13 @@ void FunctionTest::testRectifyToVector_CylinderToStation() {
 
 // OI-527
 void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_zAxis() {
-  QPointer<Function> function = new RectifyToVector();
+  oi::Guarded<Function> function = new RectifyToVector();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> feature = createPlane(0, 0, 0, 0, 0, 1.);
+  oi::Guarded<Plane> feature = createPlane(0, 0, 0, 0, 0, 1.);
 
-  QPointer<FeatureWrapper> featureWrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
   featureWrapper->setPlane(feature);
 
   const bool sense = false;
@@ -2403,13 +2408,13 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_zAxis() {
 
 // OI-527
 void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_xAxis() {
-  QPointer<Function> function = new RectifyToVector();
+  oi::Guarded<Function> function = new RectifyToVector();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> feature = createPlane(0, 0, 0, 1, 0, 0);
+  oi::Guarded<Plane> feature = createPlane(0, 0, 0, 1, 0, 0);
 
-  QPointer<FeatureWrapper> featureWrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
   featureWrapper->setPlane(feature);
 
   const bool sense = false;
@@ -2454,13 +2459,13 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_xAxis() {
 
 // OI-527
 void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_yAxis() {
-  QPointer<Function> function = new RectifyToVector();
+  oi::Guarded<Function> function = new RectifyToVector();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> feature = createPlane(0, 0, 0, 0, 1, 0);
+  oi::Guarded<Plane> feature = createPlane(0, 0, 0, 0, 1, 0);
 
-  QPointer<FeatureWrapper> featureWrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
   featureWrapper->setPlane(feature);
 
   const bool sense = false;
@@ -2505,12 +2510,12 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_yAxis() {
 
 // OI-636
 void FunctionTest::testCircleInPlaneFromPoints() {
-  QPointer<Function> function = new BestFitCircleInPlane();
+  oi::Guarded<Function> function = new BestFitCircleInPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> circle = new Circle();
-  QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
+  oi::Guarded<Circle> circle = new Circle();
+  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
   circleFeature->setCircle(circle);
 
   // colum delim: " "
@@ -2543,12 +2548,12 @@ void FunctionTest::testCircleInPlaneFromPoints() {
 
 // OI-508
 void FunctionTest::testBestFitPoint_residuals() {
-  QPointer<Function> function = new BestFitPoint();
+  oi::Guarded<Function> function = new BestFitPoint();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Point> feature = new Point();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Point> feature = new Point();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setPoint(feature);
 
   // colum delim: " "
@@ -2588,12 +2593,12 @@ void FunctionTest::testBestFitPoint_residuals() {
 
 // clock wise
 void FunctionTest::testBestFitPlane_right() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> feature = new Plane();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Plane> feature = new Plane();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setPlane(feature);
 
   // colum delim: " "
@@ -2623,12 +2628,12 @@ void FunctionTest::testBestFitPlane_right() {
 }
 
 void FunctionTest::testBestFitPlane_residuals() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Plane> feature = new Plane();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Plane> feature = new Plane();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setPlane(feature);
 
   // colum delim: " "
@@ -2684,12 +2689,12 @@ void FunctionTest::testBestFitPlane_residuals() {
 }
 
 void FunctionTest::testBestFitLine_residuals() {
-  QPointer<Function> function = new BestFitLine();
+  oi::Guarded<Function> function = new BestFitLine();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Line> feature = new Line();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Line> feature = new Line();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setLine(feature);
 
   // colum delim: " "
@@ -2745,12 +2750,12 @@ void FunctionTest::testBestFitLine_residuals() {
 }
 
 void FunctionTest::testBestFitCircleInPlane_residuals() {
-  QPointer<Function> function = new BestFitCircleInPlane();
+  oi::Guarded<Function> function = new BestFitCircleInPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> feature = new Circle();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Circle> feature = new Circle();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setCircle(feature);
 
   // colum delim: " "
@@ -2819,12 +2824,12 @@ void FunctionTest::testBestFitCircleInPlane_residuals() {
 void FunctionTest::testBestFitCircleInPlane_residuals2() {
   QSKIP("");
 
-  QPointer<Function> function = new BestFitCircleInPlane();
+  oi::Guarded<Function> function = new BestFitCircleInPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> feature = new Circle();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Circle> feature = new Circle();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setCircle(feature);
 
   // colum delim: " "
@@ -2921,12 +2926,12 @@ void FunctionTest::testBestFitCircleInPlane_residuals2() {
 }
 
 void FunctionTest::testBestFitSphere_residuals() {
-  QPointer<Function> function = new BestFitSphere();
+  oi::Guarded<Function> function = new BestFitSphere();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Sphere> feature = new Sphere();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Sphere> feature = new Sphere();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setSphere(feature);
 
   // colum delim: " "
@@ -3121,12 +3126,12 @@ void FunctionTest::testBestFitSphere_residuals() {
 }
 
 void FunctionTest::testPointFromPoints_point() {
-  QPointer<Function> function = new PointFromPoints();
+  oi::Guarded<Function> function = new PointFromPoints();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Point> feature = new Point();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Point> feature = new Point();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setPoint(feature);
 
   addInputPoint(1000.6609, 2000.3247, 3000.3180, function);
@@ -3152,7 +3157,7 @@ void FunctionTest::
   // measurement/element input involved, and stays user-owned/editable
   //(D19) - unlike a fit's output.
 
-  QPointer<Function> function = new NominalPoint();
+  oi::Guarded<Function> function = new NominalPoint();
   function->init();
   function->setMessageSink(this);
 
@@ -3163,8 +3168,8 @@ void FunctionTest::
   params.doubleParameter.insert("z [m]", 3000.3180);
   function->setScalarInputParams(params);
 
-  QPointer<Point> feature = new Point();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Point> feature = new Point();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setPoint(feature);
   feature->addFunction(function);
 
@@ -3184,7 +3189,7 @@ void FunctionTest::
 }
 
 void FunctionTest::testNominalPoint_declaresNoNeededElements() {
-  QPointer<Function> function = new NominalPoint();
+  oi::Guarded<Function> function = new NominalPoint();
   function->init();
 
   QVERIFY2(
@@ -3197,12 +3202,12 @@ void FunctionTest::testNominalPoint_declaresNoNeededElements() {
 }
 
 void FunctionTest::testPointFromPoints_circle() {
-  QPointer<Function> function = new PointFromPoints();
+  oi::Guarded<Function> function = new PointFromPoints();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Point> feature = new Point();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Point> feature = new Point();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setPoint(feature);
 
   // colum delim: " "
@@ -3226,16 +3231,16 @@ void FunctionTest::testPointFromPoints_circle() {
 }
 
 void FunctionTest::testPointFromPoints_Register() {
-  QPointer<Point> feature = new Point();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Point> feature = new Point();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setPoint(feature);
 
-  QPointer<Function> function1 = new PointFromPoints();
+  oi::Guarded<Function> function1 = new PointFromPoints();
   function1->init();
   function1->setMessageSink(this);
   feature->addFunction(function1);
 
-  QPointer<Function> function2 = new Register();
+  oi::Guarded<Function> function2 = new Register();
   function2->init();
   function2->setMessageSink(this);
   feature->addFunction(function2);
@@ -3277,8 +3282,8 @@ void FunctionTest::testPointFromPoints_Register() {
                  0.0001);
 }
 
-QPointer<Function> FunctionTest::createFunction(QString functionName) {
-  QPointer<Function> function;
+oi::Guarded<Function> FunctionTest::createFunction(QString functionName) {
+  oi::Guarded<Function> function;
   OiTemplatePlugin plugin;
 
   function = plugin.createFunction(functionName);
@@ -3298,11 +3303,11 @@ QPointer<Function> FunctionTest::createFunction(QString functionName) {
 }
 
 void FunctionTest::testPointFromPoints_RegisterV2() {
-  QPointer<Point> feature = new Point();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Point> feature = new Point();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setPoint(feature);
 
-  QPointer<Function> function = createFunction("RegisterPositionToPlane");
+  oi::Guarded<Function> function = createFunction("RegisterPositionToPlane");
   QVERIFY2(!function.isNull(), "function is null");
 
   // colum delim: " "
@@ -3345,12 +3350,12 @@ void FunctionTest::testPointFromPoints_RegisterV2() {
 }
 
 void FunctionTest::testDistance_PointFromPoints_RegisterV2() {
-  QPointer<ScalarEntityDistance> feature = new ScalarEntityDistance();
+  oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
   feature->setFeatureName("ScalarEntityDistance");
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setScalarEntityDistance(feature);
 
-  QPointer<Function> function = createFunction("DistanceFromPlane");
+  oi::Guarded<Function> function = createFunction("DistanceFromPlane");
   QVERIFY2(!function.isNull(), "function is null");
 
   addInputPoint(1000.6609, 2000.3247, 3000.3180, function, 2000, 0);
@@ -3361,7 +3366,9 @@ void FunctionTest::testDistance_PointFromPoints_RegisterV2() {
   QVERIFY2(feature->getDisplayFunctions().compare("DistanceFromPlane") == 0,
            "getDisplayFunctions");
 
-  qDebug() << qobject_cast<ConfiguredFunction*>(function)->prettyPrint();
+  qDebug() << dynamic_cast<ConfiguredFunction*>(
+                  static_cast<oi::Function*>(function))
+                  ->prettyPrint();
 
   feature->recalc();
   QVERIFY2(feature->getIsSolved(), "first recalc");
@@ -3375,12 +3382,12 @@ void FunctionTest::testDistance_PointFromPoints_RegisterV2() {
 }
 
 void FunctionTest::testXDistance_PointFromPoints_RegisterV2() {
-  QPointer<ScalarEntityDistance> feature = new ScalarEntityDistance();
+  oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
   feature->setFeatureName("ScalarEntityDistance");
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setScalarEntityDistance(feature);
 
-  QPointer<Function> function = createFunction("XDistance");
+  oi::Guarded<Function> function = createFunction("XDistance");
   QVERIFY2(!function.isNull(), "function is null");
 
   // colum delim: " "
@@ -3407,12 +3414,12 @@ void FunctionTest::testXDistance_PointFromPoints_RegisterV2() {
   COMPARE_DOUBLE(feature->getDistance(), 1.7008, 0.0001);
 }
 void FunctionTest::testYDistance_PointFromPoints_RegisterV2() {
-  QPointer<ScalarEntityDistance> feature = new ScalarEntityDistance();
+  oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
   feature->setFeatureName("ScalarEntityDistance");
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setScalarEntityDistance(feature);
 
-  QPointer<Function> function = createFunction("YDistance");
+  oi::Guarded<Function> function = createFunction("YDistance");
   QVERIFY2(!function.isNull(), "function is null");
 
   // colum delim: " "
@@ -3439,12 +3446,12 @@ void FunctionTest::testYDistance_PointFromPoints_RegisterV2() {
   COMPARE_DOUBLE(feature->getDistance(), 1.7008, 0.0001);
 }
 void FunctionTest::testZDistance_PointFromPoints_RegisterV2() {
-  QPointer<ScalarEntityDistance> feature = new ScalarEntityDistance();
+  oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
   feature->setFeatureName("ScalarEntityDistance");
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setScalarEntityDistance(feature);
 
-  QPointer<Function> function = createFunction("ZDistance");
+  oi::Guarded<Function> function = createFunction("ZDistance");
   QVERIFY2(!function.isNull(), "function is null");
 
   // colum delim: " "
@@ -3494,12 +3501,12 @@ void FunctionTest::testTODO5() {
 }
 
 void FunctionTest::testDistanceBetweenTwoPointsV2() {
-  QPointer<ScalarEntityDistance> feature = new ScalarEntityDistance();
+  oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
   feature->setFeatureName("ScalarEntityDistance");
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setScalarEntityDistance(feature);
 
-  QPointer<Function> function = createFunction("DistanceBetweenTwoPoints");
+  oi::Guarded<Function> function = createFunction("DistanceBetweenTwoPoints");
   QVERIFY2(!function.isNull(), "function is null");
 
   addInputPoint(1000.6609, 2000.3247, 3000.3180, function, 2000, 0);
@@ -3515,12 +3522,12 @@ void FunctionTest::testDistanceBetweenTwoPointsV2() {
 
 // OI-805
 void FunctionTest::testCircleInPlaneFromPoints_with_DummyPoint() {
-  QPointer<Function> function = new BestFitCircleInPlane();
+  oi::Guarded<Function> function = new BestFitCircleInPlane();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Circle> circle = new Circle();
-  QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
+  oi::Guarded<Circle> circle = new Circle();
+  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
   circleFeature->setCircle(circle);
 
   // colum delim: " "
@@ -3554,12 +3561,12 @@ void FunctionTest::testCircleInPlaneFromPoints_with_DummyPoint() {
 }
 
 void FunctionTest::testLineFromPoints() {
-  QPointer<Function> function = new BestFitLine();
+  oi::Guarded<Function> function = new BestFitLine();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Line> feature = new Line();
-  QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
+  oi::Guarded<Line> feature = new Line();
+  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
   wrapper->setLine(feature);
 
   // colum delim: " "
@@ -3594,13 +3601,13 @@ void FunctionTest::testLineFromPoints() {
 
 // OI-1003
 void FunctionTest::testNotSolved_guessAxis() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
   cylinder->setIsSolved(false);
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "
@@ -3629,13 +3636,13 @@ void FunctionTest::testNotSolved_guessAxis() {
 
 // OI-1003
 void FunctionTest::testNotSolved_firstTwoPoints() {
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   function->setMessageSink(this);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
   cylinder->setIsSolved(false);
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
 
   // colum delim: " "

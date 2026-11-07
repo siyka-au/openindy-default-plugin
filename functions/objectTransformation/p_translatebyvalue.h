@@ -15,8 +15,6 @@ class TranslateByValue : public ObjectTransformation,
                          public Transform<Line>,
                          public Transform<Plane>,
                          public Transform<Sphere> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

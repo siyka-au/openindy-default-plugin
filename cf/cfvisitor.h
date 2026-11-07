@@ -11,8 +11,6 @@ using namespace oi;
  * @brief Visitor for CFCParameter
  */
 class CFVisitor : public NodeVisitor {
-  Q_OBJECT
-
  public:
   explicit CFVisitor(CFContext ctx);
 

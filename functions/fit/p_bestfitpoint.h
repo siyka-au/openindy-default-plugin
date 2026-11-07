@@ -16,11 +16,9 @@ using namespace std;
  * \brief The BestFitPoint class
  */
 class BestFitPoint : public FitFunction, public Producer<Point> {
-  Q_OBJECT
-
  public:
-  explicit BestFitPoint(QObject* parent = nullptr)
-      : FitFunction(parent),
+  explicit BestFitPoint()
+      : FitFunction(),
         key("disable all observations but last one"),
         value_no("no"),
         value_yes("yes") {}

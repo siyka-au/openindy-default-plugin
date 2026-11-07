@@ -16,8 +16,6 @@ using namespace oi;
 class BestFitCylinder : public FitFunction,
                         public BestFitCylinderUtil,
                         public Producer<Cylinder> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method
@@ -40,15 +38,11 @@ class BestFitCylinder : public FitFunction,
 };
 
 class BestFitCylinderAppxDirection : public BestFitCylinder {
-  Q_OBJECT
-
  public:
   void init() override;
 };
 
 class BestFitCylinderAppxDummyPoint : public BestFitCylinder {
-  Q_OBJECT
-
  public:
   void init() override;
 };

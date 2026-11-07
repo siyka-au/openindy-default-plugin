@@ -58,8 +58,8 @@ bool BestFitLine::setUpResult(Line& line) {
     return false;
   }
 
-  QList<QPointer<Point> > allUsablePoints;
-  QList<QPointer<Point> > inputPoints;
+  QList<oi::Guarded<Point> > allUsablePoints;
+  QList<oi::Guarded<Point> > inputPoints;
   foreach (const InputElement& element, this->inputElements[0]) {
     if (element.point.isNull() || !element.point->getIsSolved()) {
       this->setIsUsed(0, element.id, false);
@@ -80,7 +80,7 @@ bool BestFitLine::setUpResult(Line& line) {
 
   // centroid
   OiVec centroid(3);
-  foreach (const QPointer<Point>& point, inputPoints) {
+  foreach (const oi::Guarded<Point>& point, inputPoints) {
     centroid = centroid + point->getPosition().getVector();
   }
   centroid = centroid * (1.0 / static_cast<double>(inputPoints.size()));
@@ -124,7 +124,7 @@ bool BestFitLine::setUpResult(Line& line) {
   rectifyNormalToDirection(r, direction);
 
   // calculate display residuals for each usable point
-  foreach (const QPointer<Point>& point, allUsablePoints) {
+  foreach (const oi::Guarded<Point>& point, allUsablePoints) {
     double distance = 0.0;
     OiVec v_line(3);
     const OiVec pos = point->getPosition().getVector();

@@ -25,8 +25,6 @@ class RectifyToVector : public ObjectTransformation,
                         public Transform<Circle>,
                         public Transform<Line>,
                         public Transform<Cylinder> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

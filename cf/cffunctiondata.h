@@ -15,10 +15,10 @@ class CFFunctionData {
   QString prettyPrint();
 
  public:
-  QPointer<Function> function;
+  oi::Guarded<Function> function;
 
   // feature returned / modified by this function
-  QPointer<FeatureWrapper> feature;
+  oi::Guarded<FeatureWrapper> feature;
 };
 
 #endif  // CFFUNCTIONDATA_H

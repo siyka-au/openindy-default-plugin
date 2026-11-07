@@ -13,8 +13,8 @@ using namespace oi::math;
 
 namespace {
 
-QPointer<Point> makePoint(double x, double y, double z, int id) {
-  QPointer<Point> point = new Point(id, Position(x, y, z));
+oi::Guarded<Point> makePoint(double x, double y, double z, int id) {
+  oi::Guarded<Point> point = new Point(id, Position(x, y, z));
   point->setIsSolved(true);
   return point;
 }
@@ -24,7 +24,8 @@ QPointer<Point> makePoint(double x, double y, double z, int id) {
 // Point's MeasurementIntent to a NeededElement::roleName. Tests at this
 // level bypass OiJob/tagging entirely and drive the function directly, the
 // same way tst_function.cpp does for every other fit/construct function.
-void addInputPoint(QPointer<Function> function, const QPointer<Point>& point,
+void addInputPoint(oi::Guarded<Function> function,
+                   const oi::Guarded<Point>& point,
                    int neededElementsIndex = 0) {
   InputElement element(point->getId());
   element.typeOfElement = ElementTypes::ePointElement;
@@ -32,7 +33,7 @@ void addInputPoint(QPointer<Function> function, const QPointer<Point>& point,
   function->addInputElement(element, neededElementsIndex);
 }
 
-double planeNormalAngleTo(const QPointer<Plane>& plane, double i, double j,
+double planeNormalAngleTo(const oi::Guarded<Plane>& plane, double i, double j,
                           double k) {
   const OiVec fitted = plane->getDirection().getVector();
   const double fittedNorm = std::sqrt(fitted.getAt(0) * fitted.getAt(0) +
@@ -93,7 +94,7 @@ void CollectionBindingTest::initTestCase() {
 }
 
 void CollectionBindingTest::pointsAddedAfterInitialResolutionArePickedUp() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
 
   // three points: enough to solve, all on z = 0
@@ -101,8 +102,8 @@ void CollectionBindingTest::pointsAddedAfterInitialResolutionArePickedUp() {
   addInputPoint(function, makePoint(1.0, 0.0, 0.0, 2));
   addInputPoint(function, makePoint(0.0, 1.0, 0.0, 3));
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   QVERIFY2(function->exec(planeFeature),
@@ -126,7 +127,7 @@ void CollectionBindingTest::pointsAddedAfterInitialResolutionArePickedUp() {
 }
 
 void CollectionBindingTest::declaredShapeNeverGrowsWithPointCount() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
 
   // D12: BestFitPlane declares two roles - "default" (the fitted points)
@@ -151,21 +152,21 @@ void CollectionBindingTest::declaredShapeNeverGrowsWithPointCount() {
 }
 
 void CollectionBindingTest::tooFewPointsFailsCleanly() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
 
   addInputPoint(function, makePoint(0.0, 0.0, 0.0, 1));
   addInputPoint(function, makePoint(1.0, 0.0, 0.0, 2));
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   QVERIFY2(!function->exec(planeFeature), "two points cannot define a plane");
 }
 
 void CollectionBindingTest::collinearPointsAreRejectedByTheFitNotTheCount() {
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
 
   // three points satisfies the declared minimum, and they still cannot
@@ -175,8 +176,8 @@ void CollectionBindingTest::collinearPointsAreRejectedByTheFitNotTheCount() {
   addInputPoint(function, makePoint(1.0, 1.0, 1.0, 2));
   addInputPoint(function, makePoint(2.0, 2.0, 2.0, 3));
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   QVERIFY2(!function->exec(planeFeature),
@@ -204,19 +205,19 @@ void CollectionBindingTest::
 
   int id = 1;
   int derivedId = 1000;
-  QList<QPointer<Point> > derivedPoints;
+  QList<oi::Guarded<Point> > derivedPoints;
 
   foreach (const Nest& nest, nests) {
     // three raw shots of the same nest, each nudged slightly off the
     // true position - the average should recover it
-    QPointer<Function> averager = new AverageFromPoints();
+    oi::Guarded<Function> averager = new AverageFromPoints();
     averager->init();
     addInputPoint(averager, makePoint(nest.x - 0.01, nest.y, nest.z, id++));
     addInputPoint(averager, makePoint(nest.x + 0.01, nest.y, nest.z, id++));
     addInputPoint(averager, makePoint(nest.x, nest.y, nest.z, id++));
 
-    QPointer<Point> derived = new Point(derivedId++, Position());
-    QPointer<FeatureWrapper> derivedFeature = new FeatureWrapper();
+    oi::Guarded<Point> derived = new Point(derivedId++, Position());
+    oi::Guarded<FeatureWrapper> derivedFeature = new FeatureWrapper();
     derivedFeature->setPoint(derived);
 
     QVERIFY2(averager->exec(derivedFeature),
@@ -231,26 +232,26 @@ void CollectionBindingTest::
   }
 
   // the plane fits from the four derived points
-  QPointer<Function> plane1Function = new BestFitPlane();
+  oi::Guarded<Function> plane1Function = new BestFitPlane();
   plane1Function->init();
-  foreach (const QPointer<Point>& derived, derivedPoints) {
+  foreach (const oi::Guarded<Point>& derived, derivedPoints) {
     addInputPoint(plane1Function, derived);
   }
-  QPointer<Plane> planeFromAveraged = new Plane();
-  QPointer<FeatureWrapper> planeFromAveragedFeature = new FeatureWrapper();
+  oi::Guarded<Plane> planeFromAveraged = new Plane();
+  oi::Guarded<FeatureWrapper> planeFromAveragedFeature = new FeatureWrapper();
   planeFromAveragedFeature->setPlane(planeFromAveraged);
   QVERIFY2(plane1Function->exec(planeFromAveragedFeature),
            "plane should solve from four averaged points");
 
   // and identically from the four true, un-repeated positions
-  QPointer<Function> plane2Function = new BestFitPlane();
+  oi::Guarded<Function> plane2Function = new BestFitPlane();
   plane2Function->init();
   int trueId = 5000;
   foreach (const Nest& nest, nests) {
     addInputPoint(plane2Function, makePoint(nest.x, nest.y, nest.z, trueId++));
   }
-  QPointer<Plane> planeFromTrue = new Plane();
-  QPointer<FeatureWrapper> planeFromTrueFeature = new FeatureWrapper();
+  oi::Guarded<Plane> planeFromTrue = new Plane();
+  oi::Guarded<FeatureWrapper> planeFromTrueFeature = new FeatureWrapper();
   planeFromTrueFeature->setPlane(planeFromTrue);
   QVERIFY2(plane2Function->exec(planeFromTrueFeature),
            "plane should solve from four true points");

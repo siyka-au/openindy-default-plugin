@@ -16,8 +16,6 @@ enum class IntersectionTypes { eAtFirstLine, eAtSecondLine, eMidPoint };
  * \brief The IntersectLineline class
  */
 class IntersectLineLine : public ConstructFunction, public Producer<Point> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method
@@ -37,7 +35,8 @@ class IntersectLineLine : public ConstructFunction, public Producer<Point> {
   // ##############
 
   bool setUpResult(Point& point);
-  bool isParallel(const QPointer<Line>& line1, const QPointer<Line>& line2);
+  bool isParallel(const oi::Guarded<Line>& line1,
+                  const oi::Guarded<Line>& line2);
   IntersectionTypes getIntersectionType();
 };
 

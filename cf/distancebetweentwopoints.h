@@ -7,7 +7,6 @@ using namespace oi;
 
 class DistanceBetweenTwoPoints : public ConstructFunction,
                                  public Producer<ScalarEntityDistance> {
-  Q_OBJECT
  public:
   void init() override;
 

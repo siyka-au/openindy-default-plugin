@@ -98,18 +98,19 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget() {
   // position and populated sigma the tracker error model produced, so
   // this test still exercises the same error budget as before, just
   // through the Point that would actually own that observation.
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
 
   int id = 1;
-  QList<QPointer<Observation>> observations;
+  QList<oi::Guarded<Observation>> observations;
   for (const OiVec& truePoint : scene) {
-    QPointer<Observation> obs = simulateObservation(truePoint, pose, model, id);
+    oi::Guarded<Observation> obs =
+        simulateObservation(truePoint, pose, model, id);
     observations.append(obs);
     QVERIFY2(obs->getSigmaXYZ().getAt(0) > 0.0,
              "sigma must be populated, not the silent zero default");
 
-    QPointer<Point> point = new Point(id, Position(obs->getXYZ()));
+    oi::Guarded<Point> point = new Point(id, Position(obs->getXYZ()));
     point->setIsSolved(true);
 
     InputElement element(id);
@@ -121,8 +122,8 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget() {
     id++;
   }
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
 
   QVERIFY2(function->exec(planeFeature), "plane fit did not converge");

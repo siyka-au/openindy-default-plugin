@@ -65,7 +65,7 @@ bool BestFitCircle::setUpResult(Circle& circle) {
         MessageTypes::eWarningMessage);
     return false;
   }
-  QList<QPointer<Point> > inputPoints;
+  QList<oi::Guarded<Point> > inputPoints;
   foreach (const InputElement& element, this->inputElements[0]) {
     if (!element.point.isNull() && element.point->getIsSolved() &&
         element.shouldBeUsed) {
@@ -94,7 +94,7 @@ bool BestFitCircle::setUpResult(Circle& circle) {
 
   double xc = 0, yc = 0, zc = 0, rc = 0;
 
-  foreach (const QPointer<Point>& p, inputPoints) {
+  foreach (const oi::Guarded<Point>& p, inputPoints) {
     const OiVec pos = p->getPosition().getVector();
     x[k] = pos.getAt(0);
     y[k] = pos.getAt(1);

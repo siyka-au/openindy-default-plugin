@@ -34,8 +34,6 @@ using namespace oi;
  * is a different, simpler operation.
  */
 class AverageFromPoints : public ConstructFunction, public Producer<Point> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

@@ -24,8 +24,6 @@ using namespace oi;
  * measured here.
  */
 class PointFromPlaneOrigin : public ConstructFunction, public Producer<Point> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

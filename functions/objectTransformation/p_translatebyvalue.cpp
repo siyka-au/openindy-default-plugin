@@ -91,7 +91,7 @@ bool TranslateByValue::setUpResult(Point& point) {
   if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
     return false;
   }
-  QPointer<Geometry> geometry = this->inputElements[0].at(0).geometry;
+  oi::Guarded<Geometry> geometry = this->inputElements[0].at(0).geometry;
   if (geometry.isNull() || !geometry->getIsSolved() ||
       !geometry->hasDirection()) {
     return false;
@@ -133,7 +133,7 @@ bool TranslateByValue::setUpResult(Line& line) {
   if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
     return false;
   }
-  QPointer<Geometry> geometry = this->inputElements[0].at(0).geometry;
+  oi::Guarded<Geometry> geometry = this->inputElements[0].at(0).geometry;
   if (geometry.isNull() || !geometry->getIsSolved() ||
       !geometry->hasDirection()) {
     return false;
@@ -175,7 +175,7 @@ bool TranslateByValue::setUpResult(Plane& plane) {
   if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
     return false;
   }
-  QPointer<Geometry> geometry = this->inputElements[0].at(0).geometry;
+  oi::Guarded<Geometry> geometry = this->inputElements[0].at(0).geometry;
   if (geometry.isNull() || !geometry->getIsSolved() ||
       !geometry->hasDirection()) {
     return false;
@@ -217,7 +217,7 @@ bool TranslateByValue::setUpResult(Sphere& sphere) {
   if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
     return false;
   }
-  QPointer<Geometry> geometry = this->inputElements[0].at(0).geometry;
+  oi::Guarded<Geometry> geometry = this->inputElements[0].at(0).geometry;
   if (geometry.isNull() || !geometry->getIsSolved() ||
       !geometry->hasDirection()) {
     return false;

@@ -7,11 +7,11 @@ CFContext::CFContext() {}
  * @param name
  * @return function instance and removes function from list
  */
-QPointer<Function> CFContext::getFunction(QString name) {
+oi::Guarded<Function> CFContext::getFunction(QString name) {
   for (int index = 0; index < functions.size(); index++) {
     if (!functions[index].isNull() &&
         functions[index]->getMetaData().name.compare(name) == 0) {
-      QPointer<Function> f = functions.takeAt(index);  // remove from list
+      oi::Guarded<Function> f = functions.takeAt(index);  // remove from list
       return f;
     }
   }
@@ -38,19 +38,19 @@ InputElement CFContext::getInputElement(QString name) {
  * @param featureType
  * @return feature for element of featuresTypes
  */
-QPointer<FeatureWrapper> CFContext::createApplicableFeature(
+oi::Guarded<FeatureWrapper> CFContext::createApplicableFeature(
     FeatureTypes featureType) {
-  QPointer<FeatureWrapper> featureWrapper = new FeatureWrapper();
+  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
 
   switch (featureType) {
     case FeatureTypes::ePointFeature: {
-      QPointer<Point> feature = new Point();
+      oi::Guarded<Point> feature = new Point();
       feature->setFeatureName("generated Point");
       featureWrapper->setPoint(feature);
       return featureWrapper;
     }
     case FeatureTypes::eScalarEntityDistanceFeature: {
-      QPointer<ScalarEntityDistance> feature = new ScalarEntityDistance();
+      oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
       feature->setFeatureName("generated ScalarEntityDistance");
       featureWrapper->setScalarEntityDistance(feature);
       return featureWrapper;
@@ -61,7 +61,8 @@ QPointer<FeatureWrapper> CFContext::createApplicableFeature(
       QString("can not create applicable feature").toLocal8Bit().data());
 }
 
-InputElement CFContext::createInputElement(QPointer<FeatureWrapper> feature) {
+InputElement CFContext::createInputElement(
+    oi::Guarded<FeatureWrapper> feature) {
   InputElement element;
   element.label = QString("generated InputElement: %1")
                       .arg(feature->getFeatureTypeString());

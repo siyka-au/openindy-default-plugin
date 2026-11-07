@@ -53,11 +53,11 @@ P20	-749.56	2987.57	-453.59\r\n\
   QByteArray ba = data.toUtf8();
   exchange->setDevice(QPointer<QIODevice>(new QBuffer(&ba)));
 
-  exchange->setFeatures(QList<QPointer<FeatureWrapper> >());  // only export
-  exchange->setExportObservations(false);                     // only export
+  exchange->setFeatures(QList<oi::Guarded<FeatureWrapper> >());  // only export
+  exchange->setExportObservations(false);                        // only export
   exchange->setGroupName("Group01");
-  exchange->setNominalSystem(QPointer<CoordinateSystem>(new CoordinateSystem(
-      QPointer<Station>())) /*features.at(0)->getCoordinateSystem()*/);
+  exchange->setNominalSystem(oi::Guarded<CoordinateSystem>(new CoordinateSystem(
+      oi::Guarded<Station>())) /*features.at(0)->getCoordinateSystem()*/);
 
   exchange->setUnit(DimensionType::eMetric, UnitType::eUnitMilliMeter);
   exchange->setUnit(DimensionType::eAngular, UnitType::eUnitDecimalDegree);
@@ -69,7 +69,7 @@ P20	-749.56	2987.57	-453.59\r\n\
   // test
   QVERIFY(exchange->getFeatures().size() == 6);
 
-  QPointer<Point> point = exchange->getFeatures().at(0)->getPoint();
+  oi::Guarded<Point> point = exchange->getFeatures().at(0)->getPoint();
   QCOMPARE(point->getFeatureName(), QString("P1004"));
   QCOMPARE(point->getGroupName(), QString("Group01"));
   OiVec xyz = point->getPosition().getVector();
@@ -121,11 +121,11 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
   exchange->setUserDefinedColumns(
       exchange->getDefaultColumnOrder(GeometryTypes::ePlaneGeometry));
 
-  exchange->setFeatures(QList<QPointer<FeatureWrapper> >());  // only export
-  exchange->setExportObservations(false);                     // only export
+  exchange->setFeatures(QList<oi::Guarded<FeatureWrapper> >());  // only export
+  exchange->setExportObservations(false);                        // only export
   exchange->setGroupName("Group01");
-  exchange->setNominalSystem(QPointer<CoordinateSystem>(new CoordinateSystem(
-      QPointer<Station>())) /*features.at(0)->getCoordinateSystem()*/);
+  exchange->setNominalSystem(oi::Guarded<CoordinateSystem>(new CoordinateSystem(
+      oi::Guarded<Station>())) /*features.at(0)->getCoordinateSystem()*/);
 
   exchange->setUnit(DimensionType::eMetric, UnitType::eUnitMilliMeter);
   exchange->setUnit(DimensionType::eAngular, UnitType::eUnitDecimalDegree);
@@ -137,7 +137,7 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
   // test
   QVERIFY(exchange->getFeatures().size() == 2);
 
-  QPointer<Plane> plane = exchange->getFeatures().at(0)->getPlane();
+  oi::Guarded<Plane> plane = exchange->getFeatures().at(0)->getPlane();
   QCOMPARE(plane->getFeatureName(), QString("Level_1"));
   QCOMPARE(plane->getGroupName(), QString("Group01"));
   OiVec xyz = plane->getPosition().getVector();

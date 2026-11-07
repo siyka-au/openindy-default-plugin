@@ -17,7 +17,7 @@ using namespace oi::math;
 
 namespace {
 
-QPointer<Reading> makeCartesianReading(double x, double y, double z) {
+oi::Guarded<Reading> makeCartesianReading(double x, double y, double z) {
   ReadingCartesian r;
   r.isValid = true;
   r.xyz.setAt(0, x);
@@ -60,21 +60,22 @@ class MeasuredFitTest : public QObject {
   void measuringIntoACylinderProducesASolvedCylinderEndToEnd();
 
  private:
-  QPointer<OiJob> makeJobWithActiveStation(QPointer<Station>& outStation);
-  QPointer<Point> measureOnePoint(const QPointer<OiJob>& job, int targetId,
-                                  double x, double y, double z);
+  oi::Guarded<OiJob> makeJobWithActiveStation(oi::Guarded<Station>& outStation);
+  oi::Guarded<Point> measureOnePoint(const oi::Guarded<OiJob>& job,
+                                     int targetId, double x, double y,
+                                     double z);
 };
 
 void MeasuredFitTest::initTestCase() {
   ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
-QPointer<OiJob> MeasuredFitTest::makeJobWithActiveStation(
-    QPointer<Station>& outStation) {
-  QPointer<OiJob> job = new OiJob();
+oi::Guarded<OiJob> MeasuredFitTest::makeJobWithActiveStation(
+    oi::Guarded<Station>& outStation) {
+  oi::Guarded<OiJob> job = new OiJob();
 
-  QPointer<Station> station = new Station("S1");
-  QPointer<FeatureWrapper> stationFeature = new FeatureWrapper();
+  oi::Guarded<Station> station = new Station("S1");
+  oi::Guarded<FeatureWrapper> stationFeature = new FeatureWrapper();
   stationFeature->setStation(station);
   job->addFeature(stationFeature);
 
@@ -91,17 +92,16 @@ QPointer<OiJob> MeasuredFitTest::makeJobWithActiveStation(
  * (FeatureUpdater/TrafoController, which core does not have) so the point
  * actually solves, exactly as tst_measurementintent.cpp's own tests do.
  */
-QPointer<Point> MeasuredFitTest::measureOnePoint(const QPointer<OiJob>& job,
-                                                 int targetId, double x,
-                                                 double y, double z) {
-  const QList<QPointer<FeatureWrapper> > before = job->getFeaturesList();
+oi::Guarded<Point> MeasuredFitTest::measureOnePoint(
+    const oi::Guarded<OiJob>& job, int targetId, double x, double y, double z) {
+  const QList<oi::Guarded<FeatureWrapper> > before = job->getFeaturesList();
 
-  QList<QPointer<Reading> > readings;
+  QList<oi::Guarded<Reading> > readings;
   readings << makeCartesianReading(x, y, z);
   job->addMeasurementResults(targetId, readings);
 
-  QPointer<Point> measured;
-  foreach (const QPointer<FeatureWrapper>& fw, job->getFeaturesList()) {
+  oi::Guarded<Point> measured;
+  foreach (const oi::Guarded<FeatureWrapper>& fw, job->getFeaturesList()) {
     if (fw.isNull() || fw->getPoint().isNull()) {
       continue;
     }
@@ -114,7 +114,7 @@ QPointer<Point> MeasuredFitTest::measureOnePoint(const QPointer<OiJob>& job,
     return measured;
   }
 
-  foreach (const QPointer<Observation>& obs, measured->getObservations()) {
+  foreach (const oi::Guarded<Observation>& obs, measured->getObservations()) {
     OiVec xyz(4);
     xyz.setAt(0, x);
     xyz.setAt(1, y);
@@ -129,16 +129,16 @@ QPointer<Point> MeasuredFitTest::measureOnePoint(const QPointer<OiJob>& job,
 }
 
 void MeasuredFitTest::measuringIntoAPlaneProducesASolvedPlaneEndToEnd() {
-  QPointer<Station> station;
-  QPointer<OiJob> job = makeJobWithActiveStation(station);
+  oi::Guarded<Station> station;
+  oi::Guarded<OiJob> job = makeJobWithActiveStation(station);
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
   planeFeature->getFeature()->setFeatureName("wall-01");
   job->addFeature(planeFeature);
 
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
   plane->addFunction(function);
 
@@ -200,11 +200,11 @@ void MeasuredFitTest::measuringIntoAPlaneProducesASolvedPlaneEndToEnd() {
 }
 
 void MeasuredFitTest::measuringIntoACylinderProducesASolvedCylinderEndToEnd() {
-  QPointer<Station> station;
-  QPointer<OiJob> job = makeJobWithActiveStation(station);
+  oi::Guarded<Station> station;
+  oi::Guarded<OiJob> job = makeJobWithActiveStation(station);
 
-  QPointer<Cylinder> cylinder = new Cylinder();
-  QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
+  oi::Guarded<Cylinder> cylinder = new Cylinder();
+  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
   cylinderFeature->setCylinder(cylinder);
   cylinderFeature->getFeature()->setFeatureName("post-01");
   job->addFeature(cylinderFeature);
@@ -213,7 +213,7 @@ void MeasuredFitTest::measuringIntoACylinderProducesASolvedCylinderEndToEnd() {
   // a minimum of 5, exercised here with the same real-world dataset
   // testVRadial (tst_function.cpp) already proves converges to
   // radius ~19.16
-  QPointer<Function> function = new BestFitCylinder();
+  oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert("approximation", "guess axis");

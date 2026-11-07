@@ -14,8 +14,6 @@ using namespace oi;
  * \brief The PlaneFromPlane class
  */
 class PlaneFromPlane : public ConstructFunction, public Producer<Plane> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

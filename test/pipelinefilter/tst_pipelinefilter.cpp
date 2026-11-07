@@ -16,7 +16,7 @@ using namespace oi::math;
 
 namespace {
 
-QPointer<Reading> makeCartesianReading(double x, double y, double z) {
+oi::Guarded<Reading> makeCartesianReading(double x, double y, double z) {
   ReadingCartesian r;
   r.isValid = true;
   r.xyz.setAt(0, x);
@@ -57,22 +57,23 @@ class PipelineFilterTest : public QObject {
   void observationLevelPipelineFiltersABadReadingInBestFitPoint();
 
  private:
-  QPointer<OiJob> makeJobWithActiveStation(QPointer<Station>& outStation);
-  QPointer<Point> measureOnePoint(const QPointer<OiJob>& job, int targetId,
-                                  double x, double y, double z);
-  double planeAngleErrorDeg(const QPointer<Plane>& plane);
+  oi::Guarded<OiJob> makeJobWithActiveStation(oi::Guarded<Station>& outStation);
+  oi::Guarded<Point> measureOnePoint(const oi::Guarded<OiJob>& job,
+                                     int targetId, double x, double y,
+                                     double z);
+  double planeAngleErrorDeg(const oi::Guarded<Plane>& plane);
 };
 
 void PipelineFilterTest::initTestCase() {
   ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
-QPointer<OiJob> PipelineFilterTest::makeJobWithActiveStation(
-    QPointer<Station>& outStation) {
-  QPointer<OiJob> job = new OiJob();
+oi::Guarded<OiJob> PipelineFilterTest::makeJobWithActiveStation(
+    oi::Guarded<Station>& outStation) {
+  oi::Guarded<OiJob> job = new OiJob();
 
-  QPointer<Station> station = new Station("S1");
-  QPointer<FeatureWrapper> stationFeature = new FeatureWrapper();
+  oi::Guarded<Station> station = new Station("S1");
+  oi::Guarded<FeatureWrapper> stationFeature = new FeatureWrapper();
   stationFeature->setStation(station);
   job->addFeature(stationFeature);
 
@@ -86,17 +87,16 @@ QPointer<OiJob> PipelineFilterTest::makeJobWithActiveStation(
 // is the real acquisition entry point (tags + resolves), and this stands in
 // for the app-level transform step (FeatureUpdater/TrafoController) core
 // does not have, exactly as that test's own comment explains.
-QPointer<Point> PipelineFilterTest::measureOnePoint(const QPointer<OiJob>& job,
-                                                    int targetId, double x,
-                                                    double y, double z) {
-  const QList<QPointer<FeatureWrapper> > before = job->getFeaturesList();
+oi::Guarded<Point> PipelineFilterTest::measureOnePoint(
+    const oi::Guarded<OiJob>& job, int targetId, double x, double y, double z) {
+  const QList<oi::Guarded<FeatureWrapper> > before = job->getFeaturesList();
 
-  QList<QPointer<Reading> > readings;
+  QList<oi::Guarded<Reading> > readings;
   readings << makeCartesianReading(x, y, z);
   job->addMeasurementResults(targetId, readings);
 
-  QPointer<Point> measured;
-  foreach (const QPointer<FeatureWrapper>& fw, job->getFeaturesList()) {
+  oi::Guarded<Point> measured;
+  foreach (const oi::Guarded<FeatureWrapper>& fw, job->getFeaturesList()) {
     if (fw.isNull() || fw->getPoint().isNull()) {
       continue;
     }
@@ -109,7 +109,7 @@ QPointer<Point> PipelineFilterTest::measureOnePoint(const QPointer<OiJob>& job,
     return measured;
   }
 
-  foreach (const QPointer<Observation>& obs, measured->getObservations()) {
+  foreach (const oi::Guarded<Observation>& obs, measured->getObservations()) {
     OiVec xyz(4);
     xyz.setAt(0, x);
     xyz.setAt(1, y);
@@ -123,7 +123,7 @@ QPointer<Point> PipelineFilterTest::measureOnePoint(const QPointer<OiJob>& job,
   return measured;
 }
 
-double PipelineFilterTest::planeAngleErrorDeg(const QPointer<Plane>& plane) {
+double PipelineFilterTest::planeAngleErrorDeg(const oi::Guarded<Plane>& plane) {
   // true normal for z = 0.5x + 0.25y, i.e. -0.5x - 0.25y + z = 0
   OiVec trueNormal(3);
   trueNormal.setAt(0, -0.5);
@@ -195,16 +195,16 @@ void PipelineFilterTest::
 
   //--- without the filter: the outliers must degrade the fit ---
   {
-    QPointer<Station> station;
-    QPointer<OiJob> job = this->makeJobWithActiveStation(station);
+    oi::Guarded<Station> station;
+    oi::Guarded<OiJob> job = this->makeJobWithActiveStation(station);
 
-    QPointer<Plane> plane = new Plane();
-    QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+    oi::Guarded<Plane> plane = new Plane();
+    oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
     planeFeature->setPlane(plane);
     planeFeature->getFeature()->setFeatureName("wall-nofilter");
     job->addFeature(planeFeature);
 
-    QPointer<Function> function = new BestFitPlane();
+    oi::Guarded<Function> function = new BestFitPlane();
     function->init();
     plane->addFunction(function);
 
@@ -229,16 +229,16 @@ void PipelineFilterTest::
   //--- with the filter declared: the fit converges correctly, and the
   // outliers are individually reportable with a reason ---
   {
-    QPointer<Station> station;
-    QPointer<OiJob> job = this->makeJobWithActiveStation(station);
+    oi::Guarded<Station> station;
+    oi::Guarded<OiJob> job = this->makeJobWithActiveStation(station);
 
-    QPointer<Plane> plane = new Plane();
-    QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+    oi::Guarded<Plane> plane = new Plane();
+    oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
     planeFeature->setPlane(plane);
     planeFeature->getFeature()->setFeatureName("wall-filtered");
     job->addFeature(planeFeature);
 
-    QPointer<Function> function = new BestFitPlane();
+    oi::Guarded<Function> function = new BestFitPlane();
     function->init();
     function->setPipeline(0,
                           QList<PipelineStage>()
@@ -246,9 +246,10 @@ void PipelineFilterTest::
     plane->addFunction(function);
 
     const int targetId = planeFeature->getFeature()->getId();
-    QList<QPointer<Point> > measured;
+    QList<oi::Guarded<Point> > measured;
     foreach (const Pt& p, pts) {
-      QPointer<Point> m = this->measureOnePoint(job, targetId, p.x, p.y, p.z);
+      oi::Guarded<Point> m =
+          this->measureOnePoint(job, targetId, p.x, p.y, p.z);
       QVERIFY(!m.isNull());
       measured.append(m);
     }
@@ -303,16 +304,16 @@ void PipelineFilterTest::
 }
 
 void PipelineFilterTest::addingANewOutlierLaterReTriggersTheFilterAndTheFit() {
-  QPointer<Station> station;
-  QPointer<OiJob> job = this->makeJobWithActiveStation(station);
+  oi::Guarded<Station> station;
+  oi::Guarded<OiJob> job = this->makeJobWithActiveStation(station);
 
-  QPointer<Plane> plane = new Plane();
-  QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
+  oi::Guarded<Plane> plane = new Plane();
+  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
   planeFeature->setPlane(plane);
   planeFeature->getFeature()->setFeatureName("wall-retrigger");
   job->addFeature(planeFeature);
 
-  QPointer<Function> function = new BestFitPlane();
+  oi::Guarded<Function> function = new BestFitPlane();
   function->init();
   function->setPipeline(0, QList<PipelineStage>()
                                << PipelineStage::residualOutlierRejection(3.0));
@@ -351,7 +352,8 @@ void PipelineFilterTest::addingANewOutlierLaterReTriggersTheFilterAndTheFit() {
   // a new gross-but-not-extreme outlier is measured later (see the note
   // in the sibling test above re: outlier magnitude vs PCA axis
   // hijacking) - no pipeline redeclaration
-  QPointer<Point> outlier = this->measureOnePoint(job, targetId, 1.0, 1.0, 9.0);
+  oi::Guarded<Point> outlier =
+      this->measureOnePoint(job, targetId, 1.0, 1.0, 9.0);
   QVERIFY(!outlier.isNull());
 
   plane->recalc();
@@ -372,16 +374,16 @@ void PipelineFilterTest::addingANewOutlierLaterReTriggersTheFilterAndTheFit() {
  */
 void PipelineFilterTest::
     observationLevelPipelineFiltersABadReadingInBestFitPoint() {
-  QPointer<Station> station;
-  QPointer<OiJob> job = this->makeJobWithActiveStation(station);
+  oi::Guarded<Station> station;
+  oi::Guarded<OiJob> job = this->makeJobWithActiveStation(station);
 
-  QPointer<Point> point = new Point();
-  QPointer<FeatureWrapper> pointFeature = new FeatureWrapper();
+  oi::Guarded<Point> point = new Point();
+  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
   pointFeature->setPoint(point);
   pointFeature->getFeature()->setFeatureName("target-01");
   job->addFeature(pointFeature);
 
-  QPointer<Function> function = new BestFitPoint();
+  oi::Guarded<Function> function = new BestFitPoint();
   function->init();
   function->setPipeline(0, QList<PipelineStage>()
                                << PipelineStage::residualOutlierRejection(3.0));
@@ -391,10 +393,10 @@ void PipelineFilterTest::
   // grossly mis-aimed reading. eObservationElement, position 0 - the
   // same NeededElement::pipeline mechanism, no plugin-side code touched
   // to make BestFitPoint honour it.
-  QList<QPointer<Observation> > observations;
+  QList<oi::Guarded<Observation> > observations;
   auto addReading = [&](double x, double y, double z) {
-    QPointer<Reading> reading = makeCartesianReading(x, y, z);
-    QPointer<Observation> observation = new Observation();
+    oi::Guarded<Reading> reading = makeCartesianReading(x, y, z);
+    oi::Guarded<Observation> observation = new Observation();
     reading->setObservation(observation);
     station->getCoordinateSystem()->addObservation(observation);
     OiVec xyz(4);

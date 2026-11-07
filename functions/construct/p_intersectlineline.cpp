@@ -80,8 +80,8 @@ bool IntersectLineLine::setUpResult(Point& point) {
       !this->inputElements.contains(1) || this->inputElements[1].size() != 1) {
     return false;
   }
-  QPointer<Line> line1 = this->inputElements[0].at(0).line;
-  QPointer<Line> line2 = this->inputElements[1].at(0).line;
+  oi::Guarded<Line> line1 = this->inputElements[0].at(0).line;
+  oi::Guarded<Line> line2 = this->inputElements[1].at(0).line;
   if (line1.isNull() || line2.isNull() || !line1->getIsSolved() ||
       !line2->getIsSolved()) {
     return false;
@@ -158,8 +158,8 @@ bool IntersectLineLine::setUpResult(Point& point) {
  * \param plane
  * \return
  */
-bool IntersectLineLine::isParallel(const QPointer<Line>& line1,
-                                   const QPointer<Line>& line2) {
+bool IntersectLineLine::isParallel(const oi::Guarded<Line>& line1,
+                                   const oi::Guarded<Line>& line2) {
   // scalar product of the lines's direction vector
   double dot = 0.0;
   OiVec::dot(dot, line1->getDirection().getVector(),

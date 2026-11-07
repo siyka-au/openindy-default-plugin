@@ -24,8 +24,6 @@ using namespace std;
 enum class ScaleTypes { noScale, pointScale, tempScale };
 
 class Helmert7Param : public SystemTransformation, public Producer<TrafoParam> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

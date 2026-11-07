@@ -18,8 +18,6 @@ using namespace std;
 class BestFitCircleInPlane : public FitFunction,
                              public BestFitCircleUtil,
                              public Producer<Circle> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

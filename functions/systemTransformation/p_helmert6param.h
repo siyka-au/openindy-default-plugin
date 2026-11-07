@@ -12,8 +12,6 @@ using namespace oi;
  * to its existing unscaled 6-parameter (calc_6p) path.
  */
 class Helmert6Param : public Helmert7Param {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

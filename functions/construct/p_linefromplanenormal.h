@@ -26,8 +26,6 @@ using namespace oi;
  * That is the answer to backfilling derived geometry by hand.
  */
 class LineFromPlaneNormal : public ConstructFunction, public Producer<Line> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

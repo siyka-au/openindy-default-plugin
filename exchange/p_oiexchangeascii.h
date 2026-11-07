@@ -13,8 +13,6 @@ using namespace std;
 using namespace oi;
 
 class OiExchangeAscii : public ExchangeSimpleAscii {
-  Q_OBJECT
-
  public:
   // ##############################
   // exchange initialization method

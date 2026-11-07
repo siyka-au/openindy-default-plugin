@@ -13,8 +13,6 @@ using namespace oi;
 class Shift : public ObjectTransformation,
               public Transform<Plane>,
               public Transform<Circle> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method

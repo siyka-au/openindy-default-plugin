@@ -22,8 +22,6 @@ using namespace oi;
  *  a network measurement)
  */
 class SimplePolarMeasurement : public SimulationModel {
-  Q_OBJECT
-
  public:
   // ################################
   // simulation initialization method
@@ -35,7 +33,7 @@ class SimplePolarMeasurement : public SimulationModel {
   // simulation methods
   // ##################
 
-  bool distort(const QPointer<Reading>& r, const OiMat& objectRelation,
+  bool distort(const oi::Guarded<Reading>& r, const OiMat& objectRelation,
                const bool& newIterationStart) override;
   bool analyseSimulationData(UncertaintyData& d) override;
   double getCorrelationCoefficient(const QList<double>& x,

@@ -22,8 +22,6 @@ using namespace oi;
  * \brief The PseudoTracker class
  */
 class PseudoTracker : public LaserTracker {
-  Q_OBJECT
-
  public:
   // ############################
   // sensor initialization method
@@ -45,7 +43,8 @@ class PseudoTracker : public LaserTracker {
   bool disconnectSensor() override;
 
   //! laser tracker measures a point and returns an observation
-  QList<QPointer<Reading> > measure(const MeasurementConfig& mConfig) override;
+  QList<oi::Guarded<Reading> > measure(
+      const MeasurementConfig& mConfig) override;
 
   //! stream
   QVariantMap readingStream(const ReadingTypes& streamFormat) override;
@@ -87,11 +86,14 @@ class PseudoTracker : public LaserTracker {
   bool compensation() override;
 
  private:
-  QList<QPointer<Reading> > measurePolar(const MeasurementConfig& mConfig);
-  QList<QPointer<Reading> > measureDistance(const MeasurementConfig& mConfig);
-  QList<QPointer<Reading> > measureDirection(const MeasurementConfig& mConfig);
-  QList<QPointer<Reading> > measureCartesian(const MeasurementConfig& mConfig);
-  QList<QPointer<Reading> > measureLevel(const MeasurementConfig& mConfig);
+  QList<oi::Guarded<Reading> > measurePolar(const MeasurementConfig& mConfig);
+  QList<oi::Guarded<Reading> > measureDistance(
+      const MeasurementConfig& mConfig);
+  QList<oi::Guarded<Reading> > measureDirection(
+      const MeasurementConfig& mConfig);
+  QList<oi::Guarded<Reading> > measureCartesian(
+      const MeasurementConfig& mConfig);
+  QList<oi::Guarded<Reading> > measureLevel(const MeasurementConfig& mConfig);
 
   //! the true (noise-free) aim as a noisy polar draw, using this
   //! instance's configured error terms - sigmaAzimuth/sigmaZenith/

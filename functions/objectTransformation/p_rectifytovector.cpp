@@ -112,7 +112,8 @@ std::expected<Cylinder, QString> RectifyToVector::exec(const Cylinder& input) {
 bool RectifyToVector::direction(OiVec& direction) {
   // 1. get and check position of rectify geometry if available
   if (this->inputElements.contains(0) && this->inputElements[0].size() == 1) {
-    QPointer<Geometry> rectifyGeometry = this->inputElements[0].at(0).geometry;
+    oi::Guarded<Geometry> rectifyGeometry =
+        this->inputElements[0].at(0).geometry;
     if (!rectifyGeometry.isNull() && rectifyGeometry->getIsSolved() &&
         rectifyGeometry->hasDirection()) {
       direction = rectifyGeometry->getDirection().getVector();
@@ -121,7 +122,7 @@ bool RectifyToVector::direction(OiVec& direction) {
   } else if (this->inputElements.contains(1) &&
              this->inputElements[1].size() == 1) {
     // 2. get and check position of rectify station if available
-    QPointer<Station> rectifyStation = this->inputElements[1].at(0).station;
+    oi::Guarded<Station> rectifyStation = this->inputElements[1].at(0).station;
     if (!rectifyStation.isNull()) {
       switch (axis()) {
         case Axis::eXAxis:
@@ -138,7 +139,7 @@ bool RectifyToVector::direction(OiVec& direction) {
   } else if (this->inputElements.contains(2) &&
              this->inputElements[2].size() == 1) {
     // 3. get and check position of rectify station if available
-    QPointer<CoordinateSystem> rectifyCoordinateSystem =
+    oi::Guarded<CoordinateSystem> rectifyCoordinateSystem =
         this->inputElements[2].at(0).coordSystem;
     if (!rectifyCoordinateSystem.isNull()) {
       switch (axis()) {

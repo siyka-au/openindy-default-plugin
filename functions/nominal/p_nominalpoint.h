@@ -24,8 +24,6 @@ using namespace oi;
  * Tolerance is deferred too; there is nowhere to attach it yet.
  */
 class NominalPoint : public ConstructFunction, public Producer<Point> {
-  Q_OBJECT
-
  public:
   // ##############################
   // function initialization method
