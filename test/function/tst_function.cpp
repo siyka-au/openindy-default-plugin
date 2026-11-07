@@ -5,6 +5,7 @@
 
 #include "chooselalib.h"
 #include "featurewrapper.h"
+#include "messagesink.h"
 #include "p_bestfitcircleinplane.h"
 #include "p_bestfitcylinder.h"
 #include "p_bestfitline.h"
@@ -23,11 +24,16 @@
 
 using namespace oi;
 
-class FunctionTest : public QObject {
+class FunctionTest : public QObject, public MessageSink {
   Q_OBJECT
 
  public:
   FunctionTest();
+
+  void onMessage(const QString& msg, const MessageTypes& msgType,
+                 const MessageDestinations& msgDest) override {
+    this->printMessage(msg, msgType, msgDest);
+  }
 
  private Q_SLOTS:
   void initTestCase();
@@ -615,8 +621,7 @@ void FunctionTest::testRegisterCircle() {
 void FunctionTest::testVRadial() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -698,8 +703,7 @@ void FunctionTest::testVRadial() {
 void FunctionTest::testVRadial3() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -782,8 +786,7 @@ void FunctionTest::testVRadial3() {
 void FunctionTest::testBestFitCylinder1() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -825,8 +828,7 @@ void FunctionTest::testBestFitCylinder1() {
 void FunctionTest::testBestFitCylinder1_modifyX() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -868,8 +870,7 @@ void FunctionTest::testBestFitCylinder1_modifyX() {
 void FunctionTest::testBestFitCylinder1_modifyZ() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -911,8 +912,7 @@ void FunctionTest::testBestFitCylinder1_modifyZ() {
 void FunctionTest::testBestFitCylinder1_modifyY() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -954,8 +954,7 @@ void FunctionTest::testBestFitCylinder1_modifyY() {
 void FunctionTest::testBestFitCylinder2_trafo_guess_axis_3() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -997,8 +996,7 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_3() {
 void FunctionTest::testBestFitCylinder2_trafo_1st_2_pts() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -1036,8 +1034,7 @@ void FunctionTest::testBestFitCylinder2_trafo_1st_2_pts() {
 void FunctionTest::testBestFitCylinder2_trafo_guess_axis_2() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -1079,8 +1076,7 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_2() {
 void FunctionTest::testBestFitCylinder2_trafo_guess_axis_1() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -1122,8 +1118,7 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_1() {
 void FunctionTest::testBestFitCylinder2_guess_axis() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -1165,8 +1160,7 @@ void FunctionTest::testBestFitCylinder2_guess_axis() {
 void FunctionTest::testBestFitCylinder2_1st_2_pts() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -1204,8 +1198,7 @@ void FunctionTest::testBestFitCylinder2_1st_2_pts() {
 void FunctionTest::testBestFitCylinderAproximationDirection1() {
   QPointer<Function> function = new BestFitCylinderAppxDirection();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -1252,8 +1245,7 @@ void FunctionTest::testBestFitCylinderAproximationDirection1() {
 void FunctionTest::testDisableAllObservationsButLastOne_no() {
   QPointer<Function> function = new BestFitPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert(
@@ -1293,8 +1285,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_no() {
 void FunctionTest::testDisableAllObservationsButLastOne_yes() {
   QPointer<Function> function = new BestFitPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert(
@@ -1334,8 +1325,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_yes() {
 void FunctionTest::testDisableAllObservationsButLastOne_2side_yes() {
   QPointer<Function> function = new BestFitPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert(
@@ -1377,8 +1367,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_2side_yes() {
 void FunctionTest::testBestFitPlane() {
   QPointer<Function> function = new BestFitPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> plane = new Plane();
   QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
@@ -1417,8 +1406,7 @@ void FunctionTest::testBestFitPlane() {
 void FunctionTest::testBestFitPlane_DummyPoint_positive_up() {
   QPointer<Function> function = new BestFitPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> plane = new Plane();
   QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
@@ -1456,8 +1444,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_up() {
 void FunctionTest::testBestFitPlane_DummyPoint_positive_down() {
   QPointer<Function> function = new BestFitPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> plane = new Plane();
   QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
@@ -1495,8 +1482,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_down() {
 void FunctionTest::testBestFitPlane_DummyPoint_negative_up() {
   QPointer<Function> function = new BestFitPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> plane = new Plane();
   QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
@@ -1534,8 +1520,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_up() {
 void FunctionTest::testBestFitPlane_DummyPoint_negative_down() {
   QPointer<Function> function = new BestFitPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> plane = new Plane();
   QPointer<FeatureWrapper> planeFeature = new FeatureWrapper();
@@ -1574,8 +1559,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_down() {
 void FunctionTest::testBestFitCircleInPlane_left() {
   QPointer<Function> function = new BestFitCircleInPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> circle = new Circle();
   QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
@@ -1612,8 +1596,7 @@ void FunctionTest::testBestFitCircleInPlane_left() {
 void FunctionTest::testBestFitCircleInPlane_right() {
   QPointer<Function> function = new BestFitCircleInPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> circle = new Circle();
   QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
@@ -1649,8 +1632,7 @@ void FunctionTest::testBestFitCircleInPlane_right() {
 void FunctionTest::testBestFitCircleInPlane_DummyPoint_positive_up() {
   QPointer<Function> function = new BestFitCircleInPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> circle = new Circle();
   QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
@@ -1688,8 +1670,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_positive_up() {
 void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_up() {
   QPointer<Function> function = new BestFitCircleInPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> circle = new Circle();
   QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
@@ -1727,8 +1708,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_up() {
 void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_down() {
   QPointer<Function> function = new BestFitCircleInPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> circle = new Circle();
   QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
@@ -1766,8 +1746,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_down() {
 void FunctionTest::testBestFitCylinder1__DummyPoint1() {
   QPointer<Function> function = new BestFitCylinderAppxDummyPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -1809,8 +1788,7 @@ void FunctionTest::testBestFitCylinder1__DummyPoint1() {
 void FunctionTest::testBestFitCylinder1__DummyPoint2() {
   QPointer<Function> function = new BestFitCylinderAppxDummyPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   QPointer<FeatureWrapper> cylinderFeature = new FeatureWrapper();
@@ -1853,8 +1831,7 @@ void FunctionTest::testBestFitCylinder1__DummyPoint2() {
 void FunctionTest::testIntersectLineLine_parallel() {
   QPointer<Function> function = new IntersectLineLine();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Point> point = new Point();
   OiVec posv;
@@ -1874,8 +1851,7 @@ void FunctionTest::testIntersectLineLine_parallel() {
 void FunctionTest::testIntersectLineLine_intersect1_atfirstline() {
   QPointer<Function> function = new IntersectLineLine();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Point> point = new Point();
   OiVec posv;
@@ -1906,8 +1882,7 @@ void FunctionTest::testIntersectLineLine_intersect1_atfirstline() {
 void FunctionTest::testIntersectLineLine_intersect1_atsecondline() {
   QPointer<Function> function = new IntersectLineLine();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Point> point = new Point();
   OiVec posv;
@@ -1938,8 +1913,7 @@ void FunctionTest::testIntersectLineLine_intersect1_atsecondline() {
 void FunctionTest::testIntersectLineLine_intersect1_midpoint() {
   QPointer<Function> function = new IntersectLineLine();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Point> point = new Point();
   OiVec posv;
@@ -1970,8 +1944,7 @@ void FunctionTest::testIntersectLineLine_intersect1_midpoint() {
 void FunctionTest::testIntersectLineLine_intersect2_atfirstline() {
   QPointer<Function> function = new IntersectLineLine();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Point> point = new Point();
   OiVec posv;
@@ -2002,8 +1975,7 @@ void FunctionTest::testIntersectLineLine_intersect2_atfirstline() {
 void FunctionTest::testIntersectLineLine_intersect2_atsecondline() {
   QPointer<Function> function = new IntersectLineLine();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Point> point = new Point();
   OiVec posv;
@@ -2035,8 +2007,7 @@ void FunctionTest::testIntersectLineLine_intersect2_atsecondline() {
 void FunctionTest::testIntersectLineLine_intersect2_midpoint() {
   QPointer<Function> function = new IntersectLineLine();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Point> point = new Point();
   OiVec posv;
@@ -2068,8 +2039,7 @@ void FunctionTest::testIntersectLineLine_intersect2_midpoint() {
 void FunctionTest::testRectifyToPoint_Plane_negative() {
   QPointer<Function> function = new RectifyToPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
@@ -2099,8 +2069,7 @@ void FunctionTest::testRectifyToPoint_Plane_negative() {
 void FunctionTest::testRectifyToPoint_Plane_positive() {
   QPointer<Function> function = new RectifyToPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
@@ -2130,8 +2099,7 @@ void FunctionTest::testRectifyToPoint_Plane_positive() {
 void FunctionTest::testRectifyToPoint_Plane_Station() {
   QPointer<Function> function = new RectifyToPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
@@ -2162,8 +2130,7 @@ void FunctionTest::testRectifyToPoint_Plane_Station() {
 void FunctionTest::testRectifyToPoint_Circle_negative() {
   QPointer<Function> function = new RectifyToPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> geometry = createCircle(0, 0, 0, 0, 0, 1., 10.);
 
@@ -2194,8 +2161,7 @@ void FunctionTest::testRectifyToPoint_Circle_negative() {
 void FunctionTest::testRectifyToPoint_Line_negative() {
   QPointer<Function> function = new RectifyToPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Line> geometry = createLine(0, 0, 0, 0, 0, 1.);
 
@@ -2226,8 +2192,7 @@ void FunctionTest::testRectifyToPoint_Line_negative() {
 void FunctionTest::testRectifyToPoint_Cylinder_negative() {
   QPointer<Function> function = new RectifyToPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> geometry = createCylinder(0, 0, 0, 0, 0, 1., 10.);
 
@@ -2258,8 +2223,7 @@ void FunctionTest::testRectifyToPoint_Cylinder_negative() {
 void FunctionTest::testRectifyToVector_PlaneToPlane_negative() {
   QPointer<Function> function = new RectifyToVector();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
@@ -2288,8 +2252,7 @@ void FunctionTest::testRectifyToVector_PlaneToPlane_negative() {
 void FunctionTest::testRectifyToVector_PlaneToStation() {
   QPointer<Function> function = new RectifyToVector();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> feature = createPlane(0, 0, 0, 0, 0, -1.);
 
@@ -2319,8 +2282,7 @@ void FunctionTest::testRectifyToVector_PlaneToStation() {
 void FunctionTest::testRectifyToVector_CircleToStation() {
   QPointer<Function> function = new RectifyToVector();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> feature = createCircle(0, 0, 0, 0, 0, -1., 10.);
 
@@ -2350,8 +2312,7 @@ void FunctionTest::testRectifyToVector_CircleToStation() {
 void FunctionTest::testRectifyToVector_LineToStation() {
   QPointer<Function> function = new RectifyToVector();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Line> feature = createLine(0, 0, 0, 0, 0, -1.);
 
@@ -2381,8 +2342,7 @@ void FunctionTest::testRectifyToVector_LineToStation() {
 void FunctionTest::testRectifyToVector_CylinderToStation() {
   QPointer<Function> function = new RectifyToVector();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> feature = createCylinder(0, 0, 0, 0, 0, -1., 10.);
 
@@ -2413,8 +2373,7 @@ void FunctionTest::testRectifyToVector_CylinderToStation() {
 void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_zAxis() {
   QPointer<Function> function = new RectifyToVector();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> feature = createPlane(0, 0, 0, 0, 0, 1.);
 
@@ -2446,8 +2405,7 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_zAxis() {
 void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_xAxis() {
   QPointer<Function> function = new RectifyToVector();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> feature = createPlane(0, 0, 0, 1, 0, 0);
 
@@ -2498,8 +2456,7 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_xAxis() {
 void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_yAxis() {
   QPointer<Function> function = new RectifyToVector();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> feature = createPlane(0, 0, 0, 0, 1, 0);
 
@@ -2550,8 +2507,7 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_yAxis() {
 void FunctionTest::testCircleInPlaneFromPoints() {
   QPointer<Function> function = new BestFitCircleInPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> circle = new Circle();
   QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
@@ -2589,8 +2545,7 @@ void FunctionTest::testCircleInPlaneFromPoints() {
 void FunctionTest::testBestFitPoint_residuals() {
   QPointer<Function> function = new BestFitPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Point> feature = new Point();
   QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
@@ -2635,8 +2590,7 @@ void FunctionTest::testBestFitPoint_residuals() {
 void FunctionTest::testBestFitPlane_right() {
   QPointer<Function> function = new BestFitPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> feature = new Plane();
   QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
@@ -2671,8 +2625,7 @@ void FunctionTest::testBestFitPlane_right() {
 void FunctionTest::testBestFitPlane_residuals() {
   QPointer<Function> function = new BestFitPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Plane> feature = new Plane();
   QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
@@ -2733,8 +2686,7 @@ void FunctionTest::testBestFitPlane_residuals() {
 void FunctionTest::testBestFitLine_residuals() {
   QPointer<Function> function = new BestFitLine();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Line> feature = new Line();
   QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
@@ -2795,8 +2747,7 @@ void FunctionTest::testBestFitLine_residuals() {
 void FunctionTest::testBestFitCircleInPlane_residuals() {
   QPointer<Function> function = new BestFitCircleInPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> feature = new Circle();
   QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
@@ -2870,8 +2821,7 @@ void FunctionTest::testBestFitCircleInPlane_residuals2() {
 
   QPointer<Function> function = new BestFitCircleInPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> feature = new Circle();
   QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
@@ -2973,8 +2923,7 @@ void FunctionTest::testBestFitCircleInPlane_residuals2() {
 void FunctionTest::testBestFitSphere_residuals() {
   QPointer<Function> function = new BestFitSphere();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Sphere> feature = new Sphere();
   QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
@@ -3174,8 +3123,7 @@ void FunctionTest::testBestFitSphere_residuals() {
 void FunctionTest::testPointFromPoints_point() {
   QPointer<Function> function = new PointFromPoints();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Point> feature = new Point();
   QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
@@ -3206,8 +3154,7 @@ void FunctionTest::
 
   QPointer<Function> function = new NominalPoint();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   ScalarInputParams params;
   params.isValid = true;
@@ -3252,8 +3199,7 @@ void FunctionTest::testNominalPoint_declaresNoNeededElements() {
 void FunctionTest::testPointFromPoints_circle() {
   QPointer<Function> function = new PointFromPoints();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Point> feature = new Point();
   QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
@@ -3286,14 +3232,12 @@ void FunctionTest::testPointFromPoints_Register() {
 
   QPointer<Function> function1 = new PointFromPoints();
   function1->init();
-  QObject::connect(function1.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function1->setMessageSink(this);
   feature->addFunction(function1);
 
   QPointer<Function> function2 = new Register();
   function2->init();
-  QObject::connect(function2.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function2->setMessageSink(this);
   feature->addFunction(function2);
 
   QVERIFY2(
@@ -3348,8 +3292,7 @@ QPointer<Function> FunctionTest::createFunction(QString functionName) {
       QString("no function found: %1").arg(functionName).toLatin1().data());
 
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   return function;
 }
@@ -3574,8 +3517,7 @@ void FunctionTest::testDistanceBetweenTwoPointsV2() {
 void FunctionTest::testCircleInPlaneFromPoints_with_DummyPoint() {
   QPointer<Function> function = new BestFitCircleInPlane();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Circle> circle = new Circle();
   QPointer<FeatureWrapper> circleFeature = new FeatureWrapper();
@@ -3614,8 +3556,7 @@ void FunctionTest::testCircleInPlaneFromPoints_with_DummyPoint() {
 void FunctionTest::testLineFromPoints() {
   QPointer<Function> function = new BestFitLine();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Line> feature = new Line();
   QPointer<FeatureWrapper> wrapper = new FeatureWrapper();
@@ -3655,8 +3596,7 @@ void FunctionTest::testLineFromPoints() {
 void FunctionTest::testNotSolved_guessAxis() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   cylinder->setIsSolved(false);
@@ -3691,8 +3631,7 @@ void FunctionTest::testNotSolved_guessAxis() {
 void FunctionTest::testNotSolved_firstTwoPoints() {
   QPointer<Function> function = new BestFitCylinder();
   function->init();
-  QObject::connect(function.data(), &Function::sendMessage, this,
-                   &FunctionTest::printMessage, Qt::AutoConnection);
+  function->setMessageSink(this);
 
   QPointer<Cylinder> cylinder = new Cylinder();
   cylinder->setIsSolved(false);
