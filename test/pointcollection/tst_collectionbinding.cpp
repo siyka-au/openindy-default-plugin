@@ -105,8 +105,7 @@ void CollectionBindingTest::pointsAddedAfterInitialResolutionArePickedUp() {
   addInputPoint(function, makePoint(0.0, 1.0, 0.0, 3));
 
   oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   QVERIFY2(function->exec(planeFeature),
            "plane should solve from three points");
@@ -161,8 +160,7 @@ void CollectionBindingTest::tooFewPointsFailsCleanly() {
   addInputPoint(function, makePoint(1.0, 0.0, 0.0, 2));
 
   oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   QVERIFY2(!function->exec(planeFeature), "two points cannot define a plane");
 }
@@ -179,8 +177,7 @@ void CollectionBindingTest::collinearPointsAreRejectedByTheFitNotTheCount() {
   addInputPoint(function, makePoint(2.0, 2.0, 2.0, 3));
 
   oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   QVERIFY2(!function->exec(planeFeature),
            "collinear points pass the count check and must still be rejected "
@@ -219,8 +216,8 @@ void CollectionBindingTest::
     addInputPoint(averager, makePoint(nest.x, nest.y, nest.z, id++));
 
     oi::Guarded<Point> derived = new Point(derivedId++, Position());
-    oi::Guarded<FeatureWrapper> derivedFeature = new FeatureWrapper();
-    derivedFeature->setPoint(derived);
+    oi::Guarded<oi::FeatureWrapper> derivedFeature =
+        derived->getFeatureWrapper();
 
     QVERIFY2(averager->exec(derivedFeature),
              "three points should average cleanly");
@@ -240,8 +237,8 @@ void CollectionBindingTest::
     addInputPoint(plane1Function, derived);
   }
   oi::Guarded<Plane> planeFromAveraged = new Plane();
-  oi::Guarded<FeatureWrapper> planeFromAveragedFeature = new FeatureWrapper();
-  planeFromAveragedFeature->setPlane(planeFromAveraged);
+  oi::Guarded<oi::FeatureWrapper> planeFromAveragedFeature =
+      planeFromAveraged->getFeatureWrapper();
   QVERIFY2(plane1Function->exec(planeFromAveragedFeature),
            "plane should solve from four averaged points");
 
@@ -253,8 +250,8 @@ void CollectionBindingTest::
     addInputPoint(plane2Function, makePoint(nest.x, nest.y, nest.z, trueId++));
   }
   oi::Guarded<Plane> planeFromTrue = new Plane();
-  oi::Guarded<FeatureWrapper> planeFromTrueFeature = new FeatureWrapper();
-  planeFromTrueFeature->setPlane(planeFromTrue);
+  oi::Guarded<oi::FeatureWrapper> planeFromTrueFeature =
+      planeFromTrue->getFeatureWrapper();
   QVERIFY2(plane2Function->exec(planeFromTrueFeature),
            "plane should solve from four true points");
 

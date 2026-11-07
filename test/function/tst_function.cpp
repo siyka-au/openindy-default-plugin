@@ -559,8 +559,7 @@ void FunctionTest::testRegisterPoint() {
   pointPos.setAt(1, 1999.9898);
   pointPos.setAt(2, 2999.9817);
   oi::Guarded<Point> point = new Point(Position(pointPos));
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   addInputPlane(1374.9964, 1624.9982, 1024.7504, 0.100818, -0.097854, 0.990081,
                 function);
@@ -574,7 +573,6 @@ void FunctionTest::testRegisterPoint() {
   QCOMPARE(xyz.getAt(2), 1137.5033860957583);
 
   delete point.data();
-  delete pointFeature.data();
   delete function.data();
 }
 
@@ -588,8 +586,7 @@ void FunctionTest::testRegisterSphere() {
   spherePos.setAt(2, -25.0159);
   Radius radius(1025.6284);
   oi::Guarded<Sphere> sphere = new Sphere(Position(spherePos), radius);
-  oi::Guarded<FeatureWrapper> sphereFeature = new FeatureWrapper();
-  sphereFeature->setSphere(sphere);
+  oi::Guarded<oi::FeatureWrapper> sphereFeature = sphere->getFeatureWrapper();
 
   addInputPlane(1374.9964, 1624.9982, 1024.7504, 0.100818, -0.097854, 0.990081,
                 function);
@@ -603,7 +600,6 @@ void FunctionTest::testRegisterSphere() {
   QCOMPARE(xyz.getAt(2), 983.91537298026219);
 
   delete sphere.data();
-  delete sphereFeature.data();
   delete function.data();
 }
 
@@ -614,8 +610,7 @@ void FunctionTest::testRegisterCircle() {
   oi::Guarded<Circle> circle = createCircle(
       600.0108, 499.9982, 999.9979, 0.000010, 0.000007, -1.000000, 781.0312);
 
-  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
-  circleFeature->setCircle(circle);
+  oi::Guarded<oi::FeatureWrapper> circleFeature = circle->getFeatureWrapper();
 
   addInputPlane(1374.9964, 1624.9982, 1024.7504, 0.100818, -0.097854, 0.990081,
                 function);
@@ -629,7 +624,6 @@ void FunctionTest::testRegisterCircle() {
   QCOMPARE(xyz.getAt(2), 992.62548819327355);
 
   delete circle.data();
-  delete circleFeature.data();
   delete function.data();
 }
 
@@ -640,8 +634,8 @@ void FunctionTest::testVRadial() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -723,8 +717,8 @@ void FunctionTest::testVRadial3() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -807,8 +801,8 @@ void FunctionTest::testBestFitCylinder1() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -849,8 +843,8 @@ void FunctionTest::testBestFitCylinder1_modifyX() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -891,8 +885,8 @@ void FunctionTest::testBestFitCylinder1_modifyZ() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -933,8 +927,8 @@ void FunctionTest::testBestFitCylinder1_modifyY() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -975,8 +969,8 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_3() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1018,8 +1012,8 @@ void FunctionTest::testBestFitCylinder2_trafo_1st_2_pts() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1056,8 +1050,8 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_2() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1099,8 +1093,8 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_1() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1142,8 +1136,8 @@ void FunctionTest::testBestFitCylinder2_guess_axis() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1185,8 +1179,8 @@ void FunctionTest::testBestFitCylinder2_1st_2_pts() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1223,8 +1217,8 @@ void FunctionTest::testBestFitCylinderAproximationDirection1() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1275,8 +1269,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_no() {
   function->setScalarInputParams(scalarInputParams);
 
   oi::Guarded<Point> point = new Point();
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1315,8 +1308,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_yes() {
   function->setScalarInputParams(scalarInputParams);
 
   oi::Guarded<Point> point = new Point();
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1355,8 +1347,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_2side_yes() {
   function->setScalarInputParams(scalarInputParams);
 
   oi::Guarded<Point> point = new Point();
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1392,8 +1383,7 @@ void FunctionTest::testBestFitPlane() {
   function->setMessageSink(this);
 
   oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1431,8 +1421,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_up() {
   function->setMessageSink(this);
 
   oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1469,8 +1458,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_down() {
   function->setMessageSink(this);
 
   oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1507,8 +1495,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_up() {
   function->setMessageSink(this);
 
   oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1545,8 +1532,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_down() {
   function->setMessageSink(this);
 
   oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1584,8 +1570,7 @@ void FunctionTest::testBestFitCircleInPlane_left() {
   function->setMessageSink(this);
 
   oi::Guarded<Circle> circle = new Circle();
-  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
-  circleFeature->setCircle(circle);
+  oi::Guarded<oi::FeatureWrapper> circleFeature = circle->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1621,8 +1606,7 @@ void FunctionTest::testBestFitCircleInPlane_right() {
   function->setMessageSink(this);
 
   oi::Guarded<Circle> circle = new Circle();
-  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
-  circleFeature->setCircle(circle);
+  oi::Guarded<oi::FeatureWrapper> circleFeature = circle->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1657,8 +1641,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_positive_up() {
   function->setMessageSink(this);
 
   oi::Guarded<Circle> circle = new Circle();
-  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
-  circleFeature->setCircle(circle);
+  oi::Guarded<oi::FeatureWrapper> circleFeature = circle->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1695,8 +1678,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_up() {
   function->setMessageSink(this);
 
   oi::Guarded<Circle> circle = new Circle();
-  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
-  circleFeature->setCircle(circle);
+  oi::Guarded<oi::FeatureWrapper> circleFeature = circle->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1733,8 +1715,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_down() {
   function->setMessageSink(this);
 
   oi::Guarded<Circle> circle = new Circle();
-  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
-  circleFeature->setCircle(circle);
+  oi::Guarded<oi::FeatureWrapper> circleFeature = circle->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1771,8 +1752,8 @@ void FunctionTest::testBestFitCylinder1__DummyPoint1() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1813,8 +1794,8 @@ void FunctionTest::testBestFitCylinder1__DummyPoint2() {
   function->setMessageSink(this);
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -1859,8 +1840,7 @@ void FunctionTest::testIntersectLineLine_parallel() {
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   addInputLine(1., 1., 1., 0.5772, 0.5772, 0.5772, function, 2000, 0);
   addInputLine(2., 2., 2., 0.5772, 0.5772, 0.5772, function, 2001, 1);
@@ -1879,8 +1859,7 @@ void FunctionTest::testIntersectLineLine_intersect1_atfirstline() {
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert_or_assign("intersection",
@@ -1911,8 +1890,7 @@ void FunctionTest::testIntersectLineLine_intersect1_atsecondline() {
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert_or_assign("intersection",
@@ -1943,8 +1921,7 @@ void FunctionTest::testIntersectLineLine_intersect1_midpoint() {
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert_or_assign("intersection",
@@ -1975,8 +1952,7 @@ void FunctionTest::testIntersectLineLine_intersect2_atfirstline() {
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert_or_assign("intersection",
@@ -2007,8 +1983,7 @@ void FunctionTest::testIntersectLineLine_intersect2_atsecondline() {
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert_or_assign("intersection",
@@ -2040,8 +2015,7 @@ void FunctionTest::testIntersectLineLine_intersect2_midpoint() {
   OiVec posv;
   Position pos(posv);
   point->setPoint(pos);
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert_or_assign("intersection",
@@ -2071,8 +2045,7 @@ void FunctionTest::testRectifyToPoint_Plane_negative() {
 
   oi::Guarded<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2101,8 +2074,7 @@ void FunctionTest::testRectifyToPoint_Plane_positive() {
 
   oi::Guarded<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   const bool sense = true;
   ScalarInputParams scalarInputParams;
@@ -2131,8 +2103,7 @@ void FunctionTest::testRectifyToPoint_Plane_Station() {
 
   oi::Guarded<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   const bool sense = true;
   ScalarInputParams scalarInputParams;
@@ -2162,8 +2133,7 @@ void FunctionTest::testRectifyToPoint_Circle_negative() {
 
   oi::Guarded<Circle> geometry = createCircle(0, 0, 0, 0, 0, 1., 10.);
 
-  oi::Guarded<FeatureWrapper> feature = new FeatureWrapper();
-  feature->setCircle(geometry);
+  oi::Guarded<oi::FeatureWrapper> feature = geometry->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2193,8 +2163,7 @@ void FunctionTest::testRectifyToPoint_Line_negative() {
 
   oi::Guarded<Line> geometry = createLine(0, 0, 0, 0, 0, 1.);
 
-  oi::Guarded<FeatureWrapper> feature = new FeatureWrapper();
-  feature->setLine(geometry);
+  oi::Guarded<oi::FeatureWrapper> feature = geometry->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2224,8 +2193,7 @@ void FunctionTest::testRectifyToPoint_Cylinder_negative() {
 
   oi::Guarded<Cylinder> geometry = createCylinder(0, 0, 0, 0, 0, 1., 10.);
 
-  oi::Guarded<FeatureWrapper> feature = new FeatureWrapper();
-  feature->setCylinder(geometry);
+  oi::Guarded<oi::FeatureWrapper> feature = geometry->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2255,8 +2223,7 @@ void FunctionTest::testRectifyToVector_PlaneToPlane_negative() {
 
   oi::Guarded<Plane> plane = createPlane(0, 0, 0, 0, 0, 1.);
 
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2284,8 +2251,7 @@ void FunctionTest::testRectifyToVector_PlaneToStation() {
 
   oi::Guarded<Plane> feature = createPlane(0, 0, 0, 0, 0, -1.);
 
-  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
-  featureWrapper->setPlane(feature);
+  oi::Guarded<oi::FeatureWrapper> featureWrapper = feature->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2314,8 +2280,7 @@ void FunctionTest::testRectifyToVector_CircleToStation() {
 
   oi::Guarded<Circle> feature = createCircle(0, 0, 0, 0, 0, -1., 10.);
 
-  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
-  featureWrapper->setCircle(feature);
+  oi::Guarded<oi::FeatureWrapper> featureWrapper = feature->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2344,8 +2309,7 @@ void FunctionTest::testRectifyToVector_LineToStation() {
 
   oi::Guarded<Line> feature = createLine(0, 0, 0, 0, 0, -1.);
 
-  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
-  featureWrapper->setLine(feature);
+  oi::Guarded<oi::FeatureWrapper> featureWrapper = feature->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2374,8 +2338,7 @@ void FunctionTest::testRectifyToVector_CylinderToStation() {
 
   oi::Guarded<Cylinder> feature = createCylinder(0, 0, 0, 0, 0, -1., 10.);
 
-  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
-  featureWrapper->setCylinder(feature);
+  oi::Guarded<oi::FeatureWrapper> featureWrapper = feature->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2405,8 +2368,7 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_zAxis() {
 
   oi::Guarded<Plane> feature = createPlane(0, 0, 0, 0, 0, 1.);
 
-  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
-  featureWrapper->setPlane(feature);
+  oi::Guarded<oi::FeatureWrapper> featureWrapper = feature->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2437,8 +2399,7 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_xAxis() {
 
   oi::Guarded<Plane> feature = createPlane(0, 0, 0, 1, 0, 0);
 
-  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
-  featureWrapper->setPlane(feature);
+  oi::Guarded<oi::FeatureWrapper> featureWrapper = feature->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2488,8 +2449,7 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_yAxis() {
 
   oi::Guarded<Plane> feature = createPlane(0, 0, 0, 0, 1, 0);
 
-  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
-  featureWrapper->setPlane(feature);
+  oi::Guarded<oi::FeatureWrapper> featureWrapper = feature->getFeatureWrapper();
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
@@ -2538,8 +2498,7 @@ void FunctionTest::testCircleInPlaneFromPoints() {
   function->setMessageSink(this);
 
   oi::Guarded<Circle> circle = new Circle();
-  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
-  circleFeature->setCircle(circle);
+  oi::Guarded<oi::FeatureWrapper> circleFeature = circle->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -2576,8 +2535,7 @@ void FunctionTest::testBestFitPoint_residuals() {
   function->setMessageSink(this);
 
   oi::Guarded<Point> feature = new Point();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setPoint(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -2621,8 +2579,7 @@ void FunctionTest::testBestFitPlane_right() {
   function->setMessageSink(this);
 
   oi::Guarded<Plane> feature = new Plane();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setPlane(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -2656,8 +2613,7 @@ void FunctionTest::testBestFitPlane_residuals() {
   function->setMessageSink(this);
 
   oi::Guarded<Plane> feature = new Plane();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setPlane(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -2717,8 +2673,7 @@ void FunctionTest::testBestFitLine_residuals() {
   function->setMessageSink(this);
 
   oi::Guarded<Line> feature = new Line();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setLine(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -2778,8 +2733,7 @@ void FunctionTest::testBestFitCircleInPlane_residuals() {
   function->setMessageSink(this);
 
   oi::Guarded<Circle> feature = new Circle();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setCircle(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -2852,8 +2806,7 @@ void FunctionTest::testBestFitCircleInPlane_residuals2() {
   function->setMessageSink(this);
 
   oi::Guarded<Circle> feature = new Circle();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setCircle(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -2954,8 +2907,7 @@ void FunctionTest::testBestFitSphere_residuals() {
   function->setMessageSink(this);
 
   oi::Guarded<Sphere> feature = new Sphere();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setSphere(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -3154,8 +3106,7 @@ void FunctionTest::testPointFromPoints_point() {
   function->setMessageSink(this);
 
   oi::Guarded<Point> feature = new Point();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setPoint(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   addInputPoint(1000.6609, 2000.3247, 3000.3180, function);
 
@@ -3192,8 +3143,7 @@ void FunctionTest::
   function->setScalarInputParams(params);
 
   oi::Guarded<Point> feature = new Point();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setPoint(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
   feature->addFunction(function);
 
   bool res = function->exec(wrapper);
@@ -3230,8 +3180,7 @@ void FunctionTest::testPointFromPoints_circle() {
   function->setMessageSink(this);
 
   oi::Guarded<Point> feature = new Point();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setPoint(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -3255,8 +3204,7 @@ void FunctionTest::testPointFromPoints_circle() {
 
 void FunctionTest::testPointFromPoints_Register() {
   oi::Guarded<Point> feature = new Point();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setPoint(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   oi::Guarded<Function> function1 = new PointFromPoints();
   function1->init();
@@ -3326,8 +3274,7 @@ oi::Guarded<Function> FunctionTest::createFunction(std::string functionName) {
 
 void FunctionTest::testPointFromPoints_RegisterV2() {
   oi::Guarded<Point> feature = new Point();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setPoint(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   oi::Guarded<Function> function = createFunction("RegisterPositionToPlane");
   QVERIFY2(!function.isNull(), "function is null");
@@ -3374,8 +3321,7 @@ void FunctionTest::testPointFromPoints_RegisterV2() {
 void FunctionTest::testDistance_PointFromPoints_RegisterV2() {
   oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
   feature->setFeatureName("ScalarEntityDistance");
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setScalarEntityDistance(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   oi::Guarded<Function> function = createFunction("DistanceFromPlane");
   QVERIFY2(!function.isNull(), "function is null");
@@ -3406,8 +3352,7 @@ void FunctionTest::testDistance_PointFromPoints_RegisterV2() {
 void FunctionTest::testXDistance_PointFromPoints_RegisterV2() {
   oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
   feature->setFeatureName("ScalarEntityDistance");
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setScalarEntityDistance(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   oi::Guarded<Function> function = createFunction("XDistance");
   QVERIFY2(!function.isNull(), "function is null");
@@ -3438,8 +3383,7 @@ void FunctionTest::testXDistance_PointFromPoints_RegisterV2() {
 void FunctionTest::testYDistance_PointFromPoints_RegisterV2() {
   oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
   feature->setFeatureName("ScalarEntityDistance");
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setScalarEntityDistance(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   oi::Guarded<Function> function = createFunction("YDistance");
   QVERIFY2(!function.isNull(), "function is null");
@@ -3470,8 +3414,7 @@ void FunctionTest::testYDistance_PointFromPoints_RegisterV2() {
 void FunctionTest::testZDistance_PointFromPoints_RegisterV2() {
   oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
   feature->setFeatureName("ScalarEntityDistance");
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setScalarEntityDistance(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   oi::Guarded<Function> function = createFunction("ZDistance");
   QVERIFY2(!function.isNull(), "function is null");
@@ -3525,8 +3468,7 @@ void FunctionTest::testTODO5() {
 void FunctionTest::testDistanceBetweenTwoPointsV2() {
   oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
   feature->setFeatureName("ScalarEntityDistance");
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setScalarEntityDistance(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   oi::Guarded<Function> function = createFunction("DistanceBetweenTwoPoints");
   QVERIFY2(!function.isNull(), "function is null");
@@ -3549,8 +3491,7 @@ void FunctionTest::testCircleInPlaneFromPoints_with_DummyPoint() {
   function->setMessageSink(this);
 
   oi::Guarded<Circle> circle = new Circle();
-  oi::Guarded<FeatureWrapper> circleFeature = new FeatureWrapper();
-  circleFeature->setCircle(circle);
+  oi::Guarded<oi::FeatureWrapper> circleFeature = circle->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -3588,8 +3529,7 @@ void FunctionTest::testLineFromPoints() {
   function->setMessageSink(this);
 
   oi::Guarded<Line> feature = new Line();
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setLine(feature);
+  oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -3629,8 +3569,8 @@ void FunctionTest::testNotSolved_guessAxis() {
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
   cylinder->setIsSolved(false);
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"
@@ -3665,8 +3605,8 @@ void FunctionTest::testNotSolved_firstTwoPoints() {
 
   oi::Guarded<Cylinder> cylinder = new Cylinder();
   cylinder->setIsSolved(false);
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
 
   // colum delim: " "
   // line ending: "\n"

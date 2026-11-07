@@ -21,8 +21,7 @@ oi::Guarded<FeatureWrapper> makePlane(const Position& position,
   Direction n = normal;
   plane->setPlane(p, n);
   plane->setIsSolved(true);
-  oi::Guarded<FeatureWrapper> wrapper = new FeatureWrapper();
-  wrapper->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> wrapper = plane->getFeatureWrapper();
   return wrapper;
 }
 
@@ -90,8 +89,7 @@ void DerivedFeaturesTest::lineTakesPlaneNormalAndPosition() {
   bindPlane(function, planeFeature);
 
   oi::Guarded<Line> line = new Line();
-  oi::Guarded<FeatureWrapper> lineFeature = new FeatureWrapper();
-  lineFeature->setLine(line);
+  oi::Guarded<oi::FeatureWrapper> lineFeature = line->getFeatureWrapper();
 
   QVERIFY(function->exec(lineFeature));
 
@@ -109,8 +107,7 @@ void DerivedFeaturesTest::pointTakesPlaneOrigin() {
   bindPlane(function, planeFeature);
 
   oi::Guarded<Point> point = new Point();
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   QVERIFY(function->exec(pointFeature));
 
@@ -132,12 +129,10 @@ void DerivedFeaturesTest::derivedFeaturesFollowTheirSourcePlane() {
   bindPlane(pointFunction, planeFeature);
 
   oi::Guarded<Line> line = new Line();
-  oi::Guarded<FeatureWrapper> lineFeature = new FeatureWrapper();
-  lineFeature->setLine(line);
+  oi::Guarded<oi::FeatureWrapper> lineFeature = line->getFeatureWrapper();
 
   oi::Guarded<Point> point = new Point();
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
 
   QVERIFY(lineFunction->exec(lineFeature));
   QVERIFY(pointFunction->exec(pointFeature));
@@ -163,16 +158,14 @@ void DerivedFeaturesTest::unsolvedPlaneYieldsNoDerivedFeature() {
   // from it would invent geometry that was never measured
   oi::Guarded<Plane> plane = new Plane();
   plane->setIsSolved(false);
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   oi::Guarded<Function> function = new LineFromPlaneNormal();
   function->init();
   bindPlane(function, planeFeature);
 
   oi::Guarded<Line> line = new Line();
-  oi::Guarded<FeatureWrapper> lineFeature = new FeatureWrapper();
-  lineFeature->setLine(line);
+  oi::Guarded<oi::FeatureWrapper> lineFeature = line->getFeatureWrapper();
 
   QVERIFY2(!function->exec(lineFeature),
            "an unsolved plane must not produce a derived line");

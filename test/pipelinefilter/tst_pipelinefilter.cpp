@@ -74,10 +74,10 @@ oi::Guarded<OiJob> PipelineFilterTest::makeJobWithActiveStation(
     oi::Guarded<Station>& outStation) {
   oi::Guarded<OiJob> job = new OiJob();
 
-  oi::Guarded<Station> station = new Station("S1");
-  oi::Guarded<FeatureWrapper> stationFeature = new FeatureWrapper();
-  stationFeature->setStation(station);
-  job->addFeature(stationFeature);
+  auto own_station = std::make_unique<oi::Station>("S1");
+  oi::Guarded<oi::Station> station = own_station.get();
+  oi::Guarded<oi::FeatureWrapper> stationFeature = station->getFeatureWrapper();
+  job->addFeature(std::move(own_station));
 
   station->setActiveStationState(true);
 
@@ -201,11 +201,11 @@ void PipelineFilterTest::
     oi::Guarded<Station> station;
     oi::Guarded<OiJob> job = this->makeJobWithActiveStation(station);
 
-    oi::Guarded<Plane> plane = new Plane();
-    oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-    planeFeature->setPlane(plane);
+    auto own_plane = std::make_unique<oi::Plane>();
+    oi::Guarded<oi::Plane> plane = own_plane.get();
+    oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
     planeFeature->getFeature()->setFeatureName("wall-nofilter");
-    job->addFeature(planeFeature);
+    job->addFeature(std::move(own_plane));
 
     oi::Guarded<Function> function = new BestFitPlane();
     function->init();
@@ -236,11 +236,11 @@ void PipelineFilterTest::
     oi::Guarded<Station> station;
     oi::Guarded<OiJob> job = this->makeJobWithActiveStation(station);
 
-    oi::Guarded<Plane> plane = new Plane();
-    oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-    planeFeature->setPlane(plane);
+    auto own_plane = std::make_unique<oi::Plane>();
+    oi::Guarded<oi::Plane> plane = own_plane.get();
+    oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
     planeFeature->getFeature()->setFeatureName("wall-filtered");
-    job->addFeature(planeFeature);
+    job->addFeature(std::move(own_plane));
 
     oi::Guarded<Function> function = new BestFitPlane();
     function->init();
@@ -311,11 +311,11 @@ void PipelineFilterTest::addingANewOutlierLaterReTriggersTheFilterAndTheFit() {
   oi::Guarded<Station> station;
   oi::Guarded<OiJob> job = this->makeJobWithActiveStation(station);
 
-  oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  auto own_plane = std::make_unique<oi::Plane>();
+  oi::Guarded<oi::Plane> plane = own_plane.get();
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
   planeFeature->getFeature()->setFeatureName("wall-retrigger");
-  job->addFeature(planeFeature);
+  job->addFeature(std::move(own_plane));
 
   oi::Guarded<Function> function = new BestFitPlane();
   function->init();
@@ -381,11 +381,11 @@ void PipelineFilterTest::
   oi::Guarded<Station> station;
   oi::Guarded<OiJob> job = this->makeJobWithActiveStation(station);
 
-  oi::Guarded<Point> point = new Point();
-  oi::Guarded<FeatureWrapper> pointFeature = new FeatureWrapper();
-  pointFeature->setPoint(point);
+  auto own_point = std::make_unique<oi::Point>();
+  oi::Guarded<oi::Point> point = own_point.get();
+  oi::Guarded<oi::FeatureWrapper> pointFeature = point->getFeatureWrapper();
   pointFeature->getFeature()->setFeatureName("target-01");
-  job->addFeature(pointFeature);
+  job->addFeature(std::move(own_point));
 
   oi::Guarded<Function> function = new BestFitPoint();
   function->init();

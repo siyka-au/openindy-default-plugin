@@ -3,6 +3,7 @@
 #include <QtCore>
 #include <format>
 #include <stdexcept>
+#include <utility>
 
 #include "cfcparameter.h"
 #include "cffunctiondata.h"
@@ -10,7 +11,7 @@
 #include "configuredfunction.h"
 #include "configuredfunctionconfig.h"
 
-CFVisitor::CFVisitor(CFContext ctx) : ctx(ctx) {}
+CFVisitor::CFVisitor(CFContext ctx) : ctx(std::move(ctx)) {}
 
 void CFVisitor::pre(QPointer<Node> n, int index, int level) {
   CFCParameter* node = static_cast<CFCParameter*>(n.data());
@@ -41,12 +42,11 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
                         fd.feature->getFeature()->getFeatureName()),
             level);
     } else if (node->getFeature().compare("global.copy") == 0) {
-      oi::Guarded<FeatureWrapper> copy = new FeatureWrapper();
+      oi::Guarded<FeatureWrapper> copy;
       switch (ctx.global_feature->getFeatureTypeEnum()) {
         case FeatureTypes::ePointFeature: {
           oi::Guarded<Point> src = ctx.global_feature->getPoint();
-          oi::Guarded<Point> dest = new Point(src->getPosition());
-          copy->setPoint(dest);
+          copy = ctx.adopt(std::make_unique<Point>(src->getPosition()));
           break;
         }
         default:

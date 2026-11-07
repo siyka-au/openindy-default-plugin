@@ -179,8 +179,8 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
   solver->setInputPoint(localFramePoints, observedWorldPoints);
 
   oi::Guarded<TrafoParam> trafoParam = new TrafoParam();
-  oi::Guarded<FeatureWrapper> trafoFeature = new FeatureWrapper();
-  trafoFeature->setTrafoParam(trafoParam);
+  oi::Guarded<oi::FeatureWrapper> trafoFeature =
+      trafoParam->getFeatureWrapper();
 
   // Helmert6Param/SystemTransformation both redeclare exec(TrafoParam&) as
   // protected (the "methods that cannot be reimplemented" block in

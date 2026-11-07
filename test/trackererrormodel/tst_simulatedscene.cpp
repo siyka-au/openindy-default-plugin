@@ -123,8 +123,7 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget() {
   }
 
   oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
   QVERIFY2(function->exec(planeFeature), "plane fit did not converge");
 

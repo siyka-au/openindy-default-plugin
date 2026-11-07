@@ -44,24 +44,26 @@ InputElement CFContext::getInputElement(std::string name) {
  */
 oi::Guarded<FeatureWrapper> CFContext::createApplicableFeature(
     FeatureTypes featureType) {
-  oi::Guarded<FeatureWrapper> featureWrapper = new FeatureWrapper();
-
   switch (featureType) {
     case FeatureTypes::ePointFeature: {
-      oi::Guarded<Point> feature = new Point();
+      auto feature = std::make_unique<Point>();
       feature->setFeatureName("generated Point");
-      featureWrapper->setPoint(feature);
-      return featureWrapper;
+      return this->adopt(std::move(feature));
     }
     case FeatureTypes::eScalarEntityDistanceFeature: {
-      oi::Guarded<ScalarEntityDistance> feature = new ScalarEntityDistance();
+      auto feature = std::make_unique<ScalarEntityDistance>();
       feature->setFeatureName("generated ScalarEntityDistance");
-      featureWrapper->setScalarEntityDistance(feature);
-      return featureWrapper;
+      return this->adopt(std::move(feature));
     }
   }
 
   throw logic_error(std::string("can not create applicable feature"));
+}
+
+oi::Guarded<FeatureWrapper> CFContext::adopt(std::unique_ptr<Feature> feature) {
+  oi::Guarded<FeatureWrapper> wrapper = feature->getFeatureWrapper();
+  this->generatedFeatures.push_back(std::move(feature));
+  return wrapper;
 }
 
 InputElement CFContext::createInputElement(

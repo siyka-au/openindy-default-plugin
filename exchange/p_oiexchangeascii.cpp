@@ -515,7 +515,8 @@ void OiExchangeAscii::importOiData(const OperationContext& ctx) {
       if (!errorWhileParsing) {
         switch (this->typeOfGeometry) {
           case GeometryTypes::ePointGeometry: {
-            oi::Guarded<Point> myNominal = new Point();
+            auto ownedNominal = std::make_unique<Point>();
+            oi::Guarded<Point> myNominal = ownedNominal.get();
             // I use QT property system for transportation, because "common" is
             // not "common" of nominal point but actual point!
             myNominal->setTransientAttribute("OI_FEATURE_COMMONSTATE",
@@ -534,15 +535,14 @@ void OiExchangeAscii::importOiData(const OperationContext& ctx) {
             // set nominal system
             myNominal->setNominalSystem(this->nominalSystem);
 
-            oi::Guarded<FeatureWrapper> myGeometry = new FeatureWrapper();
-            myGeometry->setPoint(myNominal);
-            this->features.push_back(myGeometry);
+            this->addImportedFeature(std::move(ownedNominal));
 
             break;
           }
           case GeometryTypes::ePlaneGeometry:
           case GeometryTypes::ePlaneLevelGeometry: {
-            oi::Guarded<Plane> plane = new Plane();
+            auto ownedPlane = std::make_unique<Plane>();
+            oi::Guarded<Plane> plane = ownedPlane.get();
             // I use QT property system for transportation, because level is a
             // special plane
             plane->setTransientAttribute(
@@ -565,9 +565,7 @@ void OiExchangeAscii::importOiData(const OperationContext& ctx) {
             // set nominal system
             plane->setNominalSystem(this->nominalSystem);
 
-            oi::Guarded<FeatureWrapper> geometry = new FeatureWrapper();
-            geometry->setPlane(plane);
-            this->features.push_back(geometry);
+            this->addImportedFeature(std::move(ownedPlane));
 
             break;
           }

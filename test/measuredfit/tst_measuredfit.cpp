@@ -76,10 +76,10 @@ oi::Guarded<OiJob> MeasuredFitTest::makeJobWithActiveStation(
     oi::Guarded<Station>& outStation) {
   oi::Guarded<OiJob> job = new OiJob();
 
-  oi::Guarded<Station> station = new Station("S1");
-  oi::Guarded<FeatureWrapper> stationFeature = new FeatureWrapper();
-  stationFeature->setStation(station);
-  job->addFeature(stationFeature);
+  auto own_station = std::make_unique<oi::Station>("S1");
+  oi::Guarded<oi::Station> station = own_station.get();
+  oi::Guarded<oi::FeatureWrapper> stationFeature = station->getFeatureWrapper();
+  job->addFeature(std::move(own_station));
 
   station->setActiveStationState(true);
 
@@ -135,11 +135,11 @@ void MeasuredFitTest::measuringIntoAPlaneProducesASolvedPlaneEndToEnd() {
   oi::Guarded<Station> station;
   oi::Guarded<OiJob> job = makeJobWithActiveStation(station);
 
-  oi::Guarded<Plane> plane = new Plane();
-  oi::Guarded<FeatureWrapper> planeFeature = new FeatureWrapper();
-  planeFeature->setPlane(plane);
+  auto own_plane = std::make_unique<oi::Plane>();
+  oi::Guarded<oi::Plane> plane = own_plane.get();
+  oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
   planeFeature->getFeature()->setFeatureName("wall-01");
-  job->addFeature(planeFeature);
+  job->addFeature(std::move(own_plane));
 
   oi::Guarded<Function> function = new BestFitPlane();
   function->init();
@@ -205,11 +205,12 @@ void MeasuredFitTest::measuringIntoACylinderProducesASolvedCylinderEndToEnd() {
   oi::Guarded<Station> station;
   oi::Guarded<OiJob> job = makeJobWithActiveStation(station);
 
-  oi::Guarded<Cylinder> cylinder = new Cylinder();
-  oi::Guarded<FeatureWrapper> cylinderFeature = new FeatureWrapper();
-  cylinderFeature->setCylinder(cylinder);
+  auto own_cylinder = std::make_unique<oi::Cylinder>();
+  oi::Guarded<oi::Cylinder> cylinder = own_cylinder.get();
+  oi::Guarded<oi::FeatureWrapper> cylinderFeature =
+      cylinder->getFeatureWrapper();
   cylinderFeature->getFeature()->setFeatureName("post-01");
-  job->addFeature(cylinderFeature);
+  job->addFeature(std::move(own_cylinder));
 
   // D12/Stage 7c-ii: cylinder is not a special case - ePointElement with
   // a minimum of 5, exercised here with the same real-world dataset

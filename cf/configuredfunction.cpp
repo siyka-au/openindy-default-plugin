@@ -50,7 +50,7 @@ std::expected<void, std::string> ConfiguredFunction::execChecked(
         this->global_feature.isNull() ? feature : this->global_feature;
 
     QPointer<NodeVisitor> cf;
-    cf = new CFVisitor(ctx);
+    cf = new CFVisitor(std::move(ctx));
 
     visitors.list.push_back(cf);
 
