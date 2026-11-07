@@ -1,5 +1,7 @@
 #include "p_pointbetweentwopoints.h"
 
+#include <format>
+
 /*!
  * \brief PointBetweenTwoPoints::init
  */
@@ -8,10 +10,9 @@ void PointBetweenTwoPoints::init() {
   this->metaData.name = "PointBetweenTwoPoints";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg("This function calculates the point between two points.")
-          .arg("Therefore you have to input those two points.");
+  this->metaData.description = std::format(
+      "{} {}", "This function calculates the point between two points.",
+      "Therefore you have to input those two points.");
   this->metaData.iid = ConstructFunction_iidd;
 
   // set needed elements
@@ -35,10 +36,10 @@ void PointBetweenTwoPoints::init() {
  * \param point
  * \return
  */
-std::expected<Point, QString> PointBetweenTwoPoints::exec() {
+std::expected<Point, std::string> PointBetweenTwoPoints::exec() {
   Point point;
   if (!this->setUpResult(point)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return point;
 }
@@ -58,8 +59,8 @@ bool PointBetweenTwoPoints::setUpResult(Point& point) {
   // check if input elements are equal
   if (this->inputElements[0].front().point->getId() ==
       this->inputElements[1].front().point->getId()) {
-    emit this->sendMessage(QString("Input geometries are equal."),
-                           MessageTypes::eWarningMessage);
+    this->sendMessage(std::string("Input geometries are equal."),
+                      MessageTypes::eWarningMessage);
     return false;
   }
 

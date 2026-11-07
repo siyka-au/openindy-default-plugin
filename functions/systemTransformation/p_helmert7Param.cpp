@@ -1,5 +1,6 @@
 #include "p_helmert7Param.h"
 
+#include <format>
 #include <utility>
 #include <vector>
 
@@ -13,14 +14,12 @@ void Helmert7Param::init() {
   this->metaData.name = "HelmertTransformation";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra, jwa";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg(
-              "This function calculates a helmert transformation with or "
-              "without scale.")
-          .arg(
-              "That transformation is based on identical points in start and "
-              "target system.");
+  this->metaData.description = std::format(
+      "{} {}",
+      "This function calculates a helmert transformation with or "
+      "without scale.",
+      "That transformation is based on identical points in start and "
+      "target system.");
   this->metaData.iid = SystemTransformation_iidd;
 
   // set needed elements
@@ -49,7 +48,7 @@ void Helmert7Param::init() {
   this->stringParameters.emplace("use reference temperature", "no");
 
   // materials
-  std::vector<QString> materials = getMaterials();
+  std::vector<std::string> materials = getMaterials();
 
   for (const auto& material : materials) {
     this->stringParameters.emplace("material", material);
@@ -61,10 +60,10 @@ void Helmert7Param::init() {
  * \param trafoParam
  * \return
  */
-std::expected<TrafoParam, QString> Helmert7Param::exec() {
+std::expected<TrafoParam, std::string> Helmert7Param::exec() {
   TrafoParam trafoParam;
   if (!this->setUpResult(trafoParam)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return trafoParam;
 }
@@ -96,8 +95,8 @@ bool Helmert7Param::setUpResult(TrafoParam& trafoParam) {
       return this->calc_6p(trafoParam);
     }
   } else {
-    emit this->sendMessage("Not enough common points!",
-                           MessageTypes::eWarningMessage);
+    this->sendMessage("Not enough common points!",
+                      MessageTypes::eWarningMessage);
   }
   return false;
 }
@@ -361,9 +360,10 @@ void Helmert7Param::fillTrafoParam(OiMat r, vector<OiVec> locC,
   // calc rotation
   OiVec rot(3);
   rot.setAt(0, qAtan2(-r.getAt(2, 1), r.getAt(2, 2)));  // alpha
-  rot.setAt(1, qAsin(r.getAt(2, 0)));                   // beta
+  rot.setAt(1, std::asin(r.getAt(2, 0)));               // beta
   rot.setAt(2, qAtan2(-r.getAt(1, 0), r.getAt(0, 0)));  // gamma
-  if (qFabs(qCos(rot.getAt(1)) * qCos(rot.getAt(2))) - qFabs(r.getAt(0, 0)) >
+  if (std::fabs(std::cos(rot.getAt(1)) * std::cos(rot.getAt(2))) -
+          std::fabs(r.getAt(0, 0)) >
       0.01) {
     rot.setAt(1, PI - rot.getAt(1));
   }
@@ -891,21 +891,25 @@ OiMat Helmert7Param::p6_getRotationMatrix(OiVec rot) {
   double alpha = rot.getAt(0);
   double beta = rot.getAt(1);
   double gamma = rot.getAt(2);
-  result.setAt(0, 0, qCos(beta) * qCos(gamma));
-  result.setAt(
-      0, 1, qCos(alpha) * qSin(gamma) + qSin(alpha) * qSin(beta) * qCos(gamma));
-  result.setAt(
-      0, 2, qSin(alpha) * qSin(gamma) - qCos(alpha) * qSin(beta) * qCos(gamma));
+  result.setAt(0, 0, std::cos(beta) * std::cos(gamma));
+  result.setAt(0, 1,
+               std::cos(alpha) * std::sin(gamma) +
+                   std::sin(alpha) * std::sin(beta) * std::cos(gamma));
+  result.setAt(0, 2,
+               std::sin(alpha) * std::sin(gamma) -
+                   std::cos(alpha) * std::sin(beta) * std::cos(gamma));
   result.setAt(0, 3, 0.0);
-  result.setAt(1, 0, -qCos(beta) * qSin(gamma));
-  result.setAt(
-      1, 1, qCos(alpha) * qCos(gamma) - qSin(alpha) * qSin(beta) * qSin(gamma));
-  result.setAt(
-      1, 2, qSin(alpha) * qCos(gamma) + qCos(alpha) * qSin(beta) * qSin(gamma));
+  result.setAt(1, 0, -std::cos(beta) * std::sin(gamma));
+  result.setAt(1, 1,
+               std::cos(alpha) * std::cos(gamma) -
+                   std::sin(alpha) * std::sin(beta) * std::sin(gamma));
+  result.setAt(1, 2,
+               std::sin(alpha) * std::cos(gamma) +
+                   std::cos(alpha) * std::sin(beta) * std::sin(gamma));
   result.setAt(1, 3, 0.0);
-  result.setAt(2, 0, qSin(beta));
-  result.setAt(2, 1, -qSin(alpha) * qCos(beta));
-  result.setAt(2, 2, qCos(alpha) * qCos(beta));
+  result.setAt(2, 0, std::sin(beta));
+  result.setAt(2, 1, -std::sin(alpha) * std::cos(beta));
+  result.setAt(2, 2, std::cos(alpha) * std::cos(beta));
   result.setAt(2, 3, 0.0);
   result.setAt(3, 0, 0.0);
   result.setAt(3, 1, 0.0);
@@ -923,9 +927,10 @@ OiMat Helmert7Param::p6_getRotationMatrix(OiVec rot) {
 OiVec Helmert7Param::p6_getRotationAngles(OiMat r) {
   OiVec rot(3);
   rot.setAt(0, qAtan2(-r.getAt(2, 1), r.getAt(2, 2)));  // alpha
-  rot.setAt(1, qAsin(r.getAt(2, 0)));                   // beta
+  rot.setAt(1, std::asin(r.getAt(2, 0)));               // beta
   rot.setAt(2, qAtan2(-r.getAt(1, 0), r.getAt(0, 0)));  // gamma
-  if (qFabs(qCos(rot.getAt(1)) * qCos(rot.getAt(2))) - qFabs(r.getAt(0, 0)) >
+  if (std::fabs(std::cos(rot.getAt(1)) * std::cos(rot.getAt(2))) -
+          std::fabs(r.getAt(0, 0)) >
       0.01) {
     rot.setAt(1, PI - rot.getAt(1));
   }
@@ -1003,7 +1008,7 @@ double Helmert7Param::setScaleValue() {
     double act = oi::value(this->scalarInputParams.doubleParameter, "actual");
     double ref =
         oi::value(this->scalarInputParams.doubleParameter, "reference");
-    QString material =
+    std::string material =
         oi::value(this->scalarInputParams.stringParameter, "material");
 
     return oi::getTemperatureExpansion(material, act, ref);

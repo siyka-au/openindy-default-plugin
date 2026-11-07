@@ -1,6 +1,6 @@
 #include "xyzfilter.h"
 
-XYZFilter::XYZFilter(QString name, bool removeX, bool removeY, bool removeZ)
+XYZFilter::XYZFilter(std::string name, bool removeX, bool removeY, bool removeZ)
     : ConstructFunction(),
       removeX(removeX),
       removeY(removeY),
@@ -12,11 +12,11 @@ void XYZFilter::init() {
   this->applicableFor.push_back(FeatureTypes::ePointFeature);
 }
 
-std::expected<Point, QString> XYZFilter::exec(const Point& input) {
+std::expected<Point, std::string> XYZFilter::exec(const Point& input) {
   if (this->inputElements[0].empty()) {
-    emit this->sendMessage("inputElements[0] is empty",
-                           MessageTypes::eWarningMessage);
-    return std::unexpected(QString("XYZFilter: inputElements[0] is empty"));
+    this->sendMessage("inputElements[0] is empty",
+                      MessageTypes::eWarningMessage);
+    return std::unexpected(std::string("XYZFilter: inputElements[0] is empty"));
   }
 
   oi::math::OiVec p =

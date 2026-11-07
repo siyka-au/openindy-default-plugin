@@ -15,7 +15,7 @@ using namespace oi;
  * This is the shape D8 settles on for derived geometry. A fit produces a
  * plane; the plane's normal and origin are real, useful features in their
  * own right, and every metrology package needs them. The alternative -
- * letting a fit function spontaneously emit several features at once -
+ * letting a fit function spontaneously several features at once -
  * inverts the direction everything else in this codebase works in (define
  * a feature, then choose the function that defines it), and is harder to
  * persist, recalculate and reason about.
@@ -37,7 +37,7 @@ class LineFromPlaneNormal : public ConstructFunction, public Producer<Line> {
   // exec methods
   // ############
 
-  std::expected<Line, QString> exec() override;
+  std::expected<Line, std::string> exec() override;
 
  private:
   // ##############

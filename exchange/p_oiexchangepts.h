@@ -1,6 +1,8 @@
 #ifndef P_OIEXCHANGEPTS_H
 #define P_OIEXCHANGEPTS_H
 
+#include <QtCore>
+
 #include "exchangedefinedformat.h"
 
 class OiExchangePts : public OiExchangeDefinedFormat {
@@ -9,10 +11,10 @@ class OiExchangePts : public OiExchangeDefinedFormat {
   PluginMetaData* getMetaData() const;
   bool importOiData(OiExchangeObject& projectData);
   bool exportOiData(OiExchangeObject& projectData);
-  QList<Configuration::GeometryTypes> getSupportedGeometries();
+  QList<GeometryTypes> getSupportedGeometries();
 
   // overwrite pure virtual methods of OiExchangeDefinedFormat
-  QStringList getSupportedFileExtensions() const;
+  std::vector<std::string> getSupportedFileExtensions() const;
 };
 
 #endif  // P_OIEXCHANGEPTS_H

@@ -1,5 +1,8 @@
 #include "p_oiexchangepts.h"
 
+#include <QtCore>
+#include <format>
+
 /*!
  * \brief OiExchangePts::getMetaData
  * \return
@@ -10,7 +13,7 @@ PluginMetaData* OiExchangePts::getMetaData() const {
   metaData->name = "OiExchangePts";
   metaData->pluginName = "OpenIndy Default Plugin";
   metaData->author = "br";
-  metaData->description = QString("%1").arg("Read *.pts files.");
+  metaData->description = std::format("{}", "Read *.pts files.");
   metaData->iid = "de.openIndy.Plugin.OiExchange.OiExchangeDefinedFormat.v001";
 
   return metaData;
@@ -34,8 +37,8 @@ bool OiExchangePts::exportOiData(OiExchangeObject& projectData) { return true; }
  * \brief OiExchangePts::getSupportedGeometries
  * \return
  */
-QList<Configuration::GeometryTypes> OiExchangePts::getSupportedGeometries() {
-  QList<Configuration::GeometryTypes> supportedGeometries;
+QList<GeometryTypes> OiExchangePts::getSupportedGeometries() {
+  QList<GeometryTypes> supportedGeometries;
 
   // add supported geometries
   supportedGeometries.append(Configuration::ePointCloudGeometry);
@@ -47,8 +50,8 @@ QList<Configuration::GeometryTypes> OiExchangePts::getSupportedGeometries() {
  * \brief OiExchangePts::getSupportedFileExtensions
  * \return
  */
-QStringList OiExchangePts::getSupportedFileExtensions() const {
-  QStringList supportedFileExtensions;
+std::vector<std::string> OiExchangePts::getSupportedFileExtensions() const {
+  std::vector<std::string> supportedFileExtensions;
 
   // add supported file extensions
   supportedFileExtensions.append("*.pts");

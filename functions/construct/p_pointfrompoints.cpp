@@ -1,5 +1,6 @@
 #include "p_pointfrompoints.h"
 
+#include <format>
 #include <utility>
 #include <vector>
 
@@ -11,12 +12,10 @@ void PointFromPoints::init() {
   this->metaData.name = "PointFromPoints";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg("This function calculates an adjusted point.")
-          .arg(
-              "You can input as many points as you want which are then used to "
-              "find the best fit 3D point.");
+  this->metaData.description = std::format(
+      "{} {}", "This function calculates an adjusted point.",
+      "You can input as many points as you want which are then used to "
+      "find the best fit 3D point.");
   this->metaData.iid = ConstructFunction_iidd;
 
   // set needed elements
@@ -36,10 +35,10 @@ void PointFromPoints::init() {
  * \param point
  * \return
  */
-std::expected<Point, QString> PointFromPoints::exec() {
+std::expected<Point, std::string> PointFromPoints::exec() {
   Point point;
   if (!this->setUpResult(point)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return point;
 }
@@ -51,10 +50,9 @@ std::expected<Point, QString> PointFromPoints::exec() {
 bool PointFromPoints::setUpResult(Point& point) {
   // get and check input points
   if (!this->inputElements.contains(0) || this->inputElements[0].size() < 1) {
-    emit this->sendMessage(
-        QString("Not enough valid points to fit the point %1")
-            .arg(point.getFeatureName()),
-        MessageTypes::eWarningMessage);
+    this->sendMessage(std::format("Not enough valid points to fit the point {}",
+                                  point.getFeatureName()),
+                      MessageTypes::eWarningMessage);
     return false;
   }
   std::vector<OiVec> inputPoints;
@@ -68,10 +66,9 @@ bool PointFromPoints::setUpResult(Point& point) {
     }
   }
   if (inputPoints.size() < 1) {
-    emit this->sendMessage(
-        QString("Not enough valid points to fit the point %1")
-            .arg(point.getFeatureName()),
-        MessageTypes::eWarningMessage);
+    this->sendMessage(std::format("Not enough valid points to fit the point {}",
+                                  point.getFeatureName()),
+                      MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -105,25 +102,25 @@ bool PointFromPoints::setUpResult(Point& point) {
     x = qxx * c;
     v = a * x - l;
   } catch (const logic_error& e) {
-    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
+    this->sendMessage(e.what(), MessageTypes::eErrorMessage);
     return false;
   } catch (const runtime_error& e) {
-    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
+    this->sendMessage(e.what(), MessageTypes::eErrorMessage);
     return false;
   }
 
   // calculate point based corrections
   OiVec corr;
   for (int i = 0; std::cmp_less(i, inputPoints.size()); i++) {
-    corr.add(qSqrt(v.getAt(3 * i) * v.getAt(3 * i) +
-                   v.getAt(3 * i + 1) * v.getAt(3 * i + 1) +
-                   v.getAt(3 * i + 2) * v.getAt(3 * i + 2)));
+    corr.add(std::sqrt(v.getAt(3 * i) * v.getAt(3 * i) +
+                       v.getAt(3 * i + 1) * v.getAt(3 * i + 1) +
+                       v.getAt(3 * i + 2) * v.getAt(3 * i + 2)));
   }
 
   // calculate standard deviation
   double stdev = 0.0;
   OiVec::dot(stdev, corr, corr);
-  stdev = qSqrt(stdev / (static_cast<double>(inputPoints.size()) - 1.0));
+  stdev = std::sqrt(stdev / (static_cast<double>(inputPoints.size()) - 1.0));
 
   // set result
   Position position;

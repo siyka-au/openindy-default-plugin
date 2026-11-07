@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include <format>
+
 #include "containers.h"
 
 /*!
@@ -12,8 +14,8 @@ void IntersectLineLine::init() {
   this->metaData.name = "IntersectLineLine";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "esc";
-  this->metaData.description = QString("%1").arg(
-      "This function calculates the intersection of a line with a line.");
+  this->metaData.description = std::format(
+      "{}", "This function calculates the intersection of a line with a line.");
   this->metaData.iid = ConstructFunction_iidd;
 
   // set needed elements
@@ -66,10 +68,10 @@ IntersectionTypes IntersectLineLine::getIntersectionType() {
  * \param point
  * \return
  */
-std::expected<Point, QString> IntersectLineLine::exec() {
+std::expected<Point, std::string> IntersectLineLine::exec() {
   Point point;
   if (!this->setUpResult(point)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return point;
 }
@@ -93,10 +95,10 @@ bool IntersectLineLine::setUpResult(Point& point) {
   }
 
   if (this->isParallel(line1, line2)) {
-    emit this->sendMessage(QString("line %1 and line %2 are parallel")
-                               .arg(line1->getFeatureName())
-                               .arg(line2->getFeatureName()),
-                           MessageTypes::eWarningMessage);
+    this->sendMessage(
+        std::format("line {} and line {} are parallel", line1->getFeatureName(),
+                    line2->getFeatureName()),
+        MessageTypes::eWarningMessage);
     return false;
   }
 

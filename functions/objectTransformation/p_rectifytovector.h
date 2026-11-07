@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QPointer>
-#include <QtMath>
+#include <string>
 
 #include "objecttransformation.h"
 #include "oimat.h"
@@ -36,10 +36,10 @@ class RectifyToVector : public ObjectTransformation,
   // exec methods
   // ############
 
-  std::expected<Plane, QString> exec(const Plane& input) override;
-  std::expected<Circle, QString> exec(const Circle& input) override;
-  std::expected<Line, QString> exec(const Line& input) override;
-  std::expected<Cylinder, QString> exec(const Cylinder& input) override;
+  std::expected<Plane, std::string> exec(const Plane& input) override;
+  std::expected<Circle, std::string> exec(const Circle& input) override;
+  std::expected<Line, std::string> exec(const Line& input) override;
+  std::expected<Cylinder, std::string> exec(const Cylinder& input) override;
 
  private:
   // ##############

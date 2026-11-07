@@ -1,5 +1,6 @@
 #include "cfcontext.h"
 
+#include <format>
 #include <utility>
 #include <vector>
 
@@ -12,7 +13,7 @@ CFContext::CFContext() {}
  * @param name
  * @return function instance and removes function from list
  */
-oi::Guarded<Function> CFContext::getFunction(QString name) {
+oi::Guarded<Function> CFContext::getFunction(std::string name) {
   for (int index = 0; std::cmp_less(index, functions.size()); index++) {
     if (!functions[index].isNull() &&
         functions[index]->getMetaData().name.compare(name) == 0) {
@@ -22,20 +23,16 @@ oi::Guarded<Function> CFContext::getFunction(QString name) {
     }
   }
 
-  throw logic_error(
-      QString("no function found: %1").arg(name).toLocal8Bit().data());
+  throw logic_error(std::format("no function found: {}", name));
 }
 
-InputElement CFContext::getInputElement(QString name) {
+InputElement CFContext::getInputElement(std::string name) {
   std::vector<InputElement> ies =
       oi::value(this->global_inputElements,
                 oi::indexOf(config.getNeededElementNames(), name));
   if (ies.size() == 0) {
-    throw logic_error(QString("invalid count (%1) of InputElements: %2")
-                          .arg(ies.size())
-                          .arg(name)
-                          .toLocal8Bit()
-                          .data());
+    throw logic_error(std::format("invalid count ({}) of InputElements: {}",
+                                  ies.size(), name));
   }
   return ies.front();
 }
@@ -64,15 +61,14 @@ oi::Guarded<FeatureWrapper> CFContext::createApplicableFeature(
     }
   }
 
-  throw logic_error(
-      QString("can not create applicable feature").toLocal8Bit().data());
+  throw logic_error(std::string("can not create applicable feature"));
 }
 
 InputElement CFContext::createInputElement(
     oi::Guarded<FeatureWrapper> feature) {
   InputElement element;
-  element.label = QString("generated InputElement: %1")
-                      .arg(feature->getFeatureTypeString());
+  element.label = std::format("generated InputElement: {}",
+                              feature->getFeatureTypeString());
 
   switch (feature->getFeatureTypeEnum()) {
     case FeatureTypes::ePointFeature:
@@ -87,10 +83,8 @@ InputElement CFContext::createInputElement(
       break;
     default:
       throw logic_error(
-          QString("can not create input element for feature type: %1")
-              .arg(feature->getFeatureTypeString())
-              .toLocal8Bit()
-              .data());
+          std::format("can not create input element for feature type: {}",
+                      feature->getFeatureTypeString()));
   }
   return element;
 }

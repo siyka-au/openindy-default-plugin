@@ -1,5 +1,7 @@
 #include "ps_octree.h"
 
+#include <QtCore>
+
 #include "ps_pointcloud.h"
 
 PS_Octree::PS_Octree() {

@@ -1,8 +1,8 @@
 #ifndef P_FACTORY_H
 #define P_FACTORY_H
 #include <QObject>
-#include <QString>
 #include <QtGlobal>
+#include <string>
 #include <vector>
 
 #include "bundleadjustment.h"
@@ -78,15 +78,15 @@ class OiTemplatePlugin : public QObject, Plugin {
   // create instances of a plugin type with a given name
   // ###################################################
 
-  oi::Guarded<Sensor> createSensor(const QString& name);
-  oi::Guarded<Function> createFunction(const QString& name);
-  oi::Guarded<Function> createFunctionFromConfig(const QString& name);
-  oi::Guarded<BundleAdjustment> createBundleAdjustment(const QString& name);
-  oi::Guarded<SimulationModel> createSimulation(const QString& name);
+  oi::Guarded<Sensor> createSensor(const std::string& name);
+  oi::Guarded<Function> createFunction(const std::string& name);
+  oi::Guarded<Function> createFunctionFromConfig(const std::string& name);
+  oi::Guarded<BundleAdjustment> createBundleAdjustment(const std::string& name);
+  oi::Guarded<SimulationModel> createSimulation(const std::string& name);
   oi::Guarded<ExchangeSimpleAscii> createSimpleAsciiExchange(
-      const QString& name);
+      const std::string& name);
   oi::Guarded<ExchangeDefinedFormat> createDefinedFormatExchange(
-      const QString& name);
+      const std::string& name);
 };
 
 #endif  // P_FACTORY_H

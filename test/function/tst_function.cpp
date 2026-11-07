@@ -1,6 +1,7 @@
 #include <QPointer>
-#include <QString>
 #include <QtTest>
+#include <sstream>
+#include <string>
 #include <vector>
 
 #include "chooselalib.h"
@@ -20,7 +21,7 @@
 #include "p_rectifytopoint.h"
 #include "p_rectifytovector.h"
 #include "p_register.h"
-#include "qtinterop.h"
+#include "stringutil.h"
 #include "test_defines.h"
 #include "types.h"
 
@@ -32,7 +33,7 @@ class FunctionTest : public QObject, public MessageSink {
  public:
   FunctionTest();
 
-  void onMessage(const QString& msg, const MessageTypes& msgType,
+  void onMessage(const std::string& msg, const MessageTypes& msgType,
                  const MessageDestinations& msgDest) override {
     this->printMessage(msg, msgType, msgDest);
   }
@@ -145,14 +146,14 @@ class FunctionTest : public QObject, public MessageSink {
 
   void testCircleInPlaneFromPoints_with_DummyPoint();  // OI-805
 
-  void printMessage(const QString& msg, const MessageTypes& msgType,
+  void printMessage(const std::string& msg, const MessageTypes& msgType,
                     const MessageDestinations& msgDest =
                         MessageDestinations::eConsoleMessage);
 
  private:
-  oi::Guarded<Function> createFunction(QString name);
+  oi::Guarded<Function> createFunction(std::string name);
 
-  void addInputObservations(QString data, oi::Guarded<Function> function,
+  void addInputObservations(std::string data, oi::Guarded<Function> function,
                             int id, int inputElementKey, bool shouldBeUsed);
 
   void addInputLine(double x, double y, double z, double i, double j, double k,
@@ -170,7 +171,7 @@ class FunctionTest : public QObject, public MessageSink {
   void addInputPoint(double x, double y, double z,
                      oi::Guarded<Function> function, int id,
                      int inputElementKey);
-  void addInputPoints(QString data, oi::Guarded<Function> function, int id,
+  void addInputPoints(std::string data, oi::Guarded<Function> function, int id,
                       int inputElementKey, bool shouldBeUsed);
   void addInputPlane(double x, double y, double z, double i, double j, double k,
                      oi::Guarded<Function> function, int id,
@@ -195,32 +196,37 @@ void FunctionTest::initTestCase() {
   ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 }
 
-void FunctionTest::printMessage(const QString& msg, const MessageTypes& msgType,
+void FunctionTest::printMessage(const std::string& msg,
+                                const MessageTypes& msgType,
                                 const MessageDestinations& msgDest) {
   qDebug() << msg;
 }
 
-void FunctionTest::addInputObservations(QString data,
+void FunctionTest::addInputObservations(std::string data,
                                         oi::Guarded<Function> function,
                                         int id = 1000, int inputElementKey = 0,
                                         bool shouldBeUsed = true) {
-  QTextStream stream(data.toUtf8());
-  while (!stream.atEnd()) {
-    std::vector<QString> xyz = oi::toVector(stream.readLine().split(" "));
+  std::istringstream stream(data);
+  std::string line;
+  while (std::getline(stream, line)) {
+    std::vector<std::string> xyz = oi::split(line, " ");
     if (xyz.size() == 0) {
       continue;
     }
 
     OiVec* vec = new OiVec(4);
-    vec->setAt(0, xyz.at(0).toDouble());
-    vec->setAt(1, xyz.at(1).toDouble());
-    vec->setAt(2, xyz.at(2).toDouble());
+    vec->setAt(0, oi::toDouble(xyz.at(0)).value_or(0.0));
+    vec->setAt(1, oi::toDouble(xyz.at(1)).value_or(0.0));
+    vec->setAt(2, oi::toDouble(xyz.at(2)).value_or(0.0));
     vec->setAt(3, 1.0);
 
     ReadingCartesian* readingCartesian = new ReadingCartesian();
-    //        readingCartesian->xyz.setAt(0, xyz.at(0).toDouble());
-    //        readingCartesian->xyz.setAt(1, xyz.at(1).toDouble());
-    //        readingCartesian->xyz.setAt(2, xyz.at(2).toDouble());
+    //        readingCartesian->xyz.setAt(0,
+    //        oi::toDouble(xyz.at(0)).value_or(0.0));
+    //        readingCartesian->xyz.setAt(1,
+    //        oi::toDouble(xyz.at(1)).value_or(0.0));
+    //        readingCartesian->xyz.setAt(2,
+    //        oi::toDouble(xyz.at(2)).value_or(0.0));
     readingCartesian->isValid = true;
 
     Observation* observation = new Observation(*vec, id, true);
@@ -245,21 +251,24 @@ void FunctionTest::addInputObservations(QString data,
   }
 }
 
-void FunctionTest::addInputPoints(QString data, oi::Guarded<Function> function,
-                                  int id = 1000, int inputElementKey = 0,
+void FunctionTest::addInputPoints(std::string data,
+                                  oi::Guarded<Function> function, int id = 1000,
+                                  int inputElementKey = 0,
                                   bool shouldBeUsed = true) {
-  QTextStream stream(data.toUtf8());
-  while (!stream.atEnd()) {
-    std::vector<QString> xyz = oi::toVector(stream.readLine().split(" "));
+  std::istringstream stream(data);
+  std::string line;
+  while (std::getline(stream, line)) {
+    std::vector<std::string> xyz = oi::split(line, " ");
     if (xyz.size() == 0) {
       continue;
     }
 
     oi::Guarded<Point> feature =
-        new Point(id, Position(xyz.at(0).toDouble(), xyz.at(1).toDouble(),
-                               xyz.at(2).toDouble()));
+        new Point(id, Position(oi::toDouble(xyz.at(0)).value_or(0.0),
+                               oi::toDouble(xyz.at(1)).value_or(0.0),
+                               oi::toDouble(xyz.at(2)).value_or(0.0)));
     feature->setIsSolved(true);
-    feature->setFeatureName(QString("point_%1").arg(id));
+    feature->setFeatureName(std::format("point_{}", id));
 
     InputElement* element = new InputElement(id);
     element->typeOfElement = ElementTypes::ePointElement;
@@ -293,7 +302,7 @@ void FunctionTest::addInputLine(double x, double y, double z, double i,
 
   Line* line = new Line(*xyz, *ijk);
   line->setIsSolved(true);
-  line->setFeatureName(QString("line_%1").arg(id));
+  line->setFeatureName(std::format("line_{}", id));
 
   InputElement* element = new InputElement(id);
   element->typeOfElement = ElementTypes::eLineElement;
@@ -321,7 +330,7 @@ void FunctionTest::addInputStation(double x, double y, double z, double i,
   a->setAt(3, 1.0);
   Direction* ijk = new Direction(*a);
 
-  oi::Guarded<Station> station = new Station(QString("station_%1").arg(id));
+  oi::Guarded<Station> station = new Station(std::format("station_{}", id));
   station->setCoordinateSystem(*xyz, Direction(0, 0, 0), Direction(0, 0, 0),
                                *ijk);
   station->setIsSolved(true);
@@ -353,7 +362,7 @@ void FunctionTest::addInputCoordinateSystem(double x, double y, double z,
   Direction* ijk = new Direction(*a);
 
   oi::Guarded<CoordinateSystem> coordianteSystem = new CoordinateSystem();
-  coordianteSystem->setFeatureName(QString("system_%1").arg(id));
+  coordianteSystem->setFeatureName(std::format("system_{}", id));
   coordianteSystem->setCoordinateSystem(*xyz, Direction(0, 0, 0),
                                         Direction(0, 0, 0), *ijk);
   coordianteSystem->setIsSolved(true);
@@ -370,7 +379,7 @@ void FunctionTest::addInputCoordinateSystem(OiMat trafo,
                                             int id = 2000,
                                             int inputElementKey = 0) {
   oi::Guarded<CoordinateSystem> coordianteSystem = new CoordinateSystem();
-  coordianteSystem->setFeatureName(QString("system_%1").arg(id));
+  coordianteSystem->setFeatureName(std::format("system_{}", id));
   coordianteSystem->transformOriginAndAxis(trafo);
   coordianteSystem->setIsSolved(true);
 
@@ -390,7 +399,7 @@ void FunctionTest::addInputPoint(double x, double y, double z,
   pointPos.setAt(2, z);
   oi::Guarded<Point> feature = new Point(Position(pointPos));
   feature->setIsSolved(true);
-  feature->setFeatureName(QString("point_%1").arg(id));
+  feature->setFeatureName(std::format("point_{}", id));
 
   InputElement* element = new InputElement(id);
   element->typeOfElement = ElementTypes::ePointElement;
@@ -423,7 +432,7 @@ void FunctionTest::addInputCircle(double x, double y, double z, double i,
 
   Circle* feature = new Circle(*xyz, *ijk, *r);
   feature->setIsSolved(true);
-  feature->setFeatureName(QString("circle_%1").arg(id));
+  feature->setFeatureName(std::format("circle_{}", id));
 
   InputElement* element = new InputElement(id);
   element->typeOfElement = ElementTypes::eCircleElement;
@@ -453,7 +462,7 @@ void FunctionTest::addInputPlane(double x, double y, double z, double i,
 
   Plane* feature = new Plane(*xyz, *ijk);
   feature->setIsSolved(true);
-  feature->setFeatureName(QString("plane_%1").arg(id));
+  feature->setFeatureName(std::format("plane_{}", id));
 
   InputElement* element = new InputElement(id);
   element->typeOfElement = ElementTypes::ePlaneElement;
@@ -637,7 +646,7 @@ void FunctionTest::testVRadial() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 -3283.654 -79.927 194.917\n\
 -3271.578 -84.991 203.643\n\
@@ -720,7 +729,7 @@ void FunctionTest::testVRadial3() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 -3283.654 -79.927 194.917\n\
 -3271.578 -84.991 203.643\n\
@@ -804,7 +813,7 @@ void FunctionTest::testBestFitCylinder1() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 900 19.05 -1205\n\
 900 19.05 0\n\
@@ -846,7 +855,7 @@ void FunctionTest::testBestFitCylinder1_modifyX() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 901 19.05 -1205\n\
 900 19.05 0\n\
@@ -888,7 +897,7 @@ void FunctionTest::testBestFitCylinder1_modifyZ() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 900 19.05 -1206\n\
 900 19.05 0\n\
@@ -930,7 +939,7 @@ void FunctionTest::testBestFitCylinder1_modifyY() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 900 20.05 -1205\n\
 900 19.05 0\n\
@@ -973,7 +982,7 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_3() {
   // line ending: "\n"
   // unit:        [mm]
   // Station 4
-  QString data =
+  std::string data =
       "\
 256.39 1460.15 1326.66\n\
 264.47 1449.69 1335.19\n\
@@ -1015,7 +1024,7 @@ void FunctionTest::testBestFitCylinder2_trafo_1st_2_pts() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 340.00 1467.40 1096.57\n\
 352.00 1466.29 1083.28\n\
@@ -1053,7 +1062,7 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_2() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 347.31 1443.06 1077.28\n\
 354.71 1432.09 1085.80\n\
@@ -1096,7 +1105,7 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_1() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 -3283.64 -79.92 194.91\n\
 -3271.56 -84.98 203.64\n\
@@ -1139,7 +1148,7 @@ void FunctionTest::testBestFitCylinder2_guess_axis() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 -59.57 -7.72 17.57\n\
 -59.44 -18.23 5.86\n\
@@ -1182,7 +1191,7 @@ void FunctionTest::testBestFitCylinder2_1st_2_pts() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 -59.57 -7.72 17.57\n\
 -34.43 -5.00 18.49\n\
@@ -1220,7 +1229,7 @@ void FunctionTest::testBestFitCylinderAproximationDirection1() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 -59.57 -7.72 17.57\n\
 -34.43 -5.00 18.49\n\
@@ -1272,7 +1281,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_no() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 1.0 1.1 1.2 FS\n\
 1.1 1.2 1.3 FS\n\
@@ -1312,7 +1321,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_yes() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 1.0 1.1 1.2 FS\n\
 1.1 1.2 1.3 FS\n\
@@ -1352,7 +1361,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_2side_yes() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 1.0 1.1 1.2 FS\n\
 1.02 1.1 1.2 BS\n\
@@ -1389,7 +1398,7 @@ void FunctionTest::testBestFitPlane() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 0.001\n\
 1.0 0.0 0.002\n\
@@ -1428,7 +1437,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_up() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 0.001\n\
 1.0 0.0 0.002\n\
@@ -1466,7 +1475,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_down() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 0.001\n\
 1.0 0.0 0.002\n\
@@ -1504,7 +1513,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_up() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 -0.004\n\
 1.0 0.0 -0.003\n\
@@ -1542,7 +1551,7 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_down() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 -0.004\n\
 1.0 0.0 -0.003\n\
@@ -1581,7 +1590,7 @@ void FunctionTest::testBestFitCircleInPlane_left() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 0.001\n\
 1.0 0.0 0.002\n\
@@ -1618,7 +1627,7 @@ void FunctionTest::testBestFitCircleInPlane_right() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 0.001\n\
 0.0 1.0 0.003\n\
@@ -1654,7 +1663,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_positive_up() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 0.001\n\
 1.0 0.0 0.002\n\
@@ -1692,7 +1701,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_up() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 -0.004\n\
 1.0 0.0 -0.003\n\
@@ -1730,7 +1739,7 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_down() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 -0.004\n\
 1.0 0.0 -0.003\n\
@@ -1768,7 +1777,7 @@ void FunctionTest::testBestFitCylinder1__DummyPoint1() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 -59.57 -7.72 17.57\n\
 -34.43 -5.00 18.49\n\
@@ -1810,7 +1819,7 @@ void FunctionTest::testBestFitCylinder1__DummyPoint2() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 -59.57 -7.72 17.57\n\
 -34.43 -5.00 18.49\n\
@@ -2535,7 +2544,7 @@ void FunctionTest::testCircleInPlaneFromPoints() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 0.001\n\
 1.0 0.0 0.002\n\
@@ -2573,7 +2582,7 @@ void FunctionTest::testBestFitPoint_residuals() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 999.9912 1999.9865 2999.9741\n\
 999.9942 1999.9931 2999.9893\n\
@@ -2618,7 +2627,7 @@ void FunctionTest::testBestFitPlane_right() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 1000.0014 1000.0030 1001.0031\n\
 999.9965 1999.9965 1099.9985\n\
@@ -2653,7 +2662,7 @@ void FunctionTest::testBestFitPlane_residuals() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 1000.0014 1000.0030 1001.0031\n\
 1999.9994 2000.0043 998.0100\n\
@@ -2714,7 +2723,7 @@ void FunctionTest::testBestFitLine_residuals() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 999.9916 999.9958 999.9917\n\
 2000.0015 2000.0008 999.9970\n\
@@ -2775,7 +2784,7 @@ void FunctionTest::testBestFitCircleInPlane_residuals() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 999.9962 999.9970 999.9958\n\
 -0.0001 999.9971 999.9975\n\
@@ -2849,7 +2858,7 @@ void FunctionTest::testBestFitCircleInPlane_residuals2() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.100568 1.002327 0.9999\n\
 0.669641 0.750807 0.9998\n\
@@ -2951,7 +2960,7 @@ void FunctionTest::testBestFitSphere_residuals() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.010757 0.107215 1.004511\n\
 0.084127 0.068784 1.000029\n\
@@ -3296,7 +3305,7 @@ void FunctionTest::testPointFromPoints_Register() {
                  0.0001);
 }
 
-oi::Guarded<Function> FunctionTest::createFunction(QString functionName) {
+oi::Guarded<Function> FunctionTest::createFunction(std::string functionName) {
   oi::Guarded<Function> function;
   OiTemplatePlugin plugin;
 
@@ -3306,9 +3315,8 @@ oi::Guarded<Function> FunctionTest::createFunction(QString functionName) {
     function = plugin.createFunction(functionName);
   }
 
-  Q_ASSERT_X(
-      !function.isNull(), "createFunction",
-      QString("no function found: %1").arg(functionName).toLatin1().data());
+  Q_ASSERT_X(!function.isNull(), "createFunction",
+             std::format("no function found: {}", functionName).c_str());
 
   function->init();
   function->setMessageSink(this);
@@ -3547,7 +3555,7 @@ void FunctionTest::testCircleInPlaneFromPoints_with_DummyPoint() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 0.0 0.0 0.001\n\
 1.0 0.0 0.002\n\
@@ -3586,7 +3594,7 @@ void FunctionTest::testLineFromPoints() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 999.9916 999.9958 999.9917\n\
 2000.0015 2000.0008 999.9970\n\
@@ -3627,7 +3635,7 @@ void FunctionTest::testNotSolved_guessAxis() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 -3283.654 -79.927 194.917\n\
 -3271.578 -84.991 203.643\n\
@@ -3663,7 +3671,7 @@ void FunctionTest::testNotSolved_firstTwoPoints() {
   // colum delim: " "
   // line ending: "\n"
   // unit:        [mm]
-  QString data(
+  std::string data(
       "\
 -3283.654 -79.927 194.917\n\
 -3271.578 -84.991 203.643\n\
@@ -3686,5 +3694,7 @@ void FunctionTest::testNotSolved_firstTwoPoints() {
 }
 
 QTEST_APPLESS_MAIN(FunctionTest)
+
+#include <format>
 
 #include "tst_function.moc"

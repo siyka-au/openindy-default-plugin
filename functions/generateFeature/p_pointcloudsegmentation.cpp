@@ -1,5 +1,7 @@
 #include "p_pointcloudsegmentation.h"
 
+#include <QtCore>
+
 /*!
  * \brief PointCloudSegmentation::getMetaData
  * \return
@@ -10,51 +12,56 @@ PluginMetaData* PointCloudSegmentation::getMetaData() const {
   metaData->pluginName = "OpenIndy Default Plugin";
   metaData->author = "Benedikt Rauls";
   metaData->description =
-      QString(
-          "%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13 %14 %15 %16 %17 %18 %19 "
-          "%20")
-          .arg("This function segments a pointcloud.")
-          .arg(
-              "It is able to detect planes, spheres and/or cylinders based on "
-              "the given input parameters.")
-          .arg("<br><br> <u>parameter description:</u> <br>")
-          .arg("<b>leafSize:</b> Maximum number of points in a leaf voxel.")
-          .arg(
-              "<b>fitSampleSize:</b> Number of points to fit a geometry during "
-              "region growing.")
-          .arg("<b>minPointsPlane:</b> Minimum number of points in a plane.")
-          .arg("<b>minPointsSphere:</b> Minimum number of points in a sphere.")
-          .arg(
-              "<b>minPointsCylinder:</b> Minimum number of points in a "
-              "cylinder.")
-          .arg(
-              "<b>maxDistancePlane:</b> Maximum distance of a point from a "
-              "plane.")
-          .arg(
-              "<b>maxDistanceSphere:</b> Maximum distance of a point from a "
-              "sphere.")
-          .arg(
-              "<b>maxDistanceCylinder:</b> Maximum distance of a point from a "
-              "cylinder.")
-          .arg("<b>minRadiusSphere:</b> Minimum radius of a sphere.")
-          .arg("<b>maxRadiusSphere:</b> Maximum radius of a sphere.")
-          .arg("<b>minRadiusCylinder:</b> Minimum radius of a cylinder.")
-          .arg("<b>maxRadiusCylinder:</b> Maximum radius of a cylinder.")
-          .arg(
-              "<b>detectPlanes:</b> Defines wether the algorithm shall detect "
-              "planes.")
-          .arg(
-              "<b>detectPlanes:</b> Defines wether the algorithm shall detect "
-              "spheres.")
-          .arg(
-              "<b>detectPlanes:</b> Defines wether the algorithm shall detect "
-              "cylinders.")
-          .arg(
-              "<b>finalFit:</b> Defines wether the extracted geometries shall "
-              "be fit using all points.")
-          .arg(
-              "<b>outlierPercentage:</b> Estimated proportion of outliers in a "
-              "leaf voxel.");
+      "This function segments a pointcloud."
+      " "
+      "It is able to detect planes, spheres and/or cylinders based on "
+      "the given input parameters."
+      " "
+      "<br><br> <u>parameter description:</u> <br>"
+      " "
+      "<b>leafSize:</b> Maximum number of points in a leaf voxel."
+      " "
+      "<b>fitSampleSize:</b> Number of points to fit a geometry during "
+      "region growing."
+      " "
+      "<b>minPointsPlane:</b> Minimum number of points in a plane."
+      " "
+      "<b>minPointsSphere:</b> Minimum number of points in a sphere."
+      " "
+      "<b>minPointsCylinder:</b> Minimum number of points in a "
+      "cylinder."
+      " "
+      "<b>maxDistancePlane:</b> Maximum distance of a point from a "
+      "plane."
+      " "
+      "<b>maxDistanceSphere:</b> Maximum distance of a point from a "
+      "sphere."
+      " "
+      "<b>maxDistanceCylinder:</b> Maximum distance of a point from a "
+      "cylinder."
+      " "
+      "<b>minRadiusSphere:</b> Minimum radius of a sphere."
+      " "
+      "<b>maxRadiusSphere:</b> Maximum radius of a sphere."
+      " "
+      "<b>minRadiusCylinder:</b> Minimum radius of a cylinder."
+      " "
+      "<b>maxRadiusCylinder:</b> Maximum radius of a cylinder."
+      " "
+      "<b>detectPlanes:</b> Defines wether the algorithm shall detect "
+      "planes."
+      " "
+      "<b>detectPlanes:</b> Defines wether the algorithm shall detect "
+      "spheres."
+      " "
+      "<b>detectPlanes:</b> Defines wether the algorithm shall detect "
+      "cylinders."
+      " "
+      "<b>finalFit:</b> Defines wether the extracted geometries shall "
+      "be fit using all points."
+      " "
+      "<b>outlierPercentage:</b> Estimated proportion of outliers in a "
+      "leaf voxel.";
   metaData->iid = "de.openIndy.Plugin.Function.GenerateFeatureFunction.v001";
   return metaData;
 }
@@ -83,8 +90,8 @@ QList<Configuration::FeatureTypes> PointCloudSegmentation::applicableFor()
  * \brief PointCloudSegmentation::getIntegerParameter
  * \return
  */
-QMap<QString, int> PointCloudSegmentation::getIntegerParameter() const {
-  QMap<QString, int> intParams;
+QMap<std::string, int> PointCloudSegmentation::getIntegerParameter() const {
+  QMap<std::string, int> intParams;
 
   // let the user specify the maximum number of points in a leaf-node of the
   // octree that will be computed
@@ -107,8 +114,8 @@ QMap<QString, int> PointCloudSegmentation::getIntegerParameter() const {
  * \brief PointCloudSegmentation::getDoubleParameter
  * \return
  */
-QMap<QString, double> PointCloudSegmentation::getDoubleParameter() const {
-  QMap<QString, double> doubleParams;
+QMap<std::string, double> PointCloudSegmentation::getDoubleParameter() const {
+  QMap<std::string, double> doubleParams;
 
   /* maximum orthogonal distance of a pointcloud-point from an estimated
   shape-surface so that the point is still associated with that shape
@@ -131,14 +138,15 @@ QMap<QString, double> PointCloudSegmentation::getDoubleParameter() const {
  * \brief PointCloudSegmentation::getStringParameter
  * \return
  */
-QMap<QString, QStringList> PointCloudSegmentation::getStringParameter() const {
-  QMap<QString, QStringList> stringParams;
+QMap<std::string, std::vector<std::string>>
+PointCloudSegmentation::getStringParameter() const {
+  QMap<std::string, std::vector<std::string>> stringParams;
 
-  QStringList myBoolOptions;
+  std::vector<std::string> myBoolOptions;
   myBoolOptions.append("true");
   myBoolOptions.append("false");
 
-  QStringList myOutlierOptions;
+  std::vector<std::string> myOutlierOptions;
   myOutlierOptions.append("0.1");
   myOutlierOptions.append("0.2");
   myOutlierOptions.append("0.3");
@@ -209,9 +217,10 @@ bool PointCloudSegmentation::exec(PointCloud& p) {
          */
 
         FunctionConfiguration userConfig = this->getFunctionConfiguration();
-        QMap<QString, QString> stringParams = userConfig.stringParameter;
-        QMap<QString, int> intParams = userConfig.intParameter;
-        QMap<QString, double> doubleParams = userConfig.doubleParameter;
+        QMap<std::string, std::string> stringParams =
+            userConfig.stringParameter;
+        QMap<std::string, int> intParams = userConfig.intParameter;
+        QMap<std::string, double> doubleParams = userConfig.doubleParameter;
 
         // special plane, sphere and cylinder parameter
         PlaneParameter pParam;
@@ -281,8 +290,8 @@ bool PointCloudSegmentation::exec(PointCloud& p) {
  * \brief PointCloudSegmentation::getResultProtocol
  * \return
  */
-QStringList PointCloudSegmentation::getResultProtocol() const {
-  QStringList dummy;
+std::vector<std::string> PointCloudSegmentation::getResultProtocol() const {
+  std::vector<std::string> dummy;
   dummy.append("test protocol");
   return dummy;
 }

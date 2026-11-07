@@ -1,5 +1,7 @@
 #include "p_shift.h"
 
+#include <format>
+
 #include "containers.h"
 
 /*!
@@ -10,8 +12,8 @@ void Shift::init() {
   this->metaData.name = "Shift";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description = QString("%1").arg(
-      "This function shifts the target geometry along its one vector.");
+  this->metaData.description = std::format(
+      "{}", "This function shifts the target geometry along its one vector.");
   this->metaData.iid = ObjectTransformation_iidd;
 
   // set spplicable for
@@ -27,10 +29,10 @@ void Shift::init() {
  * \param plane
  * \return
  */
-std::expected<Plane, QString> Shift::exec(const Plane& input) {
+std::expected<Plane, std::string> Shift::exec(const Plane& input) {
   Plane plane = input;
   if (!this->setUpResult(plane)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return plane;
 }
@@ -40,10 +42,10 @@ std::expected<Plane, QString> Shift::exec(const Plane& input) {
  * \param input
  * \return
  */
-std::expected<Circle, QString> Shift::exec(const Circle& input) {
+std::expected<Circle, std::string> Shift::exec(const Circle& input) {
   Circle circle = input;
   if (!this->setUpResult(circle)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return circle;
 }

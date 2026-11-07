@@ -1,5 +1,7 @@
 #include "cfvisitor.h"
 
+#include <QtCore>
+#include <format>
 #include <stdexcept>
 
 #include "cfcparameter.h"
@@ -13,7 +15,7 @@ CFVisitor::CFVisitor(CFContext ctx) : ctx(ctx) {}
 void CFVisitor::pre(QPointer<Node> n, int index, int level) {
   CFCParameter* node = static_cast<CFCParameter*>(n.data());
 
-  QString pre = QString("pre L%1 I%2").arg(level).arg(index);
+  std::string pre = std::format("pre L{} I{}", level, index);
 
   if (level == 0) {  // level 0, first level
 
@@ -34,9 +36,9 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
     if (node->getFeature().compare("global") == 0) {
       fd.feature = ctx.global_feature;
       debug(pre,
-            QString("set global feature: %2 to function: %1")
-                .arg(fd.function->getMetaData().name)
-                .arg(fd.feature->getFeature()->getFeatureName()),
+            std::format("set global feature: {1} to function: {0}",
+                        fd.function->getMetaData().name,
+                        fd.feature->getFeature()->getFeatureName()),
             level);
     } else if (node->getFeature().compare("global.copy") == 0) {
       oi::Guarded<FeatureWrapper> copy = new FeatureWrapper();
@@ -49,27 +51,25 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
         }
         default:
           throw std::logic_error(
-              QString("no FeatureTypes for \"%1\" found")
-                  .arg(ctx.global_feature->getFeatureTypeString())
-                  .toLocal8Bit()
-                  .data());
+              std::format("no FeatureTypes for \"{}\" found",
+                          ctx.global_feature->getFeatureTypeString()));
           break;
       }
       fd.feature = copy;
 
       debug(pre,
-            QString("set global.copy feature: %2 to function: %1")
-                .arg(fd.function->getMetaData().name)
-                .arg(fd.feature->getFeature()->getFeatureName()),
+            std::format("set global.copy feature: {1} to function: {0}",
+                        fd.function->getMetaData().name,
+                        fd.feature->getFeature()->getFeatureName()),
             level);
     } else {
       oi::Guarded<FeatureWrapper> feature = this->ctx.createApplicableFeature(
           CFUtil::featureTypesForName(node->getFeature()));
       fd.feature = feature;
       debug(pre,
-            QString("set feature: %2 to function: %1")
-                .arg(fd.function->getMetaData().name)
-                .arg(fd.feature->getFeature()->getFeatureName()),
+            std::format("set feature: {1} to function: {0}",
+                        fd.function->getMetaData().name,
+                        fd.feature->getFeature()->getFeatureName()),
             level);
     }
 
@@ -79,12 +79,10 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
       InputElement ie = ctx.createInputElement(fd.feature);
 
       debug(pre,
-            QString("add input element id: %2, %3, %4 to function: %1 (%5)")
-                .arg(parentFunction->getMetaData().name)
-                .arg(ie.id)
-                .arg(static_cast<int>(ie.typeOfElement))
-                .arg(ie.label)
-                .arg(index),
+            std::format(
+                "add input element id: {1}, {2}, {3} to function: {0} ({4})",
+                parentFunction->getMetaData().name, ie.id,
+                static_cast<int>(ie.typeOfElement), ie.label, index),
             level);
       parentFunction->addInputElement(ie, index);
     }
@@ -98,12 +96,10 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
     InputElement ie = ctx.getInputElement(node->getName());
 
     debug(pre,
-          QString("add input element id: %2, %3, %4 to function: %1 (%5)")
-              .arg(parentFunction->getMetaData().name)
-              .arg(ie.id)
-              .arg(static_cast<int>(ie.typeOfElement))
-              .arg(ie.label)
-              .arg(index),
+          std::format(
+              "add input element id: {1}, {2}, {3} to function: {0} ({4})",
+              parentFunction->getMetaData().name, ie.id,
+              static_cast<int>(ie.typeOfElement), ie.label, index),
           level);
     parentFunction->addInputElement(ie, index);
   }
@@ -112,7 +108,7 @@ void CFVisitor::pre(QPointer<Node> n, int index, int level) {
 void CFVisitor::post(QPointer<Node> n, int index, int level) {
   CFCParameter* node = static_cast<CFCParameter*>(n.data());
 
-  QString post = QString("post L%1 I%2").arg(level).arg(index);
+  std::string post = std::format("post L{} I{}", level, index);
 
   if (ctx.config.isFunction(node->getName()) &&
       level > 0 /* skip level 0 because this is the base function */) {
@@ -126,14 +122,12 @@ void CFVisitor::post(QPointer<Node> n, int index, int level) {
       // cf->global_feature = ctx.global_feature;
     }
 
-    debug(post, QString("exec featureData: %1").arg(fd.prettyPrint()), level);
+    debug(post, std::format("exec featureData: {}", fd.prettyPrint()), level);
     if (!fd.function->exec(fd.feature)) {
       throw std::logic_error(
-          QString("execution failed for function: '%1'' with feature: '%2'")
-              .arg(fd.function->getMetaData().name)
-              .arg(fd.feature->getFeature()->getFeatureName())
-              .toLocal8Bit()
-              .data());
+          std::format("execution failed for function: '{}'' with feature: '{}'",
+                      fd.function->getMetaData().name,
+                      fd.feature->getFeature()->getFeatureName()));
     }
   }
 }

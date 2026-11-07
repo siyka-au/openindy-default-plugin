@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include <format>
+
 #include "containers.h"
 
 /*!
@@ -12,7 +14,8 @@ void RectifyToPoint::init() {
   this->metaData.name = "RectifyToPoint";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description = QString("%1").arg(
+  this->metaData.description = std::format(
+      "{}",
       "This function changes the orientation of a geometry according to the "
       "specified position.");
   this->metaData.iid = ObjectTransformation_iidd;
@@ -48,10 +51,10 @@ void RectifyToPoint::init() {
  * \param plane
  * \return
  */
-std::expected<Plane, QString> RectifyToPoint::exec(const Plane& input) {
+std::expected<Plane, std::string> RectifyToPoint::exec(const Plane& input) {
   Plane plane = input;
   if (!this->setUpResult(plane)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return plane;
 }
@@ -61,10 +64,10 @@ std::expected<Plane, QString> RectifyToPoint::exec(const Plane& input) {
  * \param input
  * \return
  */
-std::expected<Circle, QString> RectifyToPoint::exec(const Circle& input) {
+std::expected<Circle, std::string> RectifyToPoint::exec(const Circle& input) {
   Circle circle = input;
   if (!this->setUpResult(circle)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return circle;
 }
@@ -74,10 +77,10 @@ std::expected<Circle, QString> RectifyToPoint::exec(const Circle& input) {
  * \param input
  * \return
  */
-std::expected<Line, QString> RectifyToPoint::exec(const Line& input) {
+std::expected<Line, std::string> RectifyToPoint::exec(const Line& input) {
   Line line = input;
   if (!this->setUpResult(line)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return line;
 }
@@ -87,10 +90,11 @@ std::expected<Line, QString> RectifyToPoint::exec(const Line& input) {
  * \param input
  * \return
  */
-std::expected<Cylinder, QString> RectifyToPoint::exec(const Cylinder& input) {
+std::expected<Cylinder, std::string> RectifyToPoint::exec(
+    const Cylinder& input) {
   Cylinder cylinder = input;
   if (!this->setUpResult(cylinder)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return cylinder;
 }

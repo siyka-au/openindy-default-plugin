@@ -195,10 +195,10 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
   QVERIFY2(stdevMeters > 0.0,
            "TrafoParam's residual-based Statistic must be populated - it comes "
            "for free from calc_6p");
-  QVERIFY2(
-      stdevMeters < 0.01,
-      qPrintable(QString("solved pose residual stdev implausibly large: %1 m")
-                     .arg(stdevMeters)));
+  QVERIFY2(stdevMeters < 0.01,
+           (std::format("solved pose residual stdev implausibly large: {} m",
+                        stdevMeters))
+               .c_str());
 
   // tolerance derived from the solve's own reported uncertainty, not a
   // fixed constant - a tighter or looser error model should tighten or
@@ -230,12 +230,10 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
         toWorld(local.position(), trueBoardRotation, trueBoardTranslation);
     const OiVec recovered = applySolved(local.position());
     const double error = distance(trueWorld, recovered);
-    QVERIFY2(
-        error < toleranceMeters,
-        qPrintable(QString("measured point %1 off by %2 m (tolerance %3 m)")
-                       .arg(local.label())
-                       .arg(error)
-                       .arg(toleranceMeters)));
+    QVERIFY2(error < toleranceMeters,
+             (std::format("measured point {} off by {} m (tolerance {} m)",
+                          local.label(), error, toleranceMeters))
+                 .c_str());
   }
 
   //--- the real point of the whole exercise: the derived point was never
@@ -250,13 +248,14 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
   const OiVec recoveredDerivedWorld = applySolved(derived->position());
   const double derivedError = distance(trueDerivedWorld, recoveredDerivedWorld);
 
-  QVERIFY2(
-      derivedError < toleranceMeters,
-      qPrintable(
-          QString("derived (never-observed) point off by %1 m (tolerance %2 m)")
-              .arg(derivedError)
-              .arg(toleranceMeters)));
+  QVERIFY2(derivedError < toleranceMeters,
+           (std::format(
+                "derived (never-observed) point off by {} m (tolerance {} m)",
+                derivedError, toleranceMeters))
+               .c_str());
 }
 
 QTEST_APPLESS_MAIN(CalibratedConstellationTest)
+#include <format>
+
 #include "tst_calibratedconstellation.moc"

@@ -1,5 +1,7 @@
 #include "p_averagefrompoints.h"
 
+#include <format>
+
 /*!
  * \brief AverageFromPoints::init
  */
@@ -8,15 +10,13 @@ void AverageFromPoints::init() {
   this->metaData.name = "AverageFromPoints";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "oi";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg(
-              "This function creates a point at the arithmetic mean position "
-              "of as many points as you give it.")
-          .arg(
-              "Use it to combine repeated shots of one physical target - e.g. "
-              "a tracker nest re-shot with a total station - into one derived "
-              "point.");
+  this->metaData.description = std::format(
+      "{} {}",
+      "This function creates a point at the arithmetic mean position "
+      "of as many points as you give it.",
+      "Use it to combine repeated shots of one physical target - e.g. "
+      "a tracker nest re-shot with a total station - into one derived "
+      "point.");
   this->metaData.iid = ConstructFunction_iidd;
 
   // set needed elements
@@ -37,10 +37,10 @@ void AverageFromPoints::init() {
  * \param point
  * \return
  */
-std::expected<Point, QString> AverageFromPoints::exec() {
+std::expected<Point, std::string> AverageFromPoints::exec() {
   Point point;
   if (!this->setUpResult(point)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return point;
 }
@@ -52,9 +52,9 @@ std::expected<Point, QString> AverageFromPoints::exec() {
  */
 bool AverageFromPoints::setUpResult(Point& point) {
   if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
-    emit this->sendMessage(QString("No points to average for point %1")
-                               .arg(point.getFeatureName()),
-                           MessageTypes::eWarningMessage);
+    this->sendMessage(std::format("No points to average for point {}",
+                                  point.getFeatureName()),
+                      MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -84,9 +84,9 @@ bool AverageFromPoints::setUpResult(Point& point) {
   }
 
   if (usedCount == 0) {
-    emit this->sendMessage(QString("No solved points to average for point %1")
-                               .arg(point.getFeatureName()),
-                           MessageTypes::eWarningMessage);
+    this->sendMessage(std::format("No solved points to average for point {}",
+                                  point.getFeatureName()),
+                      MessageTypes::eWarningMessage);
     return false;
   }
 

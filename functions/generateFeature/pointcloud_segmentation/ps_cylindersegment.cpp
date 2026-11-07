@@ -1,5 +1,7 @@
 #include "ps_cylindersegment.h"
 
+#include <QtCore>
+
 OiMat PS_CylinderSegment::Ralpha = OiMat(3, 3);
 OiMat PS_CylinderSegment::Rbeta = OiMat(3, 3);
 OiMat PS_CylinderSegment::Rall = OiMat(3, 3);
@@ -34,7 +36,9 @@ PS_CylinderSegment::~PS_CylinderSegment() {}
  * \param filePath
  * \return
  */
-bool PS_CylinderSegment::writeToX3D(const QString& filePath) { return false; }
+bool PS_CylinderSegment::writeToX3D(const std::string& filePath) {
+  return false;
+}
 
 /*!
  * \brief PS_CylinderSegment::detectCylinder
@@ -63,7 +67,7 @@ PS_CylinderSegment* PS_CylinderSegment::detectCylinder(
   }
 
   // calculate the number of necessary trials
-  numTrials = (int)ceil(qLn(1.0f - s) / qLn(1.0f - phk));
+  numTrials = (int)ceil(std::log(1.0f - s) / std::log(1.0f - phk));
 
   // get numTrials random samples
   QMap<int, QList<PS_Point_PC*> > randomSamples;
@@ -129,15 +133,15 @@ int PS_CylinderSegment::checkPointsInCylinder(
     myCylinder->getIJK(ijk);*/
 
     PS_CylinderSegment::Ralpha.setAt(0, 0, 1.0);
-    PS_CylinderSegment::Ralpha.setAt(1, 1, qCos(myCylinder->getAlpha()));
-    PS_CylinderSegment::Ralpha.setAt(1, 2, -qSin(myCylinder->getAlpha()));
-    PS_CylinderSegment::Ralpha.setAt(2, 1, qSin(myCylinder->getAlpha()));
-    PS_CylinderSegment::Ralpha.setAt(2, 2, qCos(myCylinder->getAlpha()));
-    PS_CylinderSegment::Rbeta.setAt(0, 0, qCos(myCylinder->getBeta()));
-    PS_CylinderSegment::Rbeta.setAt(0, 2, qSin(myCylinder->getBeta()));
+    PS_CylinderSegment::Ralpha.setAt(1, 1, std::cos(myCylinder->getAlpha()));
+    PS_CylinderSegment::Ralpha.setAt(1, 2, -std::sin(myCylinder->getAlpha()));
+    PS_CylinderSegment::Ralpha.setAt(2, 1, std::sin(myCylinder->getAlpha()));
+    PS_CylinderSegment::Ralpha.setAt(2, 2, std::cos(myCylinder->getAlpha()));
+    PS_CylinderSegment::Rbeta.setAt(0, 0, std::cos(myCylinder->getBeta()));
+    PS_CylinderSegment::Rbeta.setAt(0, 2, std::sin(myCylinder->getBeta()));
     PS_CylinderSegment::Rbeta.setAt(1, 1, 1.0);
-    PS_CylinderSegment::Rbeta.setAt(2, 0, -qSin(myCylinder->getBeta()));
-    PS_CylinderSegment::Rbeta.setAt(2, 2, qCos(myCylinder->getBeta()));
+    PS_CylinderSegment::Rbeta.setAt(2, 0, -std::sin(myCylinder->getBeta()));
+    PS_CylinderSegment::Rbeta.setAt(2, 2, std::cos(myCylinder->getBeta()));
 
     PS_CylinderSegment::Rall =
         PS_CylinderSegment::Rbeta * PS_CylinderSegment::Ralpha;
@@ -185,15 +189,17 @@ int PS_CylinderSegment::checkPointsInCylinder(
         n0CrossB[2] = ijk[0] * b[1] - ijk[1] * b[0];*/
 
         /*PS_CylinderSegment::Ralpha.setAt(0, 0, 1.0);
-        PS_CylinderSegment::Ralpha.setAt(1, 1, qCos(myCylinder->getAlpha()));
-        PS_CylinderSegment::Ralpha.setAt(1, 2, -qSin(myCylinder->getAlpha()));
-        PS_CylinderSegment::Ralpha.setAt(2, 1, qSin(myCylinder->getAlpha()));
-        PS_CylinderSegment::Ralpha.setAt(2, 2, qCos(myCylinder->getAlpha()));
-        PS_CylinderSegment::Rbeta.setAt(0, 0, qCos(myCylinder->getBeta()));
-        PS_CylinderSegment::Rbeta.setAt(0, 2, qSin(myCylinder->getBeta()));
-        PS_CylinderSegment::Rbeta.setAt(1, 1, 1.0);
-        PS_CylinderSegment::Rbeta.setAt(2, 0, -qSin(myCylinder->getBeta()));
-        PS_CylinderSegment::Rbeta.setAt(2, 2, qCos(myCylinder->getBeta()));
+        PS_CylinderSegment::Ralpha.setAt(1, 1,
+        std::cos(myCylinder->getAlpha())); PS_CylinderSegment::Ralpha.setAt(1,
+        2, -std::sin(myCylinder->getAlpha()));
+        PS_CylinderSegment::Ralpha.setAt(2, 1,
+        std::sin(myCylinder->getAlpha())); PS_CylinderSegment::Ralpha.setAt(2,
+        2, std::cos(myCylinder->getAlpha())); PS_CylinderSegment::Rbeta.setAt(0,
+        0, std::cos(myCylinder->getBeta())); PS_CylinderSegment::Rbeta.setAt(0,
+        2, std::sin(myCylinder->getBeta())); PS_CylinderSegment::Rbeta.setAt(1,
+        1, 1.0); PS_CylinderSegment::Rbeta.setAt(2, 0,
+        -std::sin(myCylinder->getBeta())); PS_CylinderSegment::Rbeta.setAt(2, 2,
+        std::cos(myCylinder->getBeta()));
 
         PS_CylinderSegment::Rall = PS_CylinderSegment::Rbeta *
         PS_CylinderSegment::Ralpha;
@@ -227,8 +233,8 @@ int PS_CylinderSegment::checkPointsInCylinder(
             0.0f;  // smallest distance of point p to cylinder axis
 
         radiusActual =
-            qSqrt(n0CrossB[0] * n0CrossB[0] + n0CrossB[1] * n0CrossB[1] +
-                  n0CrossB[2] * n0CrossB[2]);
+            std::sqrt(n0CrossB[0] * n0CrossB[0] + n0CrossB[1] * n0CrossB[1] +
+                      n0CrossB[2] * n0CrossB[2]);
 
         float distance = 0.0f;
 
@@ -236,7 +242,7 @@ int PS_CylinderSegment::checkPointsInCylinder(
 
         // add the point to the cylinder if the distance is lower than a
         // threshold
-        float absDist = qAbs(distance);
+        float absDist = std::abs(distance);
         if (absDist <
             (((float)toleranceFactor) * param.cylinderParams.maxDistance)) {
           myCylinder->addPoint(p);
@@ -328,15 +334,15 @@ void PS_CylinderSegment::fit() {
 
     // build rotations matrices
     PS_CylinderSegment::Ralpha.setAt(0, 0, 1.0);
-    PS_CylinderSegment::Ralpha.setAt(1, 1, qCos(_alpha));
-    PS_CylinderSegment::Ralpha.setAt(1, 2, -qSin(_alpha));
-    PS_CylinderSegment::Ralpha.setAt(2, 1, qSin(_alpha));
-    PS_CylinderSegment::Ralpha.setAt(2, 2, qCos(_alpha));
-    PS_CylinderSegment::Rbeta.setAt(0, 0, qCos(_beta));
-    PS_CylinderSegment::Rbeta.setAt(0, 2, qSin(_beta));
+    PS_CylinderSegment::Ralpha.setAt(1, 1, std::cos(_alpha));
+    PS_CylinderSegment::Ralpha.setAt(1, 2, -std::sin(_alpha));
+    PS_CylinderSegment::Ralpha.setAt(2, 1, std::sin(_alpha));
+    PS_CylinderSegment::Ralpha.setAt(2, 2, std::cos(_alpha));
+    PS_CylinderSegment::Rbeta.setAt(0, 0, std::cos(_beta));
+    PS_CylinderSegment::Rbeta.setAt(0, 2, std::sin(_beta));
     PS_CylinderSegment::Rbeta.setAt(1, 1, 1.0);
-    PS_CylinderSegment::Rbeta.setAt(2, 0, -qSin(_beta));
-    PS_CylinderSegment::Rbeta.setAt(2, 2, qCos(_beta));
+    PS_CylinderSegment::Rbeta.setAt(2, 0, -std::sin(_beta));
+    PS_CylinderSegment::Rbeta.setAt(2, 2, std::cos(_beta));
 
     PS_CylinderSegment::Rall =
         PS_CylinderSegment::Rbeta * PS_CylinderSegment::Ralpha;
@@ -347,74 +353,85 @@ void PS_CylinderSegment::fit() {
       _y = L0.getAt(i * 3 + 1);
       _z = L0.getAt(i * 3 + 2);
 
-      a1 = _X0 + _x * qCos(_beta) + _y * qSin(_alpha) * qSin(_beta) +
-           _z * qCos(_alpha) * qSin(_beta);
-      a2 = _Y0 + _y * qCos(_alpha) - _z * qSin(_alpha);
+      a1 = _X0 + _x * std::cos(_beta) +
+           _y * std::sin(_alpha) * std::sin(_beta) +
+           _z * std::cos(_alpha) * std::sin(_beta);
+      a2 = _Y0 + _y * std::cos(_alpha) - _z * std::sin(_alpha);
 
-      // B.setAt(i, i*3, -1.0 * qCos(_beta) * a1 / qSqrt(a1*a1 + a2*a2)); // x
-      // B.setAt(i, i*3+1, -1.0 * (qSin(_alpha) * qSin(_beta) * a1 +
-      // qCos(_alpha) * a2) / qSqrt(a1*a1 + a2*a2)); // y B.setAt(i, i*3+2, -1.0
-      // * (qCos(_alpha) * qSin(_beta) * a1 - qSin(_alpha) * a2) / qSqrt(a1*a1 +
-      // a2*a2)); // z
+      // B.setAt(i, i*3, -1.0 * std::cos(_beta) * a1 / std::sqrt(a1*a1 +
+      // a2*a2)); // x B.setAt(i, i*3+1, -1.0 * (std::sin(_alpha) *
+      // std::sin(_beta) * a1 + std::cos(_alpha) * a2) / std::sqrt(a1*a1 +
+      // a2*a2)); // y B.setAt(i, i*3+2, -1.0
+      // * (std::cos(_alpha) * std::sin(_beta) * a1 - std::sin(_alpha) * a2) /
+      // std::sqrt(a1*a1 + a2*a2)); // z
 
       // A
       N.setAt(i, numPoints, 1.0);
-      N.setAt(i, numPoints + 1, -1.0 * a1 / qSqrt(a1 * a1 + a2 * a2));
-      N.setAt(i, numPoints + 2, -1.0 * a2 / qSqrt(a1 * a1 + a2 * a2));
+      N.setAt(i, numPoints + 1, -1.0 * a1 / std::sqrt(a1 * a1 + a2 * a2));
+      N.setAt(i, numPoints + 2, -1.0 * a2 / std::sqrt(a1 * a1 + a2 * a2));
       N.setAt(i, numPoints + 3,
               -1.0 *
-                  ((_y * qSin(_beta) * qCos(_alpha) -
-                    _z * qSin(_beta) * qSin(_alpha)) *
+                  ((_y * std::sin(_beta) * std::cos(_alpha) -
+                    _z * std::sin(_beta) * std::sin(_alpha)) *
                        a1 -
-                   (_y * qSin(_alpha) + _z * qCos(_alpha)) * a2) /
-                  qSqrt(a1 * a1 + a2 * a2));
-      N.setAt(i, numPoints + 4,
-              -1.0 *
-                  (_y * qSin(_alpha) * qCos(_beta) - _x * qSin(_beta) +
-                   _z * qCos(_alpha) * qCos(_beta)) *
-                  a1 / qSqrt(a1 * a1 + a2 * a2));
+                   (_y * std::sin(_alpha) + _z * std::cos(_alpha)) * a2) /
+                  std::sqrt(a1 * a1 + a2 * a2));
+      N.setAt(
+          i, numPoints + 4,
+          -1.0 *
+              (_y * std::sin(_alpha) * std::cos(_beta) - _x * std::sin(_beta) +
+               _z * std::cos(_alpha) * std::cos(_beta)) *
+              a1 / std::sqrt(a1 * a1 + a2 * a2));
 
       // AT
       N.setAt(numPoints, i, 1.0);
-      N.setAt(numPoints + 1, i, -1.0 * a1 / qSqrt(a1 * a1 + a2 * a2));
-      N.setAt(numPoints + 2, i, -1.0 * a2 / qSqrt(a1 * a1 + a2 * a2));
+      N.setAt(numPoints + 1, i, -1.0 * a1 / std::sqrt(a1 * a1 + a2 * a2));
+      N.setAt(numPoints + 2, i, -1.0 * a2 / std::sqrt(a1 * a1 + a2 * a2));
       N.setAt(numPoints + 3, i,
               -1.0 *
-                  ((_y * qSin(_beta) * qCos(_alpha) -
-                    _z * qSin(_beta) * qSin(_alpha)) *
+                  ((_y * std::sin(_beta) * std::cos(_alpha) -
+                    _z * std::sin(_beta) * std::sin(_alpha)) *
                        a1 -
-                   (_y * qSin(_alpha) + _z * qCos(_alpha)) * a2) /
-                  qSqrt(a1 * a1 + a2 * a2));
-      N.setAt(numPoints + 4, i,
-              -1.0 *
-                  (_y * qSin(_alpha) * qCos(_beta) - _x * qSin(_beta) +
-                   _z * qCos(_alpha) * qCos(_beta)) *
-                  a1 / qSqrt(a1 * a1 + a2 * a2));
+                   (_y * std::sin(_alpha) + _z * std::cos(_alpha)) * a2) /
+                  std::sqrt(a1 * a1 + a2 * a2));
+      N.setAt(
+          numPoints + 4, i,
+          -1.0 *
+              (_y * std::sin(_alpha) * std::cos(_beta) - _x * std::sin(_beta) +
+               _z * std::cos(_alpha) * std::cos(_beta)) *
+              a1 / std::sqrt(a1 * a1 + a2 * a2));
 
       // BBT
       N.setAt(
           i, i,
-          (-1.0 * qCos(_beta) * a1 / qSqrt(a1 * a1 + a2 * a2)) *
-                  (-1.0 * qCos(_beta) * a1 / qSqrt(a1 * a1 + a2 * a2)) +
-              (-1.0 * (qSin(_alpha) * qSin(_beta) * a1 + qCos(_alpha) * a2) /
-               qSqrt(a1 * a1 + a2 * a2)) *
+          (-1.0 * std::cos(_beta) * a1 / std::sqrt(a1 * a1 + a2 * a2)) *
+                  (-1.0 * std::cos(_beta) * a1 / std::sqrt(a1 * a1 + a2 * a2)) +
+              (-1.0 *
+               (std::sin(_alpha) * std::sin(_beta) * a1 +
+                std::cos(_alpha) * a2) /
+               std::sqrt(a1 * a1 + a2 * a2)) *
                   (-1.0 *
-                   (qSin(_alpha) * qSin(_beta) * a1 + qCos(_alpha) * a2) /
-                   qSqrt(a1 * a1 + a2 * a2)) +
-              (-1.0 * (qCos(_alpha) * qSin(_beta) * a1 - qSin(_alpha) * a2) /
-               qSqrt(a1 * a1 + a2 * a2)) *
+                   (std::sin(_alpha) * std::sin(_beta) * a1 +
+                    std::cos(_alpha) * a2) /
+                   std::sqrt(a1 * a1 + a2 * a2)) +
+              (-1.0 *
+               (std::cos(_alpha) * std::sin(_beta) * a1 -
+                std::sin(_alpha) * a2) /
+               std::sqrt(a1 * a1 + a2 * a2)) *
                   (-1.0 *
-                   (qCos(_alpha) * qSin(_beta) * a1 - qSin(_alpha) * a2) /
-                   qSqrt(a1 * a1 + a2 * a2)));
+                   (std::cos(_alpha) * std::sin(_beta) * a1 -
+                    std::sin(_alpha) * a2) /
+                   std::sqrt(a1 * a1 + a2 * a2)));
 
       // A.setAt(i, 0, 1.0); //r
-      // A.setAt(i, 1, -1.0 * a1 / qSqrt(a1*a1 + a2*a2)); // X0
-      // A.setAt(i, 2, -1.0 * a2 / qSqrt(a1*a1 + a2*a2)); // Y0
-      // A.setAt(i, 3, -1.0 * ((_y * qSin(_beta) * qCos(_alpha) - _z *
-      // qSin(_beta) * qSin(_alpha)) * a1 - (_y * qSin(_alpha) + _z *
-      // qCos(_alpha)) * a2) / qSqrt(a1*a1 + a2*a2)); // alpha A.setAt(i, 4,
-      // -1.0 * (_y * qSin(_alpha) * qCos(_beta) - _x * qSin(_beta) + _z *
-      // qCos(_alpha) * qCos(_beta)) * a1 / qSqrt(a1*a1 + a2*a2)); // beta
+      // A.setAt(i, 1, -1.0 * a1 / std::sqrt(a1*a1 + a2*a2)); // X0
+      // A.setAt(i, 2, -1.0 * a2 / std::sqrt(a1*a1 + a2*a2)); // Y0
+      // A.setAt(i, 3, -1.0 * ((_y * std::sin(_beta) * std::cos(_alpha) - _z *
+      // std::sin(_beta) * std::sin(_alpha)) * a1 - (_y * std::sin(_alpha) + _z
+      // * std::cos(_alpha)) * a2) / std::sqrt(a1*a1 + a2*a2)); // alpha
+      // A.setAt(i, 4, -1.0 * (_y * std::sin(_alpha) * std::cos(_beta) - _x *
+      // std::sin(_beta) + _z * std::cos(_alpha) * std::cos(_beta)) * a1 /
+      // std::sqrt(a1*a1 + a2*a2)); // beta
 
       _xr = PS_CylinderSegment::Rall.getAt(0, 0) * _x +
             PS_CylinderSegment::Rall.getAt(0, 1) * _y +
@@ -425,7 +442,7 @@ void PS_CylinderSegment::fit() {
 
       // genäherter Radius des Zylinders minus Abstand Punkt i zur z-Achse ist
       // der Widerspruch
-      diff = _r - qSqrt(_xr * _xr + _yr * _yr);
+      diff = _r - std::sqrt(_xr * _xr + _yr * _yr);
 
       c.setAt(i, diff);
     }
@@ -472,32 +489,37 @@ void PS_CylinderSegment::fit() {
       _y = this->getPoints().at(i)->xyz[1];
       _z = this->getPoints().at(i)->xyz[2];
 
-      a1 = _X0 + _x * qCos(_beta) + _y * qSin(_alpha) * qSin(_beta) +
-           _z * qCos(_alpha) * qSin(_beta);
-      a2 = _Y0 + _y * qCos(_alpha) - _z * qSin(_alpha);
+      a1 = _X0 + _x * std::cos(_beta) +
+           _y * std::sin(_alpha) * std::sin(_beta) +
+           _z * std::cos(_alpha) * std::sin(_beta);
+      a2 = _Y0 + _y * std::cos(_alpha) - _z * std::sin(_alpha);
 
-      // B.setAt(i, i*3, -1.0 * qCos(_beta) * a1 / qSqrt(a1*a1 + a2*a2)); // x
-      // B.setAt(i, i*3+1, -1.0 * (qSin(_alpha) * qSin(_beta) * a1 +
-      // qCos(_alpha) * a2) / qSqrt(a1*a1 + a2*a2)); // y B.setAt(i, i*3+2, -1.0
-      // * (qCos(_alpha) * qSin(_beta) * a1 - qSin(_alpha) * a2) / qSqrt(a1*a1 +
-      // a2*a2)); // z
+      // B.setAt(i, i*3, -1.0 * std::cos(_beta) * a1 / std::sqrt(a1*a1 +
+      // a2*a2)); // x B.setAt(i, i*3+1, -1.0 * (std::sin(_alpha) *
+      // std::sin(_beta) * a1 + std::cos(_alpha) * a2) / std::sqrt(a1*a1 +
+      // a2*a2)); // y B.setAt(i, i*3+2, -1.0
+      // * (std::cos(_alpha) * std::sin(_beta) * a1 - std::sin(_alpha) * a2) /
+      // std::sqrt(a1*a1 + a2*a2)); // z
 
-      v.setAt(i * 3, (-1.0 * qCos(_beta) * a1 / qSqrt(a1 * a1 + a2 * a2)) *
-                         res.getAt(i));
-      v.setAt(i * 3 + 1,
-              (-1.0 * (qSin(_alpha) * qSin(_beta) * a1 + qCos(_alpha) * a2) /
-               qSqrt(a1 * a1 + a2 * a2)) *
+      v.setAt(i * 3,
+              (-1.0 * std::cos(_beta) * a1 / std::sqrt(a1 * a1 + a2 * a2)) *
                   res.getAt(i));
-      v.setAt(i * 3 + 2,
-              (-1.0 * (qCos(_alpha) * qSin(_beta) * a1 - qSin(_alpha) * a2) /
-               qSqrt(a1 * a1 + a2 * a2)) *
-                  res.getAt(i));
+      v.setAt(i * 3 + 1, (-1.0 *
+                          (std::sin(_alpha) * std::sin(_beta) * a1 +
+                           std::cos(_alpha) * a2) /
+                          std::sqrt(a1 * a1 + a2 * a2)) *
+                             res.getAt(i));
+      v.setAt(i * 3 + 2, (-1.0 *
+                          (std::cos(_alpha) * std::sin(_beta) * a1 -
+                           std::sin(_alpha) * a2) /
+                          std::sqrt(a1 * a1 + a2 * a2)) *
+                             res.getAt(i));
 
       /*vx = verb.getAt(i*3);
       vy = verb.getAt(i*3+1);
       vz = verb.getAt(i*3+2);
 
-      double r0 = qSqrt( (x + vx - xm) * (x + vx - xm)
+      double r0 = std::sqrt( (x + vx - xm) * (x + vx - xm)
                          + (y + vy - ym) * (y + vy - ym)
                          + (z + vz - zm) * (z + vz - zm) );
 
@@ -512,7 +534,7 @@ void PS_CylinderSegment::fit() {
 
     // s0 a posteriori
     // double sigma = 0.0;
-    // sigma = qSqrt((v.t() * v).getAt(0) / 13.0);
+    // sigma = std::sqrt((v.t() * v).getAt(0) / 13.0);
 
     // Armijo Regel
     do {
@@ -530,27 +552,32 @@ void PS_CylinderSegment::fit() {
         _z = L0.getAt(i * 3 + 2);
 
         PS_CylinderSegment::a.setAt(
-            i, _r_armijo -
-                   qSqrt((_X0_armijo + _x * qCos(_beta_armijo) +
-                          _y * qSin(_alpha_armijo) * qSin(_beta_armijo) +
-                          _z * qCos(_alpha_armijo) * qSin(_beta_armijo)) *
-                             (_X0_armijo + _x * qCos(_beta_armijo) +
-                              _y * qSin(_alpha_armijo) * qSin(_beta_armijo) +
-                              _z * qCos(_alpha_armijo) * qSin(_beta_armijo)) +
-                         (_Y0_armijo + _y * qCos(_alpha_armijo) -
-                          _z * qSin(_alpha_armijo)) *
-                             (_Y0_armijo + _y * qCos(_alpha_armijo) -
-                              _z * qSin(_alpha_armijo))));
+            i,
+            _r_armijo -
+                std::sqrt(
+                    (_X0_armijo + _x * std::cos(_beta_armijo) +
+                     _y * std::sin(_alpha_armijo) * std::sin(_beta_armijo) +
+                     _z * std::cos(_alpha_armijo) * std::sin(_beta_armijo)) *
+                        (_X0_armijo + _x * std::cos(_beta_armijo) +
+                         _y * std::sin(_alpha_armijo) * std::sin(_beta_armijo) +
+                         _z * std::cos(_alpha_armijo) *
+                             std::sin(_beta_armijo)) +
+                    (_Y0_armijo + _y * std::cos(_alpha_armijo) -
+                     _z * std::sin(_alpha_armijo)) *
+                        (_Y0_armijo + _y * std::cos(_alpha_armijo) -
+                         _z * std::sin(_alpha_armijo))));
 
         PS_CylinderSegment::b.setAt(
-            i, _r - qSqrt((_X0 + _x * qCos(_beta) +
-                           _y * qSin(_alpha) * qSin(_beta) +
-                           _z * qCos(_alpha) * qSin(_beta)) *
-                              (_X0 + _x * qCos(_beta) +
-                               _y * qSin(_alpha) * qSin(_beta) +
-                               _z * qCos(_alpha) * qSin(_beta)) +
-                          (_Y0 + _y * qCos(_alpha) - _z * qSin(_alpha)) *
-                              (_Y0 + _y * qCos(_alpha) - _z * qSin(_alpha))));
+            i, _r - std::sqrt(
+                        (_X0 + _x * std::cos(_beta) +
+                         _y * std::sin(_alpha) * std::sin(_beta) +
+                         _z * std::cos(_alpha) * std::sin(_beta)) *
+                            (_X0 + _x * std::cos(_beta) +
+                             _y * std::sin(_alpha) * std::sin(_beta) +
+                             _z * std::cos(_alpha) * std::sin(_beta)) +
+                        (_Y0 + _y * std::cos(_alpha) - _z * std::sin(_alpha)) *
+                            (_Y0 + _y * std::cos(_alpha) -
+                             _z * std::sin(_alpha))));
       }
 
       OiVec::dot(stopAA, PS_CylinderSegment::a, PS_CylinderSegment::a);
@@ -582,15 +609,15 @@ void PS_CylinderSegment::fit() {
 
   // calc sigma
   PS_CylinderSegment::Ralpha.setAt(0, 0, 1.0);
-  PS_CylinderSegment::Ralpha.setAt(1, 1, qCos(_alpha));
-  PS_CylinderSegment::Ralpha.setAt(1, 2, -qSin(_alpha));
-  PS_CylinderSegment::Ralpha.setAt(2, 1, qSin(_alpha));
-  PS_CylinderSegment::Ralpha.setAt(2, 2, qCos(_alpha));
-  PS_CylinderSegment::Rbeta.setAt(0, 0, qCos(_beta));
-  PS_CylinderSegment::Rbeta.setAt(0, 2, qSin(_beta));
+  PS_CylinderSegment::Ralpha.setAt(1, 1, std::cos(_alpha));
+  PS_CylinderSegment::Ralpha.setAt(1, 2, -std::sin(_alpha));
+  PS_CylinderSegment::Ralpha.setAt(2, 1, std::sin(_alpha));
+  PS_CylinderSegment::Ralpha.setAt(2, 2, std::cos(_alpha));
+  PS_CylinderSegment::Rbeta.setAt(0, 0, std::cos(_beta));
+  PS_CylinderSegment::Rbeta.setAt(0, 2, std::sin(_beta));
   PS_CylinderSegment::Rbeta.setAt(1, 1, 1.0);
-  PS_CylinderSegment::Rbeta.setAt(2, 0, -qSin(_beta));
-  PS_CylinderSegment::Rbeta.setAt(2, 2, qCos(_beta));
+  PS_CylinderSegment::Rbeta.setAt(2, 0, -std::sin(_beta));
+  PS_CylinderSegment::Rbeta.setAt(2, 2, std::cos(_beta));
 
   PS_CylinderSegment::Rall =
       PS_CylinderSegment::Rbeta * PS_CylinderSegment::Ralpha;
@@ -633,8 +660,9 @@ void PS_CylinderSegment::fit() {
 
     float radiusActual = 0.0f;  // smallest distance of point p to cylinder axis
 
-    radiusActual = qSqrt(n0CrossB[0] * n0CrossB[0] + n0CrossB[1] * n0CrossB[1] +
-                         n0CrossB[2] * n0CrossB[2]);
+    radiusActual =
+        std::sqrt(n0CrossB[0] * n0CrossB[0] + n0CrossB[1] * n0CrossB[1] +
+                  n0CrossB[2] * n0CrossB[2]);
 
     float distance = 0.0f;
 
@@ -651,7 +679,7 @@ void PS_CylinderSegment::fit() {
   this->myState->mainFocus[0] = centroid[0];
   this->myState->mainFocus[1] = centroid[1];
   this->myState->mainFocus[2] = centroid[2];
-  this->myState->sigma = qSqrt(sumVV / ((double)numPoints - 5.0));
+  this->myState->sigma = std::sqrt(sumVV / ((double)numPoints - 5.0));
   this->myState->isValid = true;
 }
 
@@ -748,15 +776,15 @@ void PS_CylinderSegment::fitBySample(int numPoints) {
 
     // build rotations matrices
     PS_CylinderSegment::Ralpha.setAt(0, 0, 1.0);
-    PS_CylinderSegment::Ralpha.setAt(1, 1, qCos(_alpha));
-    PS_CylinderSegment::Ralpha.setAt(1, 2, -qSin(_alpha));
-    PS_CylinderSegment::Ralpha.setAt(2, 1, qSin(_alpha));
-    PS_CylinderSegment::Ralpha.setAt(2, 2, qCos(_alpha));
-    PS_CylinderSegment::Rbeta.setAt(0, 0, qCos(_beta));
-    PS_CylinderSegment::Rbeta.setAt(0, 2, qSin(_beta));
+    PS_CylinderSegment::Ralpha.setAt(1, 1, std::cos(_alpha));
+    PS_CylinderSegment::Ralpha.setAt(1, 2, -std::sin(_alpha));
+    PS_CylinderSegment::Ralpha.setAt(2, 1, std::sin(_alpha));
+    PS_CylinderSegment::Ralpha.setAt(2, 2, std::cos(_alpha));
+    PS_CylinderSegment::Rbeta.setAt(0, 0, std::cos(_beta));
+    PS_CylinderSegment::Rbeta.setAt(0, 2, std::sin(_beta));
     PS_CylinderSegment::Rbeta.setAt(1, 1, 1.0);
-    PS_CylinderSegment::Rbeta.setAt(2, 0, -qSin(_beta));
-    PS_CylinderSegment::Rbeta.setAt(2, 2, qCos(_beta));
+    PS_CylinderSegment::Rbeta.setAt(2, 0, -std::sin(_beta));
+    PS_CylinderSegment::Rbeta.setAt(2, 2, std::cos(_beta));
 
     PS_CylinderSegment::Rall =
         PS_CylinderSegment::Rbeta * PS_CylinderSegment::Ralpha;
@@ -767,59 +795,68 @@ void PS_CylinderSegment::fitBySample(int numPoints) {
       _y = L0.getAt(i * 3 + 1);
       _z = L0.getAt(i * 3 + 2);
 
-      a1 = _X0 + _x * qCos(_beta) + _y * qSin(_alpha) * qSin(_beta) +
-           _z * qCos(_alpha) * qSin(_beta);
-      a2 = _Y0 + _y * qCos(_alpha) - _z * qSin(_alpha);
+      a1 = _X0 + _x * std::cos(_beta) +
+           _y * std::sin(_alpha) * std::sin(_beta) +
+           _z * std::cos(_alpha) * std::sin(_beta);
+      a2 = _Y0 + _y * std::cos(_alpha) - _z * std::sin(_alpha);
 
       // A
       N.setAt(i, numPoints, 1.0);
-      N.setAt(i, numPoints + 1, -1.0 * a1 / qSqrt(a1 * a1 + a2 * a2));
-      N.setAt(i, numPoints + 2, -1.0 * a2 / qSqrt(a1 * a1 + a2 * a2));
+      N.setAt(i, numPoints + 1, -1.0 * a1 / std::sqrt(a1 * a1 + a2 * a2));
+      N.setAt(i, numPoints + 2, -1.0 * a2 / std::sqrt(a1 * a1 + a2 * a2));
       N.setAt(i, numPoints + 3,
               -1.0 *
-                  ((_y * qSin(_beta) * qCos(_alpha) -
-                    _z * qSin(_beta) * qSin(_alpha)) *
+                  ((_y * std::sin(_beta) * std::cos(_alpha) -
+                    _z * std::sin(_beta) * std::sin(_alpha)) *
                        a1 -
-                   (_y * qSin(_alpha) + _z * qCos(_alpha)) * a2) /
-                  qSqrt(a1 * a1 + a2 * a2));
-      N.setAt(i, numPoints + 4,
-              -1.0 *
-                  (_y * qSin(_alpha) * qCos(_beta) - _x * qSin(_beta) +
-                   _z * qCos(_alpha) * qCos(_beta)) *
-                  a1 / qSqrt(a1 * a1 + a2 * a2));
+                   (_y * std::sin(_alpha) + _z * std::cos(_alpha)) * a2) /
+                  std::sqrt(a1 * a1 + a2 * a2));
+      N.setAt(
+          i, numPoints + 4,
+          -1.0 *
+              (_y * std::sin(_alpha) * std::cos(_beta) - _x * std::sin(_beta) +
+               _z * std::cos(_alpha) * std::cos(_beta)) *
+              a1 / std::sqrt(a1 * a1 + a2 * a2));
 
       // AT
       N.setAt(numPoints, i, 1.0);
-      N.setAt(numPoints + 1, i, -1.0 * a1 / qSqrt(a1 * a1 + a2 * a2));
-      N.setAt(numPoints + 2, i, -1.0 * a2 / qSqrt(a1 * a1 + a2 * a2));
+      N.setAt(numPoints + 1, i, -1.0 * a1 / std::sqrt(a1 * a1 + a2 * a2));
+      N.setAt(numPoints + 2, i, -1.0 * a2 / std::sqrt(a1 * a1 + a2 * a2));
       N.setAt(numPoints + 3, i,
               -1.0 *
-                  ((_y * qSin(_beta) * qCos(_alpha) -
-                    _z * qSin(_beta) * qSin(_alpha)) *
+                  ((_y * std::sin(_beta) * std::cos(_alpha) -
+                    _z * std::sin(_beta) * std::sin(_alpha)) *
                        a1 -
-                   (_y * qSin(_alpha) + _z * qCos(_alpha)) * a2) /
-                  qSqrt(a1 * a1 + a2 * a2));
-      N.setAt(numPoints + 4, i,
-              -1.0 *
-                  (_y * qSin(_alpha) * qCos(_beta) - _x * qSin(_beta) +
-                   _z * qCos(_alpha) * qCos(_beta)) *
-                  a1 / qSqrt(a1 * a1 + a2 * a2));
+                   (_y * std::sin(_alpha) + _z * std::cos(_alpha)) * a2) /
+                  std::sqrt(a1 * a1 + a2 * a2));
+      N.setAt(
+          numPoints + 4, i,
+          -1.0 *
+              (_y * std::sin(_alpha) * std::cos(_beta) - _x * std::sin(_beta) +
+               _z * std::cos(_alpha) * std::cos(_beta)) *
+              a1 / std::sqrt(a1 * a1 + a2 * a2));
 
       // BBT
       N.setAt(
           i, i,
-          (-1.0 * qCos(_beta) * a1 / qSqrt(a1 * a1 + a2 * a2)) *
-                  (-1.0 * qCos(_beta) * a1 / qSqrt(a1 * a1 + a2 * a2)) +
-              (-1.0 * (qSin(_alpha) * qSin(_beta) * a1 + qCos(_alpha) * a2) /
-               qSqrt(a1 * a1 + a2 * a2)) *
+          (-1.0 * std::cos(_beta) * a1 / std::sqrt(a1 * a1 + a2 * a2)) *
+                  (-1.0 * std::cos(_beta) * a1 / std::sqrt(a1 * a1 + a2 * a2)) +
+              (-1.0 *
+               (std::sin(_alpha) * std::sin(_beta) * a1 +
+                std::cos(_alpha) * a2) /
+               std::sqrt(a1 * a1 + a2 * a2)) *
                   (-1.0 *
-                   (qSin(_alpha) * qSin(_beta) * a1 + qCos(_alpha) * a2) /
-                   qSqrt(a1 * a1 + a2 * a2)) +
-              (-1.0 * (qCos(_alpha) * qSin(_beta) * a1 - qSin(_alpha) * a2) /
-               qSqrt(a1 * a1 + a2 * a2)) *
+                   (std::sin(_alpha) * std::sin(_beta) * a1 +
+                    std::cos(_alpha) * a2) /
+                   std::sqrt(a1 * a1 + a2 * a2)) +
+              (-1.0 *
+               (std::cos(_alpha) * std::sin(_beta) * a1 -
+                std::sin(_alpha) * a2) /
+               std::sqrt(a1 * a1 + a2 * a2)) *
                   (-1.0 *
-                   (qCos(_alpha) * qSin(_beta) * a1 - qSin(_alpha) * a2) /
-                   qSqrt(a1 * a1 + a2 * a2)));
+                   (std::cos(_alpha) * std::sin(_beta) * a1 -
+                    std::sin(_alpha) * a2) /
+                   std::sqrt(a1 * a1 + a2 * a2)));
 
       _xr = PS_CylinderSegment::Rall.getAt(0, 0) * _x +
             PS_CylinderSegment::Rall.getAt(0, 1) * _y +
@@ -830,7 +867,7 @@ void PS_CylinderSegment::fitBySample(int numPoints) {
 
       // genäherter Radius des Zylinders minus Abstand Punkt i zur z-Achse ist
       // der Widerspruch
-      diff = _r - qSqrt(_xr * _xr + _yr * _yr);
+      diff = _r - std::sqrt(_xr * _xr + _yr * _yr);
 
       c.setAt(i, diff);
     }
@@ -856,25 +893,29 @@ void PS_CylinderSegment::fitBySample(int numPoints) {
       _y = this->getPoints().at(i)->xyz[1];
       _z = this->getPoints().at(i)->xyz[2];
 
-      a1 = _X0 + _x * qCos(_beta) + _y * qSin(_alpha) * qSin(_beta) +
-           _z * qCos(_alpha) * qSin(_beta);
-      a2 = _Y0 + _y * qCos(_alpha) - _z * qSin(_alpha);
+      a1 = _X0 + _x * std::cos(_beta) +
+           _y * std::sin(_alpha) * std::sin(_beta) +
+           _z * std::cos(_alpha) * std::sin(_beta);
+      a2 = _Y0 + _y * std::cos(_alpha) - _z * std::sin(_alpha);
 
-      v.setAt(i * 3, (-1.0 * qCos(_beta) * a1 / qSqrt(a1 * a1 + a2 * a2)) *
-                         res.getAt(i));
-      v.setAt(i * 3 + 1,
-              (-1.0 * (qSin(_alpha) * qSin(_beta) * a1 + qCos(_alpha) * a2) /
-               qSqrt(a1 * a1 + a2 * a2)) *
+      v.setAt(i * 3,
+              (-1.0 * std::cos(_beta) * a1 / std::sqrt(a1 * a1 + a2 * a2)) *
                   res.getAt(i));
-      v.setAt(i * 3 + 2,
-              (-1.0 * (qCos(_alpha) * qSin(_beta) * a1 - qSin(_alpha) * a2) /
-               qSqrt(a1 * a1 + a2 * a2)) *
-                  res.getAt(i));
+      v.setAt(i * 3 + 1, (-1.0 *
+                          (std::sin(_alpha) * std::sin(_beta) * a1 +
+                           std::cos(_alpha) * a2) /
+                          std::sqrt(a1 * a1 + a2 * a2)) *
+                             res.getAt(i));
+      v.setAt(i * 3 + 2, (-1.0 *
+                          (std::cos(_alpha) * std::sin(_beta) * a1 -
+                           std::sin(_alpha) * a2) /
+                          std::sqrt(a1 * a1 + a2 * a2)) *
+                             res.getAt(i));
     }
 
     // s0 a posteriori
     // double sigma = 0.0;
-    // sigma = qSqrt((v.t() * v).getAt(0) / 13.0);
+    // sigma = std::sqrt((v.t() * v).getAt(0) / 13.0);
 
     // Armijo Regel
     do {
@@ -892,27 +933,32 @@ void PS_CylinderSegment::fitBySample(int numPoints) {
         _z = L0.getAt(i * 3 + 2);
 
         PS_CylinderSegment::a.setAt(
-            i, _r_armijo -
-                   qSqrt((_X0_armijo + _x * qCos(_beta_armijo) +
-                          _y * qSin(_alpha_armijo) * qSin(_beta_armijo) +
-                          _z * qCos(_alpha_armijo) * qSin(_beta_armijo)) *
-                             (_X0_armijo + _x * qCos(_beta_armijo) +
-                              _y * qSin(_alpha_armijo) * qSin(_beta_armijo) +
-                              _z * qCos(_alpha_armijo) * qSin(_beta_armijo)) +
-                         (_Y0_armijo + _y * qCos(_alpha_armijo) -
-                          _z * qSin(_alpha_armijo)) *
-                             (_Y0_armijo + _y * qCos(_alpha_armijo) -
-                              _z * qSin(_alpha_armijo))));
+            i,
+            _r_armijo -
+                std::sqrt(
+                    (_X0_armijo + _x * std::cos(_beta_armijo) +
+                     _y * std::sin(_alpha_armijo) * std::sin(_beta_armijo) +
+                     _z * std::cos(_alpha_armijo) * std::sin(_beta_armijo)) *
+                        (_X0_armijo + _x * std::cos(_beta_armijo) +
+                         _y * std::sin(_alpha_armijo) * std::sin(_beta_armijo) +
+                         _z * std::cos(_alpha_armijo) *
+                             std::sin(_beta_armijo)) +
+                    (_Y0_armijo + _y * std::cos(_alpha_armijo) -
+                     _z * std::sin(_alpha_armijo)) *
+                        (_Y0_armijo + _y * std::cos(_alpha_armijo) -
+                         _z * std::sin(_alpha_armijo))));
 
         PS_CylinderSegment::b.setAt(
-            i, _r - qSqrt((_X0 + _x * qCos(_beta) +
-                           _y * qSin(_alpha) * qSin(_beta) +
-                           _z * qCos(_alpha) * qSin(_beta)) *
-                              (_X0 + _x * qCos(_beta) +
-                               _y * qSin(_alpha) * qSin(_beta) +
-                               _z * qCos(_alpha) * qSin(_beta)) +
-                          (_Y0 + _y * qCos(_alpha) - _z * qSin(_alpha)) *
-                              (_Y0 + _y * qCos(_alpha) - _z * qSin(_alpha))));
+            i, _r - std::sqrt(
+                        (_X0 + _x * std::cos(_beta) +
+                         _y * std::sin(_alpha) * std::sin(_beta) +
+                         _z * std::cos(_alpha) * std::sin(_beta)) *
+                            (_X0 + _x * std::cos(_beta) +
+                             _y * std::sin(_alpha) * std::sin(_beta) +
+                             _z * std::cos(_alpha) * std::sin(_beta)) +
+                        (_Y0 + _y * std::cos(_alpha) - _z * std::sin(_alpha)) *
+                            (_Y0 + _y * std::cos(_alpha) -
+                             _z * std::sin(_alpha))));
       }
 
       OiVec::dot(stopAA, PS_CylinderSegment::a, PS_CylinderSegment::a);
@@ -944,15 +990,15 @@ void PS_CylinderSegment::fitBySample(int numPoints) {
 
   // calc sigma
   PS_CylinderSegment::Ralpha.setAt(0, 0, 1.0);
-  PS_CylinderSegment::Ralpha.setAt(1, 1, qCos(_alpha));
-  PS_CylinderSegment::Ralpha.setAt(1, 2, -qSin(_alpha));
-  PS_CylinderSegment::Ralpha.setAt(2, 1, qSin(_alpha));
-  PS_CylinderSegment::Ralpha.setAt(2, 2, qCos(_alpha));
-  PS_CylinderSegment::Rbeta.setAt(0, 0, qCos(_beta));
-  PS_CylinderSegment::Rbeta.setAt(0, 2, qSin(_beta));
+  PS_CylinderSegment::Ralpha.setAt(1, 1, std::cos(_alpha));
+  PS_CylinderSegment::Ralpha.setAt(1, 2, -std::sin(_alpha));
+  PS_CylinderSegment::Ralpha.setAt(2, 1, std::sin(_alpha));
+  PS_CylinderSegment::Ralpha.setAt(2, 2, std::cos(_alpha));
+  PS_CylinderSegment::Rbeta.setAt(0, 0, std::cos(_beta));
+  PS_CylinderSegment::Rbeta.setAt(0, 2, std::sin(_beta));
   PS_CylinderSegment::Rbeta.setAt(1, 1, 1.0);
-  PS_CylinderSegment::Rbeta.setAt(2, 0, -qSin(_beta));
-  PS_CylinderSegment::Rbeta.setAt(2, 2, qCos(_beta));
+  PS_CylinderSegment::Rbeta.setAt(2, 0, -std::sin(_beta));
+  PS_CylinderSegment::Rbeta.setAt(2, 2, std::cos(_beta));
 
   PS_CylinderSegment::Rall =
       PS_CylinderSegment::Rbeta * PS_CylinderSegment::Ralpha;
@@ -994,8 +1040,8 @@ void PS_CylinderSegment::fitBySample(int numPoints) {
 
       float radiusActual = 0.0f; //smallest distance of point p to cylinder axis
 
-      radiusActual = qSqrt( n0CrossB[0]*n0CrossB[0] + n0CrossB[1]*n0CrossB[1] +
-  n0CrossB[2]*n0CrossB[2] );
+      radiusActual = std::sqrt( n0CrossB[0]*n0CrossB[0] +
+  n0CrossB[1]*n0CrossB[1] + n0CrossB[2]*n0CrossB[2] );
 
       float distance = 0.0f;
 
@@ -1026,8 +1072,9 @@ void PS_CylinderSegment::fitBySample(int numPoints) {
 
     float radiusActual = 0.0f;  // smallest distance of point p to cylinder axis
 
-    radiusActual = qSqrt(n0CrossB[0] * n0CrossB[0] + n0CrossB[1] * n0CrossB[1] +
-                         n0CrossB[2] * n0CrossB[2]);
+    radiusActual =
+        std::sqrt(n0CrossB[0] * n0CrossB[0] + n0CrossB[1] * n0CrossB[1] +
+                  n0CrossB[2] * n0CrossB[2]);
 
     float distance = 0.0f;
 
@@ -1044,9 +1091,9 @@ void PS_CylinderSegment::fitBySample(int numPoints) {
   this->myState->mainFocus[0] = centroid[0];
   this->myState->mainFocus[1] = centroid[1];
   this->myState->mainFocus[2] = centroid[2];
-  // this->myState->sigma = qSqrt( sumVV /
+  // this->myState->sigma = std::sqrt( sumVV /
   // ((double)this->myState->myPoints.size() - 5.0) );
-  this->myState->sigma = qSqrt(sumVV / ((double)numPoints - 5.0));
+  this->myState->sigma = std::sqrt(sumVV / ((double)numPoints - 5.0));
   this->myState->isValid = true;
 }
 
@@ -1165,12 +1212,12 @@ void PS_CylinderSegment::minimumSolution(const QList<PS_Point_PC*>& points) {
     PS_CylinderSegment::u.getCol(pn, i);  // Eigenvektor
 
     // calculate rotations angles
-    a = qSqrt(1.0 / (1.0 + (pn.getAt(2) / pn.getAt(1)) *
-                               (pn.getAt(2) / pn.getAt(1))));
+    a = std::sqrt(1.0 / (1.0 + (pn.getAt(2) / pn.getAt(1)) *
+                                   (pn.getAt(2) / pn.getAt(1))));
     b = a * pn.getAt(2) / pn.getAt(1);
 
-    b_alpha = qAcos(b);
-    a_alpha = qAsin(a);
+    b_alpha = std::acos(b);
+    a_alpha = std::asin(a);
 
     alpha = 0.0;
 
@@ -1190,16 +1237,16 @@ void PS_CylinderSegment::minimumSolution(const QList<PS_Point_PC*>& points) {
     // Eigenvektor transformieren --> y-Komponente sollte jetzt 0 sein
     _y = pn.getAt(1);
     _z = pn.getAt(2);
-    pn.setAt(1, _y * qCos(alpha) - _z * qSin(alpha));
-    pn.setAt(2, _y * qSin(alpha) + _z * qCos(alpha));
+    pn.setAt(1, _y * std::cos(alpha) - _z * std::sin(alpha));
+    pn.setAt(2, _y * std::sin(alpha) + _z * std::cos(alpha));
 
     a = 0.0, b = 0.0;
-    a = qSqrt(1.0 / (1.0 + (-1.0 * pn.getAt(2) / pn.getAt(0)) *
-                               (-1.0 * pn.getAt(2) / pn.getAt(0))));
+    a = std::sqrt(1.0 / (1.0 + (-1.0 * pn.getAt(2) / pn.getAt(0)) *
+                                   (-1.0 * pn.getAt(2) / pn.getAt(0))));
     b = -1.0 * pn.getAt(2) * a / pn.getAt(0);
 
-    b_beta = qAcos(b);
-    a_beta = qAsin(a);
+    b_beta = std::acos(b);
+    a_beta = std::asin(a);
 
     beta = 0.0;
 
@@ -1216,15 +1263,15 @@ void PS_CylinderSegment::minimumSolution(const QList<PS_Point_PC*>& points) {
 
     // set up rotations matrices
     PS_CylinderSegment::Ralpha.setAt(0, 0, 1.0);
-    PS_CylinderSegment::Ralpha.setAt(1, 1, qCos(alpha));
-    PS_CylinderSegment::Ralpha.setAt(1, 2, -qSin(alpha));
-    PS_CylinderSegment::Ralpha.setAt(2, 1, qSin(alpha));
-    PS_CylinderSegment::Ralpha.setAt(2, 2, qCos(alpha));
-    PS_CylinderSegment::Rbeta.setAt(0, 0, qCos(beta));
-    PS_CylinderSegment::Rbeta.setAt(0, 2, qSin(beta));
+    PS_CylinderSegment::Ralpha.setAt(1, 1, std::cos(alpha));
+    PS_CylinderSegment::Ralpha.setAt(1, 2, -std::sin(alpha));
+    PS_CylinderSegment::Ralpha.setAt(2, 1, std::sin(alpha));
+    PS_CylinderSegment::Ralpha.setAt(2, 2, std::cos(alpha));
+    PS_CylinderSegment::Rbeta.setAt(0, 0, std::cos(beta));
+    PS_CylinderSegment::Rbeta.setAt(0, 2, std::sin(beta));
     PS_CylinderSegment::Rbeta.setAt(1, 1, 1.0);
-    PS_CylinderSegment::Rbeta.setAt(2, 0, -qSin(beta));
-    PS_CylinderSegment::Rbeta.setAt(2, 2, qCos(beta));
+    PS_CylinderSegment::Rbeta.setAt(2, 0, -std::sin(beta));
+    PS_CylinderSegment::Rbeta.setAt(2, 2, std::cos(beta));
 
     PS_CylinderSegment::Rall =
         PS_CylinderSegment::Rbeta * PS_CylinderSegment::Ralpha;
@@ -1292,12 +1339,13 @@ void PS_CylinderSegment::minimumSolution(const QList<PS_Point_PC*>& points) {
     // midpoint + radius
     x_m = (-1.0 * s.getAt(0) / 2.0) + centroid2D[0];
     y_m = (-1.0 * s.getAt(1) / 2.0) + centroid2D[1];
-    radius = qSqrt(0.25 * (s.getAt(0) * s.getAt(0) + s.getAt(1) * s.getAt(1)) -
-                   s.getAt(2));
+    radius =
+        std::sqrt(0.25 * (s.getAt(0) * s.getAt(0) + s.getAt(1) * s.getAt(1)) -
+                  s.getAt(2));
 
     v = -1.0 * A1 - A2 * s;
     OiVec::dot(sum_vv, v, v);
-    sum_vv = qSqrt(sum_vv / (numPoints - 3.0));
+    sum_vv = std::sqrt(sum_vv / (numPoints - 3.0));
 
     // wenn diese Lösung besser als die bisher beste Lösung ist
     if (sum_vv < vv_ref) {
@@ -1391,7 +1439,7 @@ void PS_CylinderSegment::mergeCylinders(
 
       PS_CylinderSegment* c2 = detectedCylinders.at(j);
 
-      diffRadius = qAbs(c2->getRadius() - c1->getRadius());
+      diffRadius = std::abs(c2->getRadius() - c1->getRadius());
 
       float ijk1[3], ijk2[3], *x01, *x02, pc1[3], pc2[3];
       c2->getIJK(ijk2);
@@ -1422,23 +1470,24 @@ void PS_CylinderSegment::mergeCylinders(
 
       OiVec::cross(distHelper, ijk2Helper, x01Helper - pc02Helper);
       OiVec::dot(distX01C2, distHelper, distHelper);
-      distX01C2 = qSqrt(distX01C2);
+      distX01C2 = std::sqrt(distX01C2);
 
       OiVec::cross(distHelper, ijk1Helper, x02Helper - pc01Helper);
       OiVec::dot(distX02C1, distHelper, distHelper);
-      distX02C1 = qSqrt(distX02C1);
+      distX02C1 = std::sqrt(distX02C1);
 
-      /*diffAlpha = qAbs(c2->getAlpha() - c1->getAlpha());
-      diffBeta = qAbs(c2->getBeta() - c1->getBeta());
-      diffXYZ = qSqrt(
+      /*diffAlpha = std::abs(c2->getAlpha() - c1->getAlpha());
+      diffBeta = std::abs(c2->getBeta() - c1->getBeta());
+      diffXYZ = std::sqrt(
       (c2->getXYZ()[0]-c1->getXYZ()[0])*(c2->getXYZ()[0]-c1->getXYZ()[0])
               +
       (c2->getXYZ()[1]-c1->getXYZ()[1])*(c2->getXYZ()[1]-c1->getXYZ()[1]) );
-      diffRadius = qAbs(c2->getRadius() - c1->getRadius());
+      diffRadius = std::abs(c2->getRadius() - c1->getRadius());
 
-      if(qAbs(diffAlpha - 2.0*PS_PI) < diffAlpha){ diffAlpha = qAbs(diffAlpha
-      - 2.0*PS_PI); } if(qAbs(diffBeta - 2.0*PS_PI) < diffBeta){ diffBeta =
-      qAbs(diffBeta - 2.0*PS_PI); }*/
+      if(std::abs(diffAlpha - 2.0*PS_PI) < diffAlpha){ diffAlpha =
+      std::abs(diffAlpha
+      - 2.0*PS_PI); } if(std::abs(diffBeta - 2.0*PS_PI) < diffBeta){ diffBeta =
+      std::abs(diffBeta - 2.0*PS_PI); }*/
 
       // if the parameter-differences are under a threshold
       /*if(diffXYZ < 10.0 && diffRadius < 10.0*param.cylinderParams.maxDistance
@@ -1643,7 +1692,7 @@ void PS_CylinderSegment::verifyCylinders(
       }
     }
 
-    planeSigma = qSqrt(eVal / (double)(numPoints - 3.0));
+    planeSigma = std::sqrt(eVal / (double)(numPoints - 3.0));
 
     if (3.0 * planeSigma >
         cylinder->getSigma()) {  // 3.0*param.sphereParams.maxDistance ){
@@ -1664,15 +1713,15 @@ void PS_CylinderSegment::verifyCylinders(
  */
 void PS_CylinderSegment::getX0(float* x0) const {
   PS_CylinderSegment::Ralpha.setAt(0, 0, 1.0);
-  PS_CylinderSegment::Ralpha.setAt(1, 1, qCos(this->getAlpha()));
-  PS_CylinderSegment::Ralpha.setAt(1, 2, -qSin(this->getAlpha()));
-  PS_CylinderSegment::Ralpha.setAt(2, 1, qSin(this->getAlpha()));
-  PS_CylinderSegment::Ralpha.setAt(2, 2, qCos(this->getAlpha()));
-  PS_CylinderSegment::Rbeta.setAt(0, 0, qCos(this->getBeta()));
-  PS_CylinderSegment::Rbeta.setAt(0, 2, qSin(this->getBeta()));
+  PS_CylinderSegment::Ralpha.setAt(1, 1, std::cos(this->getAlpha()));
+  PS_CylinderSegment::Ralpha.setAt(1, 2, -std::sin(this->getAlpha()));
+  PS_CylinderSegment::Ralpha.setAt(2, 1, std::sin(this->getAlpha()));
+  PS_CylinderSegment::Ralpha.setAt(2, 2, std::cos(this->getAlpha()));
+  PS_CylinderSegment::Rbeta.setAt(0, 0, std::cos(this->getBeta()));
+  PS_CylinderSegment::Rbeta.setAt(0, 2, std::sin(this->getBeta()));
   PS_CylinderSegment::Rbeta.setAt(1, 1, 1.0);
-  PS_CylinderSegment::Rbeta.setAt(2, 0, -qSin(this->getBeta()));
-  PS_CylinderSegment::Rbeta.setAt(2, 2, qCos(this->getBeta()));
+  PS_CylinderSegment::Rbeta.setAt(2, 0, -std::sin(this->getBeta()));
+  PS_CylinderSegment::Rbeta.setAt(2, 2, std::cos(this->getBeta()));
 
   PS_CylinderSegment::Rall =
       PS_CylinderSegment::Rbeta * PS_CylinderSegment::Ralpha;
@@ -1695,15 +1744,15 @@ void PS_CylinderSegment::getX0(float* x0) const {
  */
 void PS_CylinderSegment::getIJK(float* ijk) const {
   PS_CylinderSegment::Ralpha.setAt(0, 0, 1.0);
-  PS_CylinderSegment::Ralpha.setAt(1, 1, qCos(this->getAlpha()));
-  PS_CylinderSegment::Ralpha.setAt(1, 2, -qSin(this->getAlpha()));
-  PS_CylinderSegment::Ralpha.setAt(2, 1, qSin(this->getAlpha()));
-  PS_CylinderSegment::Ralpha.setAt(2, 2, qCos(this->getAlpha()));
-  PS_CylinderSegment::Rbeta.setAt(0, 0, qCos(this->getBeta()));
-  PS_CylinderSegment::Rbeta.setAt(0, 2, qSin(this->getBeta()));
+  PS_CylinderSegment::Ralpha.setAt(1, 1, std::cos(this->getAlpha()));
+  PS_CylinderSegment::Ralpha.setAt(1, 2, -std::sin(this->getAlpha()));
+  PS_CylinderSegment::Ralpha.setAt(2, 1, std::sin(this->getAlpha()));
+  PS_CylinderSegment::Ralpha.setAt(2, 2, std::cos(this->getAlpha()));
+  PS_CylinderSegment::Rbeta.setAt(0, 0, std::cos(this->getBeta()));
+  PS_CylinderSegment::Rbeta.setAt(0, 2, std::sin(this->getBeta()));
   PS_CylinderSegment::Rbeta.setAt(1, 1, 1.0);
-  PS_CylinderSegment::Rbeta.setAt(2, 0, -qSin(this->getBeta()));
-  PS_CylinderSegment::Rbeta.setAt(2, 2, qCos(this->getBeta()));
+  PS_CylinderSegment::Rbeta.setAt(2, 0, -std::sin(this->getBeta()));
+  PS_CylinderSegment::Rbeta.setAt(2, 2, std::cos(this->getBeta()));
 
   PS_CylinderSegment::Rall =
       PS_CylinderSegment::Rbeta * PS_CylinderSegment::Ralpha;

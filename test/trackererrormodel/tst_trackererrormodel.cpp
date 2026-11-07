@@ -81,9 +81,9 @@ void TrackerErrorModelTest::reportedSigmaMatchesExternalScatter() {
   // default", which is the bug this replaces.
   QVERIFY2(externalSigma > reported.sigmaDistance * 0.4 &&
                externalSigma < reported.sigmaDistance * 2.5,
-           qPrintable(QString("external sigma %1 vs reported %2")
-                          .arg(externalSigma)
-                          .arg(reported.sigmaDistance)));
+           (std::format("external sigma {} vs reported {}", externalSigma,
+                        reported.sigmaDistance))
+               .c_str());
 }
 
 void TrackerErrorModelTest::zeroErrorTermsAreExact() {
@@ -95,10 +95,12 @@ void TrackerErrorModelTest::zeroErrorTermsAreExact() {
   QCOMPARE(reading.sigmaAzimuth, 0.0);
   QCOMPARE(reading.sigmaZenith, 0.0);
   QCOMPARE(reading.sigmaDistance, 0.0);
-  QVERIFY(qAbs(reading.distance - 8.0) < 1e-9);
-  QVERIFY(qAbs(reading.azimuth - 0.3) < 1e-9);
-  QVERIFY(qAbs(reading.zenith - 1.2) < 1e-9);
+  QVERIFY(std::abs(reading.distance - 8.0) < 1e-9);
+  QVERIFY(std::abs(reading.azimuth - 0.3) < 1e-9);
+  QVERIFY(std::abs(reading.zenith - 1.2) < 1e-9);
 }
 
 QTEST_APPLESS_MAIN(TrackerErrorModelTest)
+#include <format>
+
 #include "tst_trackererrormodel.moc"

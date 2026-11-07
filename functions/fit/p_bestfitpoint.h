@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QPointer>
-#include <QtMath>
+#include <string>
 
 #include "fitfunction.h"
 #include "oimat.h"
@@ -33,7 +33,7 @@ class BestFitPoint : public FitFunction, public Producer<Point> {
   // exec methods
   // ############
 
-  std::expected<Point, QString> exec() override;
+  std::expected<Point, std::string> exec() override;
 
  private:
   // ##############
@@ -42,9 +42,9 @@ class BestFitPoint : public FitFunction, public Producer<Point> {
 
   bool setUpResult(Point& point);
 
-  const QString key;  // disable all observations but last one
-  const QString value_no;
-  const QString value_yes;
+  const std::string key;  // disable all observations but last one
+  const std::string value_no;
+  const std::string value_yes;
 };
 
 #endif  // P_BESTFITPOINT_H

@@ -33,10 +33,10 @@ class ConfiguredFunction : public SpecialFunction {
   // Function::execByFeatureType's Producer<T>/Transform<T> dispatch -
   // Function::canActAsProducer/canActAsTransform exempt any
   // SpecialFunction from the mixin check for the same reason.
-  std::expected<void, QString> execChecked(
+  std::expected<void, std::string> execChecked(
       const oi::Guarded<FeatureWrapper>& feature) override;
 
-  QString prettyPrint();
+  std::string prettyPrint();
 
  public:
   std::map<int, std::vector<InputElement> > global_inputElements;

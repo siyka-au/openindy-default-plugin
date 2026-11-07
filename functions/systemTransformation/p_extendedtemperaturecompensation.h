@@ -1,7 +1,8 @@
 #ifndef P_EXTENDEDTEMPERATURECOMPENSATION_H
 #define P_EXTENDEDTEMPERATURECOMPENSATION_H
 
-#include <QtCore/qmath.h>
+#include <QtCore>
+#include <string>
 
 #include "pluginmetadata.h"
 #include "systemtransformation.h"
@@ -40,7 +41,7 @@ class ExtendedTemperatureCompensation : public SystemTransformation {
   virtual bool mergeInputElements();
 
  private:
-  QStringList protocol;
+  std::vector<std::string> protocol;
 
   bool svdError;
 

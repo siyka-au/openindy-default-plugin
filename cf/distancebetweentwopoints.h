@@ -10,7 +10,7 @@ class DistanceBetweenTwoPoints : public ConstructFunction,
  public:
   void init() override;
 
-  std::expected<ScalarEntityDistance, QString> exec() override;
+  std::expected<ScalarEntityDistance, std::string> exec() override;
 };
 
 #endif  // DISTANCEBETWEENTWOPOINTS_H

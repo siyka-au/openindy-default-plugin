@@ -1,5 +1,7 @@
 #include "p_planefromplane.h"
 
+#include <format>
+
 /*!
  * \brief PlaneFromPlane::init
  */
@@ -9,7 +11,7 @@ void PlaneFromPlane::init() {
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
   this->metaData.description =
-      QString("%1").arg("This function creates a copy of another plane.");
+      std::format("{}", "This function creates a copy of another plane.");
   this->metaData.iid = ConstructFunction_iidd;
 
   // set needed elements
@@ -28,10 +30,10 @@ void PlaneFromPlane::init() {
  * \param plane
  * \return
  */
-std::expected<Plane, QString> PlaneFromPlane::exec() {
+std::expected<Plane, std::string> PlaneFromPlane::exec() {
   Plane plane;
   if (!this->setUpResult(plane)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return plane;
 }
@@ -49,10 +51,9 @@ bool PlaneFromPlane::setUpResult(Plane& plane) {
 
   oi::Guarded<Plane> inputPlane = this->inputElements[0].at(0).plane;
   if (inputPlane.isNull() || !inputPlane->getIsSolved()) {
-    emit this->sendMessage(
-        QString("Not enough valid input to copy the plane %1")
-            .arg(plane.getFeatureName()),
-        MessageTypes::eWarningMessage);
+    this->sendMessage(std::format("Not enough valid input to copy the plane {}",
+                                  plane.getFeatureName()),
+                      MessageTypes::eWarningMessage);
     return false;
   }
 

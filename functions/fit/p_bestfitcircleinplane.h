@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QPointer>
-#include <QtMath>
+#include <string>
 
 #include "fitfunction.h"
 #include "oimat.h"
@@ -29,7 +29,7 @@ class BestFitCircleInPlane : public FitFunction,
   // exec methods
   // ############
 
-  std::expected<Circle, QString> exec() override;
+  std::expected<Circle, std::string> exec() override;
 
  private:
   // ##############

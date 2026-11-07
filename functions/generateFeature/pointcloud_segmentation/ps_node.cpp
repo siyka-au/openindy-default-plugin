@@ -1,5 +1,7 @@
 #include "ps_node.h"
 
+#include <QtCore>
+
 PS_Node::PS_Node() {
   this->depth = 0;
   for (int i = 0; i < 3; i++) {

@@ -29,9 +29,9 @@ class Register : public ObjectTransformation,
   // exec methods
   // ############
 
-  std::expected<Point, QString> exec(const Point& input) override;
-  std::expected<Sphere, QString> exec(const Sphere& input) override;
-  std::expected<Circle, QString> exec(const Circle& input) override;
+  std::expected<Point, std::string> exec(const Point& input) override;
+  std::expected<Sphere, std::string> exec(const Sphere& input) override;
+  std::expected<Circle, std::string> exec(const Circle& input) override;
 
  private:
   // ##############

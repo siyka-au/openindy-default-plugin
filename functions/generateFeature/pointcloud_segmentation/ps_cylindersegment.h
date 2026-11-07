@@ -4,7 +4,6 @@
 #include <math.h>
 
 #include <QList>
-#include <QtMath>
 #include <limits>
 #include <string>
 
@@ -62,7 +61,7 @@ class PS_CylinderSegment : public PS_ShapeSegment {
   PS_CylinderSegment();
   ~PS_CylinderSegment();
 
-  bool writeToX3D(const QString& filePath);
+  bool writeToX3D(const std::string& filePath);
 
   void fit();
   void fitBySample(int numPoints);

@@ -1,5 +1,7 @@
 #include "p_rectifytovector.h"
 
+#include <format>
+
 #include "containers.h"
 
 /*!
@@ -10,7 +12,8 @@ void RectifyToVector::init() {
   this->metaData.name = "RectifyToVector";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description = QString("%1").arg(
+  this->metaData.description = std::format(
+      "{}",
       "This function changes the orientation of a geometry according to the "
       "specified direction.");
   this->metaData.iid = ObjectTransformation_iidd;
@@ -59,10 +62,10 @@ void RectifyToVector::init() {
  * \param plane
  * \return
  */
-std::expected<Plane, QString> RectifyToVector::exec(const Plane& input) {
+std::expected<Plane, std::string> RectifyToVector::exec(const Plane& input) {
   Plane plane = input;
   if (!this->setUpResult(plane)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return plane;
 }
@@ -72,10 +75,10 @@ std::expected<Plane, QString> RectifyToVector::exec(const Plane& input) {
  * \param input
  * \return
  */
-std::expected<Circle, QString> RectifyToVector::exec(const Circle& input) {
+std::expected<Circle, std::string> RectifyToVector::exec(const Circle& input) {
   Circle circle = input;
   if (!this->setUpResult(circle)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return circle;
 }
@@ -85,10 +88,10 @@ std::expected<Circle, QString> RectifyToVector::exec(const Circle& input) {
  * \param input
  * \return
  */
-std::expected<Line, QString> RectifyToVector::exec(const Line& input) {
+std::expected<Line, std::string> RectifyToVector::exec(const Line& input) {
   Line line = input;
   if (!this->setUpResult(line)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return line;
 }
@@ -98,10 +101,11 @@ std::expected<Line, QString> RectifyToVector::exec(const Line& input) {
  * \param input
  * \return
  */
-std::expected<Cylinder, QString> RectifyToVector::exec(const Cylinder& input) {
+std::expected<Cylinder, std::string> RectifyToVector::exec(
+    const Cylinder& input) {
   Cylinder cylinder = input;
   if (!this->setUpResult(cylinder)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return cylinder;
 }
@@ -209,7 +213,7 @@ bool RectifyToVector::setUpResult(Geometry& geometry) {
   // calculate the angle between both directions
   double angle = 0.0;
   OiVec::dot(angle, r_reference, r);
-  angle = qAbs(qAcos(angle));
+  angle = std::abs(std::acos(angle));
 
   // invert the normal vector if the angle is greater than 90°
   if (angle > PI / 2.0) {

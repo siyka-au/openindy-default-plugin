@@ -1,8 +1,9 @@
 #include "cfutil.h"
 
+#include <format>
 #include <stdexcept>
 
-FeatureTypes CFUtil::featureTypesForName(QString name) {
+FeatureTypes CFUtil::featureTypesForName(std::string name) {
   if (name.compare("Circle") == 0) {
     return FeatureTypes::eCircleFeature;
   } else if (name.compare("Cone") == 0) {
@@ -48,8 +49,5 @@ FeatureTypes CFUtil::featureTypesForName(QString name) {
   } else if (name.compare("TrafoParam") == 0) {
     return FeatureTypes::eTrafoParamFeature;
   }
-  throw std::logic_error(QString("no FeatureTypes for \"%1\" found")
-                             .arg(name)
-                             .toLocal8Bit()
-                             .data());
+  throw std::logic_error(std::format("no FeatureTypes for \"{}\" found", name));
 }

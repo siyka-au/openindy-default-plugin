@@ -154,9 +154,10 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget() {
   // inside what a plane fit should achieve for ~0.1-0.2 arcsec-class
   // per-point angular noise averaged over 5 points - failing this means
   // the fit diverged, not that the tolerance is merely tight
-  QVERIFY2(angleErrorArcsec < 60.0,
-           qPrintable(QString("fitted plane normal off by %1 arcsec")
-                          .arg(angleErrorArcsec)));
+  QVERIFY2(
+      angleErrorArcsec < 60.0,
+      (std::format("fitted plane normal off by {} arcsec", angleErrorArcsec))
+          .c_str());
 }
 
 void SimulatedSceneTest::reflectorlessObservationIsNoisierThanReflector() {
@@ -201,4 +202,6 @@ void SimulatedSceneTest::reflectorlessObservationIsNoisierThanReflector() {
 }
 
 QTEST_APPLESS_MAIN(SimulatedSceneTest)
+#include <format>
+
 #include "tst_simulatedscene.moc"

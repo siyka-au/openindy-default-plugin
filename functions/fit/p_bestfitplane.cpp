@@ -1,5 +1,6 @@
 #include "p_bestfitplane.h"
 
+#include <format>
 #include <vector>
 
 /*!
@@ -10,12 +11,10 @@ void BestFitPlane::init() {
   this->metaData.name = "BestFitPlane";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg("This function calculates an adjusted plane.")
-          .arg(
-              "You can input as many points as you want which are then used to "
-              "find the best fit plane.");
+  this->metaData.description = std::format(
+      "{} {}", "This function calculates an adjusted plane.",
+      "You can input as many points as you want which are then used to "
+      "find the best fit plane.");
   this->metaData.iid = FitFunction_iidd;
 
   // D12/domain-model.md S2/S3: only a Point is ever measured, and a fit's
@@ -50,11 +49,11 @@ void BestFitPlane::init() {
  * \brief BestFitPlane::exec
  * \return
  */
-std::expected<Plane, QString> BestFitPlane::exec() {
+std::expected<Plane, std::string> BestFitPlane::exec() {
   this->statistic.reset();
   Plane plane;
   if (!this->setUpResult(plane)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return plane;
 }
@@ -66,8 +65,8 @@ std::expected<Plane, QString> BestFitPlane::exec() {
  */
 bool BestFitPlane::setUpResult(Plane& plane) {
   if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
-    emit this->sendMessage(
-        QString("No points tagged for plane %1").arg(plane.getFeatureName()),
+    this->sendMessage(
+        std::format("No points tagged for plane {}", plane.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
@@ -101,11 +100,10 @@ bool BestFitPlane::setUpResult(Plane& plane) {
   //(bestFitPlane's own degeneracy check, fitfunction.h) - a declared
   // minimum is a hint, never a gate (domain-model.md S9.4).
   if (usedPositions.size() < 3) {
-    emit this->sendMessage(
-        QString(
-            "Not enough points tagged for plane %1 (have %2, need at least 3)")
-            .arg(plane.getFeatureName())
-            .arg(usedPositions.size()),
+    this->sendMessage(
+        std::format(
+            "Not enough points tagged for plane {} (have {}, need at least 3)",
+            plane.getFeatureName(), usedPositions.size()),
         MessageTypes::eWarningMessage);
     return false;
   }
@@ -114,8 +112,8 @@ bool BestFitPlane::setUpResult(Plane& plane) {
   OiVec n(3);
   double eVal = 0.0;
   if (!bestFitPlane(centroid, n, eVal, points)) {
-    emit this->sendMessage(
-        QString("Cannot fit plane %1").arg(plane.getFeatureName()),
+    this->sendMessage(
+        std::format("Cannot fit plane {}", plane.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
@@ -173,7 +171,7 @@ bool BestFitPlane::setUpResult(Plane& plane) {
   // set statistic
   this->statistic.setIsValid(true);
   this->statistic.setStdev(
-      qSqrt(eVal / (static_cast<double>(usedPositions.size()) - 3.0)));
+      std::sqrt(eVal / (static_cast<double>(usedPositions.size()) - 3.0)));
   plane.setStatistic(this->statistic);
 
   return true;

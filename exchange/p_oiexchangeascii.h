@@ -1,6 +1,5 @@
 #ifndef P_OIEXCHANGEASCII_H
 #define P_OIEXCHANGEASCII_H
-#include <QRegularExpression>
 #include <exception>
 #include <map>
 #include <vector>
@@ -33,7 +32,7 @@ class OiExchangeAscii : public ExchangeSimpleAscii {
 
   std::vector<ExchangeSimpleAscii::ColumnType> getDefaultColumnOrder(
       const GeometryTypes& typeOfGeometry);
-  std::map<ExchangeSimpleAscii::ColumnType, std::vector<QVariant>>
+  std::map<ExchangeSimpleAscii::ColumnType, std::vector<oi::Value>>
   getFilePreview(const GeometryTypes& typeOfGeometry);
   std::vector<ExchangeSimpleAscii::ColumnType> getPossibleColumns(
       const GeometryTypes& typeOfGeometry);
@@ -43,8 +42,8 @@ class OiExchangeAscii : public ExchangeSimpleAscii {
   // helper methods
   // ##############
 
-  [[nodiscard]] QRegularExpression getDelimiter(
-      const QString& delimiterName) const;
+  [[nodiscard]] std::vector<std::string> splitLine(
+      const std::string& line) const;
 };
 
 #endif  // P_OIEXCHANGEASCII_H

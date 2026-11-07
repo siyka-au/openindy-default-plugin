@@ -16,7 +16,7 @@ class PS_LoadingDialog : public QDialog {
 
  public slots:
   void reset();
-  void setStatus(QString msg, int status);
+  void setStatus(std::string msg, int status);
 
  private:
   Ui::PS_LoadingDialog* ui;

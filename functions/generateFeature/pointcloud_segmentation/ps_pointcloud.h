@@ -6,8 +6,6 @@
 #include <QFile>
 #include <QList>
 #include <QObject>
-#include <QString>
-#include <QStringList>
 #include <QTextStream>
 #include <QThread>
 #include <ctime>
@@ -87,7 +85,7 @@ class PS_PointCloud : public QObject {
   PS_PointCloud(const PS_PointCloud& copy);
   PS_PointCloud& operator=(const PS_PointCloud& copy);
 
-  bool loadPointCloud(QString fileName);
+  bool loadPointCloud(std::string fileName);
   bool setCloud(vector<PS_Point_PC*>* myPoints, PS_BoundingBox_PC bbox,
                 unsigned long numPoints);
   bool setUpOctree(PS_InputParameter param);
@@ -98,8 +96,8 @@ class PS_PointCloud : public QObject {
   const QList<PS_CylinderSegment*>& getDetectedCylinders();
 
  signals:
-  void parseLine(QString line);
-  void updateStatus(QString msg, int status);
+  void parseLine(std::string line);
+  void updateStatus(std::string msg, int status);
 
  private:
   clock_t c1;
@@ -136,14 +134,14 @@ class PS_PointCloud : public QObject {
                              unsigned long& numUsedPoints,
                              const PS_InputParameter& param);
 
-  void printOutput(QString filePath, double processingTime,
+  void printOutput(std::string filePath, double processingTime,
                    PS_InputParameter param);
 
   static QList<PS_Node*>
       mergedNodes;  // save all merged nodes temporarily to be able to set them
                     // as unmerged in each iteration
 
-  QString filePath;
+  std::string filePath;
 };
 
 #endif  // PS_POINTCLOUD_H

@@ -1,8 +1,8 @@
 #ifndef CFCONTEXT_H
 #define CFCONTEXT_H
 #include <QPointer>
-#include <QString>
 #include <map>
+#include <string>
 #include <vector>
 
 #include "configuredfunction.h"
@@ -21,9 +21,9 @@ class CFContext {
    * @param name
    * @return function instance and removes function from list
    */
-  oi::Guarded<Function> getFunction(QString name);
+  oi::Guarded<Function> getFunction(std::string name);
 
-  InputElement getInputElement(QString name);
+  InputElement getInputElement(std::string name);
 
   /**
    * @brief createApplicableFeature

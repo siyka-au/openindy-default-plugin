@@ -25,7 +25,7 @@ class PlaneFromPlane : public ConstructFunction, public Producer<Plane> {
   // exec methods
   // ############
 
-  std::expected<Plane, QString> exec() override;
+  std::expected<Plane, std::string> exec() override;
 
  private:
   // ##############

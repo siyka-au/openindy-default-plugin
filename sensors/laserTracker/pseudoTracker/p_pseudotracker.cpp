@@ -1,9 +1,12 @@
 #include "p_pseudotracker.h"
 
+#include <QtCore>
+#include <format>
 #include <map>
 #include <vector>
 
 #include "containers.h"
+#include "stringutil.h"
 
 /*!
  * \brief PseudoTracker::init
@@ -165,21 +168,21 @@ void PseudoTracker::init() {
  * \param action
  * \return
  */
-bool PseudoTracker::doSelfDefinedAction(const QString& action) {
+bool PseudoTracker::doSelfDefinedAction(const std::string& action) {
   qDebug() << "PseudoTracker::doSelfDefinedAction(): " << action;
   if (action == "echo") {
-    emit this->sensorMessage(action, MessageTypes::eInformationMessage,
-                             MessageDestinations::eMessageBoxMessage);
+    this->sensorMessage(action, MessageTypes::eInformationMessage,
+                        MessageDestinations::eMessageBoxMessage);
   } else if (action == "stopMeasure") {
     this->isScanning = false;
-    emit this->sensorMessage("try to stop / finish measurement",
-                             MessageTypes::eInformationMessage,
-                             MessageDestinations::eConsoleMessage);
+    this->sensorMessage("try to stop / finish measurement",
+                        MessageTypes::eInformationMessage,
+                        MessageDestinations::eConsoleMessage);
   } else if (action == "toggle return readings") {
     this->returnReading = !this->returnReading;  // toggle
-    emit this->sensorMessage(
-        QString("return readings: %1")
-            .arg(this->returnReading.load() ? "true" : "false"),
+    this->sensorMessage(
+        std::format("return readings: {}",
+                    this->returnReading.load() ? "true" : "false"),
         MessageTypes::eInformationMessage,
         MessageDestinations::eConsoleMessage);
   }
@@ -247,7 +250,7 @@ bool PseudoTracker::move(const double& azimuth, const double& zenith,
  */
 bool PseudoTracker::move(const double& x, const double& y, const double& z) {
   this->myAzimuth = qAtan2(y, x);
-  this->myDistance = qSqrt(x * x + y * y + z * z);
+  this->myDistance = std::sqrt(x * x + y * y + z * z);
   this->myZenith = this->myDistance == 0. ? M_PI / 2. : acos(z / myDistance);
   QThread::msleep(1000);
   return true;
@@ -380,8 +383,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measure(
  * \param streamFormat
  * \return
  */
-std::map<QString, QVariant> PseudoTracker::readingStream(
-    const ReadingTypes& streamFormat) {
+oi::ValueMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
@@ -389,7 +391,7 @@ std::map<QString, QVariant> PseudoTracker::readingStream(
   double azimuth = 0.0;
   double zenith = 0.0;
 
-  std::map<QString, QVariant> m;
+  oi::ValueMap m;
 
   oi::Guarded<Reading> r(nullptr);
 
@@ -487,17 +489,17 @@ bool PseudoTracker::getIsReadyForMeasurement() { return true; }
  * \brief PseudoTracker::getSensorStats
  * \return
  */
-std::map<QString, QString> PseudoTracker::getSensorStatus() {
-  std::map<QString, QString> stats;
+std::map<std::string, std::string> PseudoTracker::getSensorStatus() {
+  std::map<std::string, std::string> stats;
 
-  stats.insert_or_assign("connected", QString::number(isConnected));
-  stats.insert_or_assign("side", QString::number(side));
-  stats.insert_or_assign("myAzimuth", QString::number(myAzimuth));
-  stats.insert_or_assign("myZenith", QString::number(myZenith));
-  stats.insert_or_assign("myDistance", QString::number(myDistance));
-  stats.insert_or_assign("myMotor", QString::number(myMotor));
-  stats.insert_or_assign("myInit", QString::number(myInit));
-  stats.insert_or_assign("myCompIt", QString::number(myCompIt));
+  stats.insert_or_assign("connected", oi::number(isConnected));
+  stats.insert_or_assign("side", oi::number(side));
+  stats.insert_or_assign("myAzimuth", oi::number(myAzimuth));
+  stats.insert_or_assign("myZenith", oi::number(myZenith));
+  stats.insert_or_assign("myDistance", oi::number(myDistance));
+  stats.insert_or_assign("myMotor", oi::number(myMotor));
+  stats.insert_or_assign("myInit", oi::number(myInit));
+  stats.insert_or_assign("myCompIt", oi::number(myCompIt));
 
   QThread::msleep(300);
 
@@ -528,7 +530,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measurePolar(
                                  // this class between 1 and 2
   p->setMeasuredAt(std::chrono::system_clock::now());
 
-  QVariant td = mConfig.getTransientData("isDummyPoint");
+  oi::Value td = mConfig.getTransientData("isDummyPoint");
   if (td.isValid()) {
     p->setTransientAttribute("isDummyPoint", td);
   } else {
@@ -636,7 +638,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureCartesian(
                                  // this class between 1 and 2
   p->setMeasuredAt(std::chrono::system_clock::now());
 
-  QVariant td = mConfig.getTransientData("isDummyPoint");
+  oi::Value td = mConfig.getTransientData("isDummyPoint");
   if (td.isValid()) {
     p->setTransientAttribute("isDummyPoint", td);
   } else {
@@ -662,7 +664,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureCartesian(
  */
 ReadingPolar PseudoTracker::simulateAim() const {
   TrackerErrorTerms terms;
-  const std::map<QString, double> params =
+  const std::map<std::string, double> params =
       this->sensorConfiguration.getDoubleParameter();
   terms.lambdaMm = oi::value(params, "lambda [mm]");
   terms.mu = oi::value(params, "mu");
@@ -686,8 +688,8 @@ ReadingPolar PseudoTracker::simulateAim() const {
 }
 
 bool PseudoTracker::search() {
-  emit this->sensorMessage("search", MessageTypes::eInformationMessage,
-                           MessageDestinations::eConsoleMessage);
+  this->sensorMessage("search", MessageTypes::eInformationMessage,
+                      MessageDestinations::eConsoleMessage);
   QThread::msleep(1000);
   return true;
 }

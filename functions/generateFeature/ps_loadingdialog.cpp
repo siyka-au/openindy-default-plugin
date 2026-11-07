@@ -1,5 +1,7 @@
 #include "ps_loadingdialog.h"
 
+#include <QtCore>
+
 #include "ui_ps_loadingdialog.h"
 
 PS_LoadingDialog::PS_LoadingDialog(QWidget* parent)
@@ -14,7 +16,7 @@ void PS_LoadingDialog::reset() {
   this->ui->listwidget_msg->clear();
 }
 
-void PS_LoadingDialog::setStatus(QString msg, int status) {
+void PS_LoadingDialog::setStatus(std::string msg, int status) {
   this->ui->listwidget_msg->addItem(msg);
   this->ui->progressBar_status->setValue(status);
 }

@@ -1,6 +1,8 @@
 #ifndef P_PSEUDOSENSOR_H
 #define P_PSEUDOSENSOR_H
 
+#include <QtCore>
+
 #include "sensor.h"
 
 class PseudoSensor : public Sensor {
@@ -13,14 +15,14 @@ class PseudoSensor : public Sensor {
 
   PluginMetaData* getMetaData() const;
 
-  QMap<QString, int>* getIntegerParameter() const;
-  QMap<QString, double>* getDoubleParameter() const;
-  QMap<QString, QStringList>* getStringParameter() const;
-  QStringList selfDefinedActions() const;
-  bool doSelfDefinedAction(QString a);
+  QMap<std::string, int>* getIntegerParameter() const;
+  QMap<std::string, double>* getDoubleParameter() const;
+  QMap<std::string, std::vector<std::string>>* getStringParameter() const;
+  std::vector<std::string> selfDefinedActions() const;
+  bool doSelfDefinedAction(std::string a);
 
-  QString getUndefinedReadingName() const;
-  QMap<QString, double>* getDefaultAccuracy() const;
+  std::string getUndefinedReadingName() const;
+  QMap<std::string, double>* getDefaultAccuracy() const;
 
   bool accept(SensorControl*, Configuration::SensorFunctionalities) {
     return false;
@@ -38,7 +40,7 @@ class PseudoSensor : public Sensor {
   QList<Reading*> measure(MeasurementConfig* mc);
 
   //! stream
-  QVariantMap readingStream(Configuration::ReadingTypes streamFormat);
+  oi::ValueMap readingStream(Configuration::ReadingTypes streamFormat);
 
   //! getConnectionState
   bool getConnectionState();
@@ -47,7 +49,7 @@ class PseudoSensor : public Sensor {
   bool isReadyForMeasurement();
 
   //! sensor stats
-  QMap<QString, QString> getSensorStats();
+  QMap<std::string, std::string> getSensorStats();
 
   //! checks if sensor is busy
   bool isBusy();

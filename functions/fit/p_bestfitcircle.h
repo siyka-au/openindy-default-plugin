@@ -25,7 +25,7 @@ class BestFitCircle : public FitFunction, public Producer<Circle> {
   // exec methods
   // ############
 
-  std::expected<Circle, QString> exec() override;
+  std::expected<Circle, std::string> exec() override;
 
  private:
   bool setUpResult(Circle& circle);

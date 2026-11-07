@@ -157,7 +157,7 @@ void PipelineFilterTest::
   // its own outliers once the sample is large enough: for k outliers of
   // residual R among N points, eVal (bestFitPlane's smallest PCA
   // eigenvalue, dominated by the outliers' own contribution) gives
-  // stdev = qSqrt(eVal/(N-3)) ~= R*sqrt(k/(N-3)), and a 3-sigma
+  // stdev = std::sqrt(eVal/(N-3)) ~= R*sqrt(k/(N-3)), and a 3-sigma
   // threshold only exceeds R once N > 9k+3. With k=2 that is N > 21 -
   // this suite uses 64 good points for a comfortable margin (a real
   // inspection dataset is this size or larger, so this is
@@ -224,9 +224,10 @@ void PipelineFilterTest::
 
     const double angleErrorDeg = this->planeAngleErrorDeg(plane);
     QVERIFY2(angleErrorDeg > 1.0,
-             qPrintable(QString("expected the undeclared-filter fit to be "
-                                "measurably off, got %1 degrees")
-                            .arg(angleErrorDeg)));
+             (std::format("expected the undeclared-filter fit to be "
+                          "measurably off, got {} degrees",
+                          angleErrorDeg))
+                 .c_str());
   }
 
   //--- with the filter declared: the fit converges correctly, and the
@@ -264,9 +265,9 @@ void PipelineFilterTest::
     const double angleErrorDeg = this->planeAngleErrorDeg(plane);
     QVERIFY2(
         angleErrorDeg < 0.1,
-        qPrintable(
-            QString("expected the filtered fit to converge, got %1 degrees")
-                .arg(angleErrorDeg)));
+        (std::format("expected the filtered fit to converge, got {} degrees",
+                     angleErrorDeg))
+            .c_str());
 
     // the two deliberate outliers are the last two measured points -
     // both must be excluded, and both must be individually reportable
@@ -274,8 +275,9 @@ void PipelineFilterTest::
     const std::vector<PipelineExclusion> exclusions =
         function->getPipelineExclusions(0);
     QVERIFY2(exclusions.size() >= 2,
-             qPrintable(QString("expected at least 2 exclusions, got %1")
-                            .arg(exclusions.size())));
+             (std::format("expected at least 2 exclusions, got {}",
+                          exclusions.size()))
+                 .c_str());
 
     const int outlier1Id = measured.at(measured.size() - 2)->getId();
     const int outlier2Id = measured.at(measured.size() - 1)->getId();
@@ -283,11 +285,11 @@ void PipelineFilterTest::
     for (const PipelineExclusion& excl : exclusions) {
       if (excl.elementId == outlier1Id) {
         found1 = true;
-        QVERIFY(!excl.reason.isEmpty());
+        QVERIFY(!excl.reason.empty());
       }
       if (excl.elementId == outlier2Id) {
         found2 = true;
-        QVERIFY(!excl.reason.isEmpty());
+        QVERIFY(!excl.reason.empty());
       }
     }
     QVERIFY2(found1 && found2,
@@ -427,9 +429,9 @@ void PipelineFilterTest::
            "point must be solved after fitting its observations");
   QVERIFY2(
       std::abs(point->getPosition().getVector().getAt(2) - 30.0) < 1.0,
-      qPrintable(
-          QString("expected z near 30 with the bad reading filtered, got %1")
-              .arg(point->getPosition().getVector().getAt(2))));
+      (std::format("expected z near 30 with the bad reading filtered, got {}",
+                   point->getPosition().getVector().getAt(2)))
+          .c_str());
 
   const int badId = observations.back()->getId();
   QVERIFY2(!function->getShouldBeUsed(0, badId),
@@ -441,7 +443,7 @@ void PipelineFilterTest::
   for (const PipelineExclusion& excl : exclusions) {
     if (excl.elementId == badId) {
       found = true;
-      QVERIFY(!excl.reason.isEmpty());
+      QVERIFY(!excl.reason.empty());
     }
   }
   QVERIFY2(
@@ -450,4 +452,6 @@ void PipelineFilterTest::
 }
 
 QTEST_APPLESS_MAIN(PipelineFilterTest)
+#include <format>
+
 #include "tst_pipelinefilter.moc"

@@ -4,7 +4,7 @@
 #include <math.h>
 
 #include <QList>
-#include <QtMath>
+#include <string>
 
 #include "oimat.h"
 #include "oivec.h"
@@ -54,7 +54,7 @@ class PS_PlaneSegment : public PS_ShapeSegment {
   PS_PlaneSegment();
   ~PS_PlaneSegment();
 
-  bool writeToX3D(const QString& filePath);
+  bool writeToX3D(const std::string& filePath);
 
   void fit();
   void fitBySample(int numPoints);

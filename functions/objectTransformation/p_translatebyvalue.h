@@ -26,10 +26,10 @@ class TranslateByValue : public ObjectTransformation,
   // exec methods
   // ############
 
-  std::expected<Point, QString> exec(const Point& input) override;
-  std::expected<Line, QString> exec(const Line& input) override;
-  std::expected<Plane, QString> exec(const Plane& input) override;
-  std::expected<Sphere, QString> exec(const Sphere& input) override;
+  std::expected<Point, std::string> exec(const Point& input) override;
+  std::expected<Line, std::string> exec(const Line& input) override;
+  std::expected<Plane, std::string> exec(const Plane& input) override;
+  std::expected<Sphere, std::string> exec(const Sphere& input) override;
 
  private:
   // ##############

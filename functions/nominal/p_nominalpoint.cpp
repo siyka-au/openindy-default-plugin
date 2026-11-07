@@ -1,5 +1,7 @@
 #include "p_nominalpoint.h"
 
+#include <format>
+
 #include "containers.h"
 
 /*!
@@ -10,7 +12,8 @@ void NominalPoint::init() {
   this->metaData.name = "NominalPoint";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "OpenIndy";
-  this->metaData.description = QString("%1").arg(
+  this->metaData.description = std::format(
+      "{}",
       "Defines a point from hand-entered x/y/z coordinates. Produces a "
       "nominal: user-editable, no measurement involved.");
   this->metaData.iid = ConstructFunction_iidd;
@@ -34,7 +37,7 @@ void NominalPoint::init() {
  * \param point
  * \return
  */
-std::expected<Point, QString> NominalPoint::exec() {
+std::expected<Point, std::string> NominalPoint::exec() {
   Point point;
 
   // user-entered values, falling back to the declared defaults - same

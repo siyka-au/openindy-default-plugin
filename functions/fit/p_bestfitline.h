@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QPointer>
-#include <QtMath>
+#include <string>
 
 #include "fitfunction.h"
 #include "oimat.h"
@@ -29,7 +29,7 @@ class BestFitLine : public FitFunction,
   // exec methods
   // ############
 
-  std::expected<Line, QString> exec() override;
+  std::expected<Line, std::string> exec() override;
 
  private:
   // ##############

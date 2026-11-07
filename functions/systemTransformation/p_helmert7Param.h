@@ -1,13 +1,12 @@
 #ifndef P_HELMERT7PARAM_H
 #define P_HELMERT7PARAM_H
 
-#include <QtCore/qmath.h>
-
 #include <QDateTime>
 #include <QDebug>
 #include <QObject>
 #include <QThread>
 #include <QtGlobal>
+#include <string>
 #include <vector>
 
 #include "oimat.h"
@@ -35,7 +34,7 @@ class Helmert7Param : public SystemTransformation, public Producer<TrafoParam> {
   // exec methods
   // ############
 
-  std::expected<TrafoParam, QString> exec() override;
+  std::expected<TrafoParam, std::string> exec() override;
 
  private:
   bool setUpResult(TrafoParam& trafoParam);

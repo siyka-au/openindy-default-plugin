@@ -1,10 +1,18 @@
 #include "functionconfigparser.h"
 
+#include <QtCore>
 #include <map>
 #include <vector>
 
 #include "cfutil.h"
 #include "containers.h"
+
+namespace {
+// JSON values are read with Qt; the configuration itself is std::string
+std::string text(const QJsonValue& value) {
+  return value.toString().toStdString();
+}
+}  // namespace
 
 const char* jsonData =
 #include <utility>
@@ -13,12 +21,13 @@ const char* jsonData =
     ;
 
 std::vector<ConfiguredFunctionConfig> FunctionConfigParser::readConfigFromJson(
-    QString filename) {
+    std::string filename) {
   std::vector<ConfiguredFunctionConfig> configs;
 
   QString val;
   QFile file;
-  file.setFileName(QDir::currentPath() + "/" + filename);
+  file.setFileName(QDir::currentPath() + "/" +
+                   QString::fromStdString(filename));
   if (!file.exists()) {
     return configs;
   }
@@ -53,16 +62,15 @@ std::vector<ConfiguredFunctionConfig> FunctionConfigParser::readConfigFromJson(
       ConfiguredFunctionConfig config;
       config.version = 2;
       QJsonObject object = function.toObject();
-      config.name = object["name"].toString();
-      config.description = object["description"].toString();
+      config.name = text(object["name"]);
+      config.description = text(object["description"]);
       config.applicableFor = applicableFor(object["applicableFor"]);
 
       config.neededElements = neededElements(object["neededElements"]);
 
       QPointer<Node> node = new CFCParameter(
           config.name, "configured function",
-          object["feature"]
-              .toString(),  // "global" or TypeOfElement name e.g. Plane
+          text(object["feature"]),  // "global" or TypeOfElement name e.g. Plane
           parameter(object["parameter"]) /* parameter tree */);
       config.parameter = node;
 
@@ -84,8 +92,8 @@ std::vector<QPointer<Node> > FunctionConfigParser::parameter(QJsonValue value) {
     QJsonObject object = element.toObject();
 
     QPointer<Node> p = new CFCParameter(
-        object["name"].toString(), object["comment"].toString(),
-        object["feature"].toString(), parameter(object["parameter"]));
+        text(object["name"]), text(object["comment"]), text(object["feature"]),
+        parameter(object["parameter"]));
 
     list.push_back(p);
   }
@@ -109,8 +117,8 @@ FunctionConfigParser::inputElementsMapping(ConfiguredFunctionConfig config,
     mapping.srcInputElementIndex = -1;
     mapping.dstInputElementIndex = -1;
 
-    QString fromNeededElementName =
-        object["from"].toObject()["neededElement"].toString();
+    std::string fromNeededElementName =
+        text(object["from"].toObject()["neededElement"]);
     for (int i = 0; std::cmp_less(i, config.neededElements.size()); i++) {
       if (config.neededElements[i].first.compare(fromNeededElementName) == 0) {
         mapping.srcInputElementIndex = i;
@@ -118,7 +126,7 @@ FunctionConfigParser::inputElementsMapping(ConfiguredFunctionConfig config,
       }
     }
 
-    QString toFunctionName = object["to"].toObject()["function"].toString();
+    std::string toFunctionName = text(object["to"].toObject()["function"]);
     mapping.functionIndex = oi::indexOf(config.functionNames, toFunctionName);
 
     mapping.dstInputElementIndex = object["to"].toObject()["index"].toInt();
@@ -129,14 +137,14 @@ FunctionConfigParser::inputElementsMapping(ConfiguredFunctionConfig config,
   return inputElementsMapping;
 }
 
-std::vector<QString> FunctionConfigParser::functionNames(QJsonValue value) {
+std::vector<std::string> FunctionConfigParser::functionNames(QJsonValue value) {
   if (value.isNull() || !value.isArray()) {
     throw logic_error("can not parse json");
   }
-  std::vector<QString> list;
+  std::vector<std::string> list;
   for (QJsonValue element : value.toArray()) {
     QJsonObject object = element.toObject();
-    list.push_back(object["name"].toString());
+    list.push_back(text(object["name"]));
   }
   return list;
 }
@@ -145,7 +153,7 @@ ElementTypes FunctionConfigParser::typeOfElement(QJsonValue value) {
   if (value.isNull()) {
     throw logic_error("can not parse json");
   }
-  QString s = value.toString();
+  std::string s = text(value);
   if (s.compare("Circle") == 0) {
     return ElementTypes::eCircleElement;
   } else if (s.compare("Cone") == 0) {
@@ -215,21 +223,21 @@ ElementTypes FunctionConfigParser::typeOfElement(QJsonValue value) {
   }
 }
 
-std::vector<QPair<QString, NeededElement> >
+std::vector<std::pair<std::string, NeededElement> >
 FunctionConfigParser::neededElements(QJsonValue value) {
   if (value.isNull() || !value.isArray()) {
     throw logic_error("can not parse json");
   }
-  std::vector<QPair<QString, NeededElement> > list;
+  std::vector<std::pair<std::string, NeededElement> > list;
   for (QJsonValue element : value.toArray()) {
     QJsonObject object = element.toObject();
 
     NeededElement neededElement;
-    neededElement.description = object["description"].toString();
+    neededElement.description = text(object["description"]);
     neededElement.infinite = object["infinite"].toBool();
     neededElement.typeOfElement = typeOfElement(object["typeOfElement"]);
-    QPair<QString, NeededElement> ne;
-    ne.first = object["name"].toString();
+    std::pair<std::string, NeededElement> ne;
+    ne.first = text(object["name"]);
     ne.second = neededElement;
     list.push_back(ne);
   }
@@ -244,7 +252,7 @@ std::vector<FeatureTypes> FunctionConfigParser::applicableFor(
   }
   std::vector<FeatureTypes> list;
   for (QJsonValue element : value.toArray()) {
-    QString s = element.toString();
+    std::string s = text(element);
     list.push_back(CFUtil::featureTypesForName(s));
   }
 

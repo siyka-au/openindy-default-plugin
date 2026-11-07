@@ -35,7 +35,7 @@ class NominalPoint : public ConstructFunction, public Producer<Point> {
   // exec methods
   // ############
 
-  std::expected<Point, QString> exec() override;
+  std::expected<Point, std::string> exec() override;
 };
 
 #endif  // P_NOMINALPOINT_H

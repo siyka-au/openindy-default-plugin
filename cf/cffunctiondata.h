@@ -1,7 +1,7 @@
 #ifndef CFFUNCTIONDATA_H
 #define CFFUNCTIONDATA_H
 
-#include <QString>
+#include <string>
 
 #include "featurewrapper.h"
 #include "function.h"
@@ -12,7 +12,7 @@ class CFFunctionData {
  public:
   CFFunctionData();
 
-  QString prettyPrint();
+  std::string prettyPrint();
 
  public:
   oi::Guarded<Function> function;

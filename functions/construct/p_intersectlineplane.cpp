@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include <format>
+
 /*!
  * \brief IntersectLinePlane::init
  */
@@ -10,7 +12,8 @@ void IntersectLinePlane::init() {
   this->metaData.name = "IntersectLinePlane";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description = QString("%1").arg(
+  this->metaData.description = std::format(
+      "{}",
       "This function calculates the intersection of a line with a plane.");
   this->metaData.iid = ConstructFunction_iidd;
 
@@ -35,10 +38,10 @@ void IntersectLinePlane::init() {
  * \param point
  * \return
  */
-std::expected<Point, QString> IntersectLinePlane::exec() {
+std::expected<Point, std::string> IntersectLinePlane::exec() {
   Point point;
   if (!this->setUpResult(point)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return point;
 }
@@ -63,10 +66,9 @@ bool IntersectLinePlane::setUpResult(Point& point) {
 
   // check if line and plane intersect
   if (!this->isIntersection(line, plane)) {
-    emit this->sendMessage(
-        QString("No intersection between line %1 and plane %2")
-            .arg(line->getFeatureName())
-            .arg(plane->getFeatureName()),
+    this->sendMessage(
+        std::format("No intersection between line {} and plane {}",
+                    line->getFeatureName(), plane->getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }

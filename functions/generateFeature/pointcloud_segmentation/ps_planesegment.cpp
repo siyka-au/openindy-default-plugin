@@ -1,5 +1,7 @@
 #include "ps_planesegment.h"
 
+#include <QtCore>
+
 OiMat PS_PlaneSegment::u = OiMat(3, 3);
 OiMat PS_PlaneSegment::v = OiMat(3, 3);
 OiVec PS_PlaneSegment::d = OiVec(3);
@@ -23,7 +25,7 @@ PS_PlaneSegment::~PS_PlaneSegment() {}
  * \param filePath
  * \return
  */
-bool PS_PlaneSegment::writeToX3D(const QString& filePath) { return false; }
+bool PS_PlaneSegment::writeToX3D(const std::string& filePath) { return false; }
 
 /*!
  * \brief PS_PlaneSegment::detectPlane
@@ -51,7 +53,7 @@ PS_PlaneSegment* PS_PlaneSegment::detectPlane(const QList<PS_Point_PC*>& points,
   }
 
   // calculate the number of necessary trials
-  numTrials = (int)ceil(qLn(1.0f - s) / qLn(1.0f - phk));
+  numTrials = (int)ceil(std::log(1.0f - s) / std::log(1.0f - phk));
 
   // get numTrials random samples of k points
   QMap<int, QList<PS_Point_PC*> > randomSamples;
@@ -125,7 +127,7 @@ int PS_PlaneSegment::checkPointsInPlane(PS_PlaneSegment* myPlane,
                          myPlane->getDistance();
 
         // add the point to the plane if the distance is lower than a threshold
-        if (qAbs(distance) < distanceThreshold) {
+        if (std::abs(distance) < distanceThreshold) {
           myPlane->addPoint(p);
           result++;
         }
@@ -227,7 +229,7 @@ void PS_PlaneSegment::fit() {
     this->myPlaneState->n0[1] = PS_PlaneSegment::n0.getAt(1);
     this->myPlaneState->n0[2] = PS_PlaneSegment::n0.getAt(2);
     this->myPlaneState->d = d;
-    this->myState->sigma = qSqrt(eVal / ((double)numPoints - 3.0));
+    this->myState->sigma = std::sqrt(eVal / ((double)numPoints - 3.0));
     this->myState->mainFocus[0] = centroid[0];
     this->myState->mainFocus[1] = centroid[1];
     this->myState->mainFocus[2] = centroid[2];
@@ -371,8 +373,8 @@ void PS_PlaneSegment::fitBySample(int numPoints) {
     this->myPlaneState->n0[1] = PS_PlaneSegment::n0.getAt(1);
     this->myPlaneState->n0[2] = PS_PlaneSegment::n0.getAt(2);
     this->myPlaneState->d = d;
-    // this->myState->sigma = qSqrt(sumVV / ((double)planePoints - 3.0));
-    this->myState->sigma = qSqrt(eVal / ((double)numPoints - 3.0));
+    // this->myState->sigma = std::sqrt(sumVV / ((double)planePoints - 3.0));
+    this->myState->sigma = std::sqrt(eVal / ((double)numPoints - 3.0));
     this->myState->mainFocus[0] = centroid[0];
     this->myState->mainFocus[1] = centroid[1];
     this->myState->mainFocus[2] = centroid[2];
@@ -411,7 +413,7 @@ void PS_PlaneSegment::minimumSolution(const QList<PS_Point_PC*>& points) {
 
   // dividing by the length of the normal vector results in the unit normal
   // vector
-  float laenge_n = qSqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+  float laenge_n = std::sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
   n[0] = n[0] / laenge_n;
   n[1] = n[1] / laenge_n;
   n[2] = n[2] / laenge_n;
@@ -489,12 +491,12 @@ void PS_PlaneSegment::mergePlanes(const QList<PS_PlaneSegment*>& detectedPlanes,
       PS_PlaneSegment* p2 = detectedPlanes.at(j);  // get the second plane
 
       // calculate the angle between the normal vectors of plane 1 and 2
-      nAngle = qAcos(p1->getIJK()[0] * p2->getIJK()[0] +
-                     p1->getIJK()[1] * p2->getIJK()[1] +
-                     p1->getIJK()[2] * p2->getIJK()[2]);
-      nAngle = qAbs(fmod(nAngle, PS_PI));
-      if (qAbs(nAngle - PS_PI) < nAngle) {
-        nAngle = qAbs(nAngle - PS_PI);
+      nAngle = std::acos(p1->getIJK()[0] * p2->getIJK()[0] +
+                         p1->getIJK()[1] * p2->getIJK()[1] +
+                         p1->getIJK()[2] * p2->getIJK()[2]);
+      nAngle = std::abs(fmod(nAngle, PS_PI));
+      if (std::abs(nAngle - PS_PI) < nAngle) {
+        nAngle = std::abs(nAngle - PS_PI);
       }
 
       dCP2P1 = p2->getMainFocus()[0] * p1->getIJK()[0] +

@@ -468,7 +468,7 @@ double densityNormal(const double& x, const double& expectation,
   double e = -0.5 * (((x - expectation) / (uncertainty)) *
                      ((x - expectation) / (uncertainty)));
 
-  double result = (1.0 / (uncertainty * sqrt(2.0 * M_PI))) * qExp(e);
+  double result = (1.0 / (uncertainty * sqrt(2.0 * M_PI))) * std::exp(e);
 
   return result;
 }
@@ -806,8 +806,9 @@ bool SimplePolarMeasurement::distortionBySensor(Reading* r) {
   ReadingPolar rPolar;
 
   rPolar.azimuth = qAtan2(p.getAt(1), p.getAt(0));
-  rPolar.distance = qSqrt(p.getAt(0) * p.getAt(0) + p.getAt(1) * p.getAt(1) +
-                          p.getAt(2) * p.getAt(2));
+  rPolar.distance =
+      std::sqrt(p.getAt(0) * p.getAt(0) + p.getAt(1) * p.getAt(1) +
+                p.getAt(2) * p.getAt(2));
   rPolar.zenith = acos(p.getAt(2) / rPolar.distance);
 
   r->setPolarReading(rPolar);

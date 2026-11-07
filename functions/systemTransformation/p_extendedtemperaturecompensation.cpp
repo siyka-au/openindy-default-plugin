@@ -1,5 +1,8 @@
 #include "p_extendedtemperaturecompensation.h"
 
+#include <QtCore>
+#include <format>
+
 // not stable, temporary not ready to use
 
 /*!
@@ -10,12 +13,11 @@ void ExtendedTemperatureCompensation::init() {
   this->metaData.name = "9ParameterHelmertTransformation";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "jwa";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg(
-              "This is a 9 parameter helmert transformation. You can calculate "
-              "the")
-          .arg("parameters by the given points (at least 3).");
+  this->metaData.description = std::format(
+      "{} {}",
+      "This is a 9 parameter helmert transformation. You can calculate "
+      "the",
+      "parameters by the given points (at least 3).");
   this->metaData.iid = SystemTransformation_iidd;
 
   // set needed elements
@@ -61,7 +63,7 @@ bool ExtendedTemperatureCompensation::exec(TrafoParam& trafoParam) {
     }
 
   } else {
-    emit this->sendMessage(
+    this->sendMessage(
         "Not enough points to calculate transformation parameters",
         MessageTypes::eWarningMessage);
     return false;
@@ -335,14 +337,20 @@ OiVec ExtendedTemperatureCompensation::approxScale(OiVec rot) {
 
   for (int i = 1; i < this->locSystem.size(); i++) {
     // get x y and z component of vector from point 0 to i in loc system
-    double sxLoc = qFabs(locSystem.at(0).getAt(0) - locSystem.at(i).getAt(0));
-    double syLoc = qFabs(locSystem.at(0).getAt(1) - locSystem.at(i).getAt(1));
-    double szLoc = qFabs(locSystem.at(0).getAt(2) - locSystem.at(i).getAt(2));
+    double sxLoc =
+        std::fabs(locSystem.at(0).getAt(0) - locSystem.at(i).getAt(0));
+    double syLoc =
+        std::fabs(locSystem.at(0).getAt(1) - locSystem.at(i).getAt(1));
+    double szLoc =
+        std::fabs(locSystem.at(0).getAt(2) - locSystem.at(i).getAt(2));
 
     // get x y and z component of vector from point 0 to i in ref system
-    double sxRef = qFabs(tmpRefList.at(0).getAt(0) - tmpRefList.at(i).getAt(0));
-    double syRef = qFabs(tmpRefList.at(0).getAt(1) - tmpRefList.at(i).getAt(1));
-    double szRef = qFabs(tmpRefList.at(0).getAt(2) - tmpRefList.at(i).getAt(2));
+    double sxRef =
+        std::fabs(tmpRefList.at(0).getAt(0) - tmpRefList.at(i).getAt(0));
+    double syRef =
+        std::fabs(tmpRefList.at(0).getAt(1) - tmpRefList.at(i).getAt(1));
+    double szRef =
+        std::fabs(tmpRefList.at(0).getAt(2) - tmpRefList.at(i).getAt(2));
 
     // 0.050m is criteria, because of noisy measurements
     // and no representative distances.
@@ -506,21 +514,25 @@ OiMat ExtendedTemperatureCompensation::getRotationMatrix(OiVec rot) {
   double alpha = rot.getAt(0);
   double beta = rot.getAt(1);
   double gamma = rot.getAt(2);
-  result.setAt(0, 0, qCos(beta) * qCos(gamma));
-  result.setAt(
-      0, 1, qCos(alpha) * qSin(gamma) + qSin(alpha) * qSin(beta) * qCos(gamma));
-  result.setAt(
-      0, 2, qSin(alpha) * qSin(gamma) - qCos(alpha) * qSin(beta) * qCos(gamma));
+  result.setAt(0, 0, std::cos(beta) * std::cos(gamma));
+  result.setAt(0, 1,
+               std::cos(alpha) * std::sin(gamma) +
+                   std::sin(alpha) * std::sin(beta) * std::cos(gamma));
+  result.setAt(0, 2,
+               std::sin(alpha) * std::sin(gamma) -
+                   std::cos(alpha) * std::sin(beta) * std::cos(gamma));
   result.setAt(0, 3, 0.0);
-  result.setAt(1, 0, -qCos(beta) * qSin(gamma));
-  result.setAt(
-      1, 1, qCos(alpha) * qCos(gamma) - qSin(alpha) * qSin(beta) * qSin(gamma));
-  result.setAt(
-      1, 2, qSin(alpha) * qCos(gamma) + qCos(alpha) * qSin(beta) * qSin(gamma));
+  result.setAt(1, 0, -std::cos(beta) * std::sin(gamma));
+  result.setAt(1, 1,
+               std::cos(alpha) * std::cos(gamma) -
+                   std::sin(alpha) * std::sin(beta) * std::sin(gamma));
+  result.setAt(1, 2,
+               std::sin(alpha) * std::cos(gamma) +
+                   std::cos(alpha) * std::sin(beta) * std::sin(gamma));
   result.setAt(1, 3, 0.0);
-  result.setAt(2, 0, qSin(beta));
-  result.setAt(2, 1, -qSin(alpha) * qCos(beta));
-  result.setAt(2, 2, qCos(alpha) * qCos(beta));
+  result.setAt(2, 0, std::sin(beta));
+  result.setAt(2, 1, -std::sin(alpha) * std::cos(beta));
+  result.setAt(2, 2, std::cos(alpha) * std::cos(beta));
   result.setAt(2, 3, 0.0);
   result.setAt(3, 0, 0.0);
   result.setAt(3, 1, 0.0);
@@ -743,9 +755,10 @@ OiMat ExtendedTemperatureCompensation::rotationMatrix(OiVec q) {
 OiVec ExtendedTemperatureCompensation::getRotationAngles(OiMat r) {
   OiVec rot(3);
   rot.setAt(0, qAtan2(-r.getAt(2, 1), r.getAt(2, 2)));  // alpha
-  rot.setAt(1, qAsin(r.getAt(2, 0)));                   // beta
+  rot.setAt(1, std::asin(r.getAt(2, 0)));               // beta
   rot.setAt(2, qAtan2(-r.getAt(1, 0), r.getAt(0, 0)));  // gamma
-  if (qFabs(qCos(rot.getAt(1)) * qCos(rot.getAt(2))) - qFabs(r.getAt(0, 0)) >
+  if (std::fabs(std::cos(rot.getAt(1)) * std::cos(rot.getAt(2))) -
+          std::fabs(r.getAt(0, 0)) >
       0.01) {
     rot.setAt(1, PI - rot.getAt(1));
   }

@@ -2,7 +2,7 @@
 #define P_BESTFITSPHERE_H
 #include <QObject>
 #include <QPointer>
-#include <QtMath>
+#include <string>
 #include <vector>
 
 #include "fitfunction.h"
@@ -26,7 +26,7 @@ class BestFitSphere : public FitFunction, public Producer<Sphere> {
   // exec methods
   // ############
 
-  std::expected<Sphere, QString> exec() override;
+  std::expected<Sphere, std::string> exec() override;
 
  private:
   // ##############

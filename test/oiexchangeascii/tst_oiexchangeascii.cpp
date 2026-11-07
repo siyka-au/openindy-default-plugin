@@ -1,7 +1,7 @@
 #include <QPointer>
-#include <QString>
 #include <QtTest>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "chooselalib.h"
@@ -25,7 +25,7 @@ class OiExchangeAsciiTest : public QObject {
 OiExchangeAsciiTest::OiExchangeAsciiTest() {}
 
 void OiExchangeAsciiTest::testImportNominal() {
-  QString data(
+  std::string data(
       "\
 Name	x	y	z\r\n\
 P1004	-969.17	-566.68	-514.68\r\n\
@@ -52,7 +52,7 @@ P20	-749.56	2987.57	-453.59\r\n\
   columns.push_back(ExchangeSimpleAscii::eColumnZ);
   exchange->setUserDefinedColumns(columns);
 
-  std::stringstream stream(data.toStdString());
+  std::stringstream stream(data);
   exchange->setStream(&stream);
 
   exchange->setFeatures(
@@ -73,23 +73,23 @@ P20	-749.56	2987.57	-453.59\r\n\
   QVERIFY(exchange->getFeatures().size() == 6);
 
   oi::Guarded<Point> point = exchange->getFeatures().at(0)->getPoint();
-  QCOMPARE(point->getFeatureName(), QString("P1004"));
-  QCOMPARE(point->getGroupName(), QString("Group01"));
+  QCOMPARE(point->getFeatureName(), std::string("P1004"));
+  QCOMPARE(point->getGroupName(), std::string("Group01"));
   OiVec xyz = point->getPosition().getVector();
   QCOMPARE(xyz.getAt(0), -.96917);
   QCOMPARE(xyz.getAt(1), -.56668);
   QCOMPARE(xyz.getAt(2), -.51468);
 
   QCOMPARE(exchange->getFeatures().at(1)->getPoint()->getFeatureName(),
-           QString("P14"));
+           std::string("P14"));
   QCOMPARE(exchange->getFeatures().at(2)->getPoint()->getFeatureName(),
-           QString("P16"));
+           std::string("P16"));
   QCOMPARE(exchange->getFeatures().at(3)->getPoint()->getFeatureName(),
-           QString("P17"));
+           std::string("P17"));
   QCOMPARE(exchange->getFeatures().at(4)->getPoint()->getFeatureName(),
-           QString("P19"));
+           std::string("P19"));
   QCOMPARE(exchange->getFeatures().at(5)->getPoint()->getFeatureName(),
-           QString("P20"));
+           std::string("P20"));
 
   delete exchange;
 }
@@ -97,7 +97,7 @@ P20	-749.56	2987.57	-453.59\r\n\
 void OiExchangeAsciiTest::testImportLevel() {
   ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
 
-  QString data(
+  std::string data(
       "\
 name x y z i j k\r\n\
 # Level as Plane\r\n\
@@ -117,7 +117,7 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
   exchange->setSkipFirstLine(true);
   exchange->setDelimiter("whitespace [ ]");
 
-  std::stringstream stream(data.toStdString());
+  std::stringstream stream(data);
   exchange->setStream(&stream);
 
   // read column count from file / device
@@ -142,8 +142,8 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
   QVERIFY(exchange->getFeatures().size() == 2);
 
   oi::Guarded<Plane> plane = exchange->getFeatures().at(0)->getPlane();
-  QCOMPARE(plane->getFeatureName(), QString("Level_1"));
-  QCOMPARE(plane->getGroupName(), QString("Group01"));
+  QCOMPARE(plane->getFeatureName(), std::string("Level_1"));
+  QCOMPARE(plane->getGroupName(), std::string("Group01"));
   OiVec xyz = plane->getPosition().getVector();
   QCOMPARE(xyz.getAt(0), .0);
   QCOMPARE(xyz.getAt(1), .0);
@@ -155,7 +155,7 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
   QCOMPARE(ijk.getAt(2), 0.999997);
 
   QCOMPARE(exchange->getFeatures().at(1)->getPlane()->getFeatureName(),
-           QString("Level_2"));
+           std::string("Level_2"));
 
   delete exchange;
 }

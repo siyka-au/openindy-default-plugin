@@ -1,7 +1,7 @@
 #ifndef CFUTIL_H
 #define CFUTIL_H
 
-#include <QString>
+#include <string>
 
 #include "types.h"
 
@@ -11,7 +11,7 @@ class CFUtil {
  public:
   CFUtil();
 
-  static FeatureTypes featureTypesForName(QString name);
+  static FeatureTypes featureTypesForName(std::string name);
 };
 
 #endif

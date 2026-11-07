@@ -1,5 +1,7 @@
 #include "p_pseudosensor.h"
 
+#include <QtCore>
+
 PseudoSensor::PseudoSensor() {}
 
 PluginMetaData* PseudoSensor::getMetaData() const {
@@ -40,27 +42,32 @@ QList<Configuration::ConnectionTypes>* PseudoSensor::getConnectionType() const {
   return connectionTypes;
 }
 
-QMap<QString, int>* PseudoSensor::getIntegerParameter() const { return NULL; }
-
-QMap<QString, double>* PseudoSensor::getDoubleParameter() const { return NULL; }
-
-QMap<QString, QStringList>* PseudoSensor::getStringParameter() const {
+QMap<std::string, int>* PseudoSensor::getIntegerParameter() const {
   return NULL;
 }
 
-QStringList PseudoSensor::selfDefinedActions() const {
-  QStringList a;
+QMap<std::string, double>* PseudoSensor::getDoubleParameter() const {
+  return NULL;
+}
+
+QMap<std::string, std::vector<std::string>>* PseudoSensor::getStringParameter()
+    const {
+  return NULL;
+}
+
+std::vector<std::string> PseudoSensor::selfDefinedActions() const {
+  std::vector<std::string> a;
   return a;
 }
 
-bool PseudoSensor::doSelfDefinedAction(QString a) { return true; }
+bool PseudoSensor::doSelfDefinedAction(std::string a) { return true; }
 
-QString PseudoSensor::getUndefinedReadingName() const {
+std::string PseudoSensor::getUndefinedReadingName() const {
   return "pseudo reading";
 }
 
-QMap<QString, double>* PseudoSensor::getDefaultAccuracy() const {
-  QMap<QString, double>* undefinedSigma = new QMap<QString, double>;
+QMap<std::string, double>* PseudoSensor::getDefaultAccuracy() const {
+  QMap<std::string, double>* undefinedSigma = new QMap<std::string, double>;
 
   undefinedSigma->insert("pseudoSigma", 0.54);
 
@@ -103,9 +110,9 @@ QList<Reading*> PseudoSensor::measure(MeasurementConfig* mc) {
   return readings;
 }
 
-QVariantMap PseudoSensor::readingStream(
+oi::ValueMap PseudoSensor::readingStream(
     Configuration::ReadingTypes streamFormat) {
-  QVariantMap r;
+  oi::ValueMap r;
 
   double randomValue = ((double)rand() / RAND_MAX) * (6.283185 - 0.0001) + 1.0;
 
@@ -119,8 +126,8 @@ bool PseudoSensor::getConnectionState() { return isConnected; }
 
 bool PseudoSensor::isReadyForMeasurement() { return true; }
 
-QMap<QString, QString> PseudoSensor::getSensorStats() {
-  QMap<QString, QString> a;
+QMap<std::string, std::string> PseudoSensor::getSensorStats() {
+  QMap<std::string, std::string> a;
 
   return a;
 }

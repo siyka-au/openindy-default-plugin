@@ -27,7 +27,7 @@ class BestFitCylinder : public FitFunction,
   // exec methods
   // ############
 
-  std::expected<Cylinder, QString> exec() override;
+  std::expected<Cylinder, std::string> exec() override;
 
  private:
   // ##############

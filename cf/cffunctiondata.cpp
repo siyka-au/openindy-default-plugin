@@ -2,8 +2,8 @@
 
 CFFunctionData::CFFunctionData() {}
 
-QString CFFunctionData::prettyPrint() {
-  QString s;
+std::string CFFunctionData::prettyPrint() {
+  std::string s;
   s += "function: '" +
        (this->function.isNull() ? "null" : this->function->getMetaData().name) +
        "', feature: '" +

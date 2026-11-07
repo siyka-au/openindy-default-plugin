@@ -1,5 +1,9 @@
 #include "ps_shapesegment.h"
 
+#include <QtCore>
+
+#include "stringutil.h"
+
 PS_ShapeSegment::PS_ShapeSegment() {}
 
 PS_ShapeSegment::~PS_ShapeSegment() {}
@@ -10,14 +14,14 @@ PS_ShapeSegment::~PS_ShapeSegment() {}
  * \param filePath
  * \return
  */
-bool PS_ShapeSegment::writeToObj(const QString& filePath) {
+bool PS_ShapeSegment::writeToObj(const std::string& filePath) {
   QFile file(filePath);
   if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
     QTextStream streama(&file);
     for (int i = 0; i < this->getPoints().size(); i++) {
-      streama << "v " << QString::number(this->getPoints().at(i)->xyz[0]) << " "
-              << QString::number(this->getPoints().at(i)->xyz[1]) << " "
-              << QString::number(this->getPoints().at(i)->xyz[2]) << endl;
+      streama << "v " << oi::number(this->getPoints().at(i)->xyz[0]) << " "
+              << oi::number(this->getPoints().at(i)->xyz[1]) << " "
+              << oi::number(this->getPoints().at(i)->xyz[2]) << endl;
     }
 
     qDebug() << "writing finished";
@@ -33,7 +37,7 @@ bool PS_ShapeSegment::writeToObj(const QString& filePath) {
  * \param filePath
  * \return
  */
-bool PS_ShapeSegment::writeToPts(const QString& filePath) {
+bool PS_ShapeSegment::writeToPts(const std::string& filePath) {
   int r = 0;
   int g = 0;
   int b = 0;
@@ -50,10 +54,10 @@ bool PS_ShapeSegment::writeToPts(const QString& filePath) {
   if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
     QTextStream streama(&file);
     for (int i = 0; i < this->getPoints().size(); i++) {
-      streama << QString::number(this->getPoints().at(i)->xyz[0]) << " "
-              << QString::number(this->getPoints().at(i)->xyz[1]) << " "
-              << QString::number(this->getPoints().at(i)->xyz[2]) << " " << r
-              << " " << g << " " << b << endl;
+      streama << oi::number(this->getPoints().at(i)->xyz[0]) << " "
+              << oi::number(this->getPoints().at(i)->xyz[1]) << " "
+              << oi::number(this->getPoints().at(i)->xyz[2]) << " " << r << " "
+              << g << " " << b << endl;
     }
     return true;
   }

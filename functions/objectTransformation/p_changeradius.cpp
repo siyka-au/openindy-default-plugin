@@ -1,5 +1,7 @@
 #include "p_changeradius.h"
 
+#include <format>
+
 #include "containers.h"
 
 /*!
@@ -10,7 +12,8 @@ void ChangeRadius::init() {
   this->metaData.name = "ChangeRadius";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description = QString("%1").arg(
+  this->metaData.description = std::format(
+      "{}",
       "This functions adds the specified offset to the radius of the target "
       "geometry");
   this->metaData.iid = ObjectTransformation_iidd;
@@ -29,10 +32,10 @@ void ChangeRadius::init() {
  * \param sphere
  * \return
  */
-std::expected<Sphere, QString> ChangeRadius::exec(const Sphere& input) {
+std::expected<Sphere, std::string> ChangeRadius::exec(const Sphere& input) {
   Sphere sphere = input;
   if (!this->setUpResult(sphere)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return sphere;
 }
@@ -42,10 +45,10 @@ std::expected<Sphere, QString> ChangeRadius::exec(const Sphere& input) {
  * \param input
  * \return
  */
-std::expected<Circle, QString> ChangeRadius::exec(const Circle& input) {
+std::expected<Circle, std::string> ChangeRadius::exec(const Circle& input) {
   Circle circle = input;
   if (!this->setUpResult(circle)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return circle;
 }
@@ -55,10 +58,10 @@ std::expected<Circle, QString> ChangeRadius::exec(const Circle& input) {
  * \param input
  * \return
  */
-std::expected<Cylinder, QString> ChangeRadius::exec(const Cylinder& input) {
+std::expected<Cylinder, std::string> ChangeRadius::exec(const Cylinder& input) {
   Cylinder cylinder = input;
   if (!this->setUpResult(cylinder)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return cylinder;
 }

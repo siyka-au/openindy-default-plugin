@@ -28,9 +28,9 @@ class ChangeRadius : public ObjectTransformation,
   // exec methods
   // ############
 
-  std::expected<Sphere, QString> exec(const Sphere& input) override;
-  std::expected<Circle, QString> exec(const Circle& input) override;
-  std::expected<Cylinder, QString> exec(const Cylinder& input) override;
+  std::expected<Sphere, std::string> exec(const Sphere& input) override;
+  std::expected<Circle, std::string> exec(const Circle& input) override;
+  std::expected<Cylinder, std::string> exec(const Cylinder& input) override;
 
  private:
   // ##############

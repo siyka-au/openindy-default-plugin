@@ -25,7 +25,7 @@ class IntersectPlanePlane : public ConstructFunction, public Producer<Line> {
   // exec methods
   // ############
 
-  std::expected<Line, QString> exec() override;
+  std::expected<Line, std::string> exec() override;
 
  private:
   // ##############

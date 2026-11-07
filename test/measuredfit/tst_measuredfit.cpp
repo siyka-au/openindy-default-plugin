@@ -196,10 +196,9 @@ void MeasuredFitTest::measuringIntoAPlaneProducesASolvedPlaneEndToEnd() {
   dot = std::clamp(dot, -1.0, 1.0);
   const double angleErrorDeg = std::acos(std::abs(dot)) * 180.0 / M_PI;
 
-  QVERIFY2(
-      angleErrorDeg < 0.01,
-      qPrintable(
-          QString("fitted plane normal off by %1 degrees").arg(angleErrorDeg)));
+  QVERIFY2(angleErrorDeg < 0.01,
+           (std::format("fitted plane normal off by {} degrees", angleErrorDeg))
+               .c_str());
 }
 
 void MeasuredFitTest::measuringIntoACylinderProducesASolvedCylinderEndToEnd() {
@@ -249,9 +248,12 @@ void MeasuredFitTest::measuringIntoACylinderProducesASolvedCylinderEndToEnd() {
            "cylinder must be solved after measuring eight points into it");
 
   QVERIFY2(std::abs(cylinder->getRadius().getRadius() - 19.16) < 0.05,
-           qPrintable(QString("fitted radius %1, expected ~19.16")
-                          .arg(cylinder->getRadius().getRadius())));
+           (std::format("fitted radius {}, expected ~19.16",
+                        cylinder->getRadius().getRadius()))
+               .c_str());
 }
 
 QTEST_APPLESS_MAIN(MeasuredFitTest)
+#include <format>
+
 #include "tst_measuredfit.moc"

@@ -1,5 +1,7 @@
 #include "p_factory.h"
 
+#include <QtCore>
+#include <format>
 #include <vector>
 
 using namespace oi;
@@ -117,7 +119,7 @@ OiTemplatePlugin::createDefinedFormatExchanges() {
  * \param name
  * \return
  */
-oi::Guarded<Sensor> OiTemplatePlugin::createSensor(const QString& name) {
+oi::Guarded<Sensor> OiTemplatePlugin::createSensor(const std::string& name) {
   oi::Guarded<Sensor> result(nullptr);
   if (name.compare("PseudoTracker") == 0) {
     result = new PseudoTracker();
@@ -131,7 +133,8 @@ oi::Guarded<Sensor> OiTemplatePlugin::createSensor(const QString& name) {
  * \param name
  * \return
  */
-oi::Guarded<Function> OiTemplatePlugin::createFunction(const QString& name) {
+oi::Guarded<Function> OiTemplatePlugin::createFunction(
+    const std::string& name) {
   oi::Guarded<Function> result(nullptr);
   if (name.compare("NominalPoint") == 0) {
     result = new NominalPoint();
@@ -194,7 +197,7 @@ oi::Guarded<Function> OiTemplatePlugin::createFunction(const QString& name) {
 }
 
 oi::Guarded<Function> OiTemplatePlugin::createFunctionFromConfig(
-    const QString& functionName) {
+    const std::string& functionName) {
   // internal functions
   if (functionName.compare("DistanceBetweenTwoPoints") == 0) {
     return new DistanceBetweenTwoPoints();
@@ -212,11 +215,10 @@ oi::Guarded<Function> OiTemplatePlugin::createFunctionFromConfig(
   for (ConfiguredFunctionConfig config : parser.readConfigFromJson()) {
     if (config.name.compare(functionName) == 0) {
       std::vector<oi::Guarded<Function> > functions;
-      for (QString name : config.getFunctionNames()) {
+      for (std::string name : config.getFunctionNames()) {
         oi::Guarded<Function> f = createFunction(name);
         if (f.isNull()) {
-          throw logic_error(
-              QString("no function found: %1").arg(name).toLocal8Bit().data());
+          throw logic_error(std::format("no function found: {}", name));
         }
         f->init();
         functions.push_back(f);
@@ -244,7 +246,7 @@ oi::Guarded<Function> OiTemplatePlugin::createFunctionFromConfig(
  * \return
  */
 oi::Guarded<BundleAdjustment> OiTemplatePlugin::createBundleAdjustment(
-    const QString& name) {
+    const std::string& name) {
   oi::Guarded<BundleAdjustment> result(nullptr);
   return result;
 }
@@ -256,7 +258,7 @@ oi::Guarded<BundleAdjustment> OiTemplatePlugin::createBundleAdjustment(
  * \return
  */
 oi::Guarded<SimulationModel> OiTemplatePlugin::createSimulation(
-    const QString& name) {
+    const std::string& name) {
   oi::Guarded<SimulationModel> result(nullptr);
 
   if (name.compare("SimplePolarMeasurement") == 0) {
@@ -272,7 +274,7 @@ oi::Guarded<SimulationModel> OiTemplatePlugin::createSimulation(
  * \return
  */
 oi::Guarded<ExchangeSimpleAscii> OiTemplatePlugin::createSimpleAsciiExchange(
-    const QString& name) {
+    const std::string& name) {
   oi::Guarded<ExchangeSimpleAscii> result(nullptr);
 
   if (name.compare("OiExchangeAscii") == 0) {
@@ -288,7 +290,7 @@ oi::Guarded<ExchangeSimpleAscii> OiTemplatePlugin::createSimpleAsciiExchange(
  * \return
  */
 oi::Guarded<ExchangeDefinedFormat>
-OiTemplatePlugin::createDefinedFormatExchange(const QString& name) {
+OiTemplatePlugin::createDefinedFormatExchange(const std::string& name) {
   oi::Guarded<ExchangeDefinedFormat> result(nullptr);
   return result;
 }

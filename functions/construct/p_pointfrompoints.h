@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QPointer>
-#include <QtMath>
+#include <string>
 
 #include "constructfunction.h"
 #include "oimat.h"
@@ -27,7 +27,7 @@ class PointFromPoints : public ConstructFunction, public Producer<Point> {
   // exec methods
   // ############
 
-  std::expected<Point, QString> exec() override;
+  std::expected<Point, std::string> exec() override;
 
  private:
   // ##############

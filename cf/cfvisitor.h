@@ -1,6 +1,8 @@
 #ifndef CFVISITOR_H
 #define CFVISITOR_H
 
+#include <QtCore>
+
 #include "cfcontext.h"
 #include "cffunctiondata.h"
 #include "treeutil.h"

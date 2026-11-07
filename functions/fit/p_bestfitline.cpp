@@ -2,6 +2,7 @@
 
 #include <math.h>
 
+#include <format>
 #include <utility>
 #include <vector>
 
@@ -10,12 +11,10 @@ void BestFitLine::init() {
   this->metaData.name = "BestFitLine";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg("This function calculates an adjusted line.")
-          .arg(
-              "You can input as many points as you want which are then used to "
-              "find the best fit 3D line.");
+  this->metaData.description = std::format(
+      "{} {}", "This function calculates an adjusted line.",
+      "You can input as many points as you want which are then used to "
+      "find the best fit 3D line.");
   this->metaData.iid = FitFunction_iidd;
 
   // D12/Stage 7c-ii: consolidates BestFitLine (raw Observations) and
@@ -39,11 +38,11 @@ void BestFitLine::init() {
  * \param line
  * \return
  */
-std::expected<Line, QString> BestFitLine::exec() {
+std::expected<Line, std::string> BestFitLine::exec() {
   this->statistic.reset();
   Line line;
   if (!this->setUpResult(line)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return line;
 }
@@ -55,8 +54,8 @@ std::expected<Line, QString> BestFitLine::exec() {
  */
 bool BestFitLine::setUpResult(Line& line) {
   if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
-    emit this->sendMessage(
-        QString("No points tagged for line %1").arg(line.getFeatureName()),
+    this->sendMessage(
+        std::format("No points tagged for line {}", line.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
@@ -75,9 +74,9 @@ bool BestFitLine::setUpResult(Line& line) {
     }
   }
   if (inputPoints.size() < 2) {
-    emit this->sendMessage(QString("Not enough valid points to fit the line %1")
-                               .arg(line.getFeatureName()),
-                           MessageTypes::eWarningMessage);
+    this->sendMessage(std::format("Not enough valid points to fit the line {}",
+                                  line.getFeatureName()),
+                      MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -147,7 +146,7 @@ bool BestFitLine::setUpResult(Line& line) {
     double dot = NAN;
     OiVec::dot(dot, v_line, v_line);
     addDisplayResidual(point->getId(), v_line.getAt(0), v_line.getAt(1),
-                       v_line.getAt(2), qSqrt(dot));
+                       v_line.getAt(2), std::sqrt(dot));
   }
 
   // set result
@@ -160,7 +159,7 @@ bool BestFitLine::setUpResult(Line& line) {
   // set statistic
   this->statistic.setIsValid(true);
   this->statistic.setStdev(
-      qSqrt(vtv / (static_cast<double>(inputPoints.size()) - 2.0)));
+      std::sqrt(vtv / (static_cast<double>(inputPoints.size()) - 2.0)));
   line.setStatistic(this->statistic);
 
   return true;

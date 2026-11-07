@@ -1,5 +1,7 @@
 #include "p_helmert6param.h"
 
+#include <format>
+
 /*!
  * \brief Helmert6Param::init
  */
@@ -10,7 +12,8 @@ void Helmert6Param::init() {
   this->metaData.name = "Helmert6Param";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra, jwa";
-  this->metaData.description = QString("%1").arg(
+  this->metaData.description = std::format(
+      "{}",
       "This function calculates a helmert transformation without scale (scale "
       "fixed to 1).");
   this->metaData.iid = SystemTransformation_iidd;

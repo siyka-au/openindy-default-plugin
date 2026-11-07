@@ -14,11 +14,11 @@ using namespace oi;
  */
 class XYZFilter : public ConstructFunction, public Transform<Point> {
  public:
-  XYZFilter(QString name, bool removeX, bool removeY, bool removeZ);
+  XYZFilter(std::string name, bool removeX, bool removeY, bool removeZ);
 
   void init() override;
 
-  std::expected<Point, QString> exec(const Point& input) override;
+  std::expected<Point, std::string> exec(const Point& input) override;
 
  private:
   bool removeX;

@@ -3,7 +3,8 @@
 #include <QDebug>
 #include <QObject>
 #include <QPointer>
-#include <QString>
+#include <format>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -11,8 +12,8 @@ class Node : public QObject {
   Q_OBJECT
 
  public:
-  virtual QString getName() = 0;
-  virtual QString prettyPrint() = 0;
+  virtual std::string getName() = 0;
+  virtual std::string prettyPrint() = 0;
   virtual std::vector<QPointer<Node> >& getSubnodes() = 0;
 };
 
@@ -23,11 +24,10 @@ class NodeVisitor : public QObject {
   virtual void pre(QPointer<Node> node, int index, int level) = 0;
   virtual void post(QPointer<Node> node, int index, int level) = 0;
 
-  void debug(QString label, QString message, int level) {
-    qDebug() << QString("%1%2: %3")
-                    .arg(QString(level * 2, QChar(' ')))
-                    .arg(label)
-                    .arg(message);
+  void debug(std::string label, std::string message, int level) {
+    qDebug() << QString::fromStdString(std::format(
+        "{}{}: {}", std::string(static_cast<std::size_t>(level) * 2, ' '),
+        label, message));
   }
 };
 
@@ -39,12 +39,11 @@ class NodeVisitor : public QObject {
 class PrintVisitor : public NodeVisitor {
  public:
   void pre(QPointer<Node> node, int index, int level) override {
-    debug(QString("pre L%1 I%2").arg(level).arg(index), node->prettyPrint(),
-          level);
+    debug(std::format("pre L{} I{}", level, index), node->prettyPrint(), level);
   }
 
   void post(QPointer<Node> node, int index, int level) override {
-    debug(QString("post L%1 I%2").arg(level).arg(index), node->prettyPrint(),
+    debug(std::format("post L{} I{}", level, index), node->prettyPrint(),
           level);
   }
 };

@@ -2,8 +2,8 @@
 #define PS_SHAPESEGMENT_H
 
 #include <QList>
-#include <QtMath>
 #include <QtXml>
+#include <string>
 
 #include "oimat.h"
 #include "oivec.h"
@@ -47,9 +47,9 @@ class PS_ShapeSegment {
 
   virtual void minimumSolution(const QList<PS_Point_PC*>& points) = 0;
 
-  virtual bool writeToObj(const QString& filePath);
-  virtual bool writeToPts(const QString& filePath);
-  virtual bool writeToX3D(const QString& filePath) = 0;
+  virtual bool writeToObj(const std::string& filePath);
+  virtual bool writeToPts(const std::string& filePath);
+  virtual bool writeToX3D(const std::string& filePath) = 0;
 
   //! \brief Returns all points of the shape
   inline const QList<PS_Point_PC*>& getPoints() {

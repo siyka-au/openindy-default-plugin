@@ -1,6 +1,6 @@
 #ifndef P_SHIFTPLANE_H
 #define P_SHIFTPLANE_H
-#include <QString>
+#include <string>
 
 #include "objecttransformation.h"
 #include "oimat.h"
@@ -22,8 +22,8 @@ class Shift : public ObjectTransformation,
   // exec methods
   // ############
 
-  std::expected<Plane, QString> exec(const Plane& input) override;
-  std::expected<Circle, QString> exec(const Circle& input) override;
+  std::expected<Plane, std::string> exec(const Plane& input) override;
+  std::expected<Circle, std::string> exec(const Circle& input) override;
 
  private:
   // ##############

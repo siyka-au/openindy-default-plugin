@@ -1,5 +1,6 @@
 #ifndef CONFIGUREDFUNCTIONCONFIG_H
 #define CONFIGUREDFUNCTIONCONFIG_H
+#include <QtCore>
 #include <map>
 #include <vector>
 
@@ -22,27 +23,27 @@ class ConfiguredFunctionConfig {
   ConfiguredFunctionConfig();
 
  public:
-  bool isNeededElement(QString name);
-  bool isFunction(QString name);
+  bool isNeededElement(std::string name);
+  bool isFunction(std::string name);
   /**
    * @brief getFunctionNames
    * @return all necessary funktions for this config
    */
-  std::vector<QString> getFunctionNames();
+  std::vector<std::string> getFunctionNames();
   void collectFunctionNames(std::vector<QPointer<Node> >& parameter,
-                            std::vector<QString>& names);
+                            std::vector<std::string>& names);
   std::vector<NeededElement> getNeededElements();
-  std::vector<QString> getNeededElementNames();
+  std::vector<std::string> getNeededElementNames();
 
  public:
   int version{};
-  QString name;
-  QString description;
-  std::vector<QPair<QString, NeededElement> > neededElements;
+  std::string name;
+  std::string description;
+  std::vector<QPair<std::string, NeededElement> > neededElements;
   std::vector<FeatureTypes> applicableFor;
 
   // versionn 1
-  std::vector<QString> functionNames;
+  std::vector<std::string> functionNames;
   std::multimap<int, InputElementMapping> inputElementsMapping;
 
   // version 2

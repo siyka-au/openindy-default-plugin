@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include <format>
+
 /*!
  * \brief IntersectPlanePlane::init
  */
@@ -10,7 +12,8 @@ void IntersectPlanePlane::init() {
   this->metaData.name = "IntersectPlanePlane";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description = QString("%1").arg(
+  this->metaData.description = std::format(
+      "{}",
       "This function calculates the line of intersection of a plane with "
       "another plane.");
   this->metaData.iid = ConstructFunction_iidd;
@@ -37,10 +40,10 @@ void IntersectPlanePlane::init() {
  * \param line
  * \return
  */
-std::expected<Line, QString> IntersectPlanePlane::exec() {
+std::expected<Line, std::string> IntersectPlanePlane::exec() {
   Line line;
   if (!this->setUpResult(line)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return line;
 }
@@ -60,8 +63,8 @@ bool IntersectPlanePlane::setUpResult(Line& line) {
   // check if input elements are equal
   if (this->inputElements[0].front().plane->getId() ==
       this->inputElements[1].front().plane->getId()) {
-    emit this->sendMessage(QString("Input geometries are equal."),
-                           MessageTypes::eWarningMessage);
+    this->sendMessage(std::string("Input geometries are equal."),
+                      MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -74,10 +77,9 @@ bool IntersectPlanePlane::setUpResult(Line& line) {
 
   // check if the two planes intersect
   if (!this->isIntersection(plane1, plane2)) {
-    emit this->sendMessage(
-        QString("No intersection between plane %1 and plane %2")
-            .arg(plane1->getFeatureName())
-            .arg(plane2->getFeatureName()),
+    this->sendMessage(
+        std::format("No intersection between plane {} and plane {}",
+                    plane1->getFeatureName(), plane2->getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }

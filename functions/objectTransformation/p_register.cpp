@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include <format>
+
 /*!
  * \brief Register::init
  */
@@ -10,7 +12,8 @@ void Register::init() {
   this->metaData.name = "Register";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description = QString("%1").arg(
+  this->metaData.description = std::format(
+      "{}",
       "This function projects the target geometry in the specified plane.");
   this->metaData.iid = ObjectTransformation_iidd;
 
@@ -33,10 +36,10 @@ void Register::init() {
  * \param point
  * \return
  */
-std::expected<Point, QString> Register::exec(const Point& input) {
+std::expected<Point, std::string> Register::exec(const Point& input) {
   Point point = input;
   if (!this->setUpResult(point)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return point;
 }
@@ -46,10 +49,10 @@ std::expected<Point, QString> Register::exec(const Point& input) {
  * \param input
  * \return
  */
-std::expected<Sphere, QString> Register::exec(const Sphere& input) {
+std::expected<Sphere, std::string> Register::exec(const Sphere& input) {
   Sphere sphere = input;
   if (!this->setUpResult(sphere)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return sphere;
 }
@@ -59,10 +62,10 @@ std::expected<Sphere, QString> Register::exec(const Sphere& input) {
  * \param input
  * \return
  */
-std::expected<Circle, QString> Register::exec(const Circle& input) {
+std::expected<Circle, std::string> Register::exec(const Circle& input) {
   Circle circle = input;
   if (!this->setUpResult(circle)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return circle;
 }

@@ -1,5 +1,6 @@
 #include "p_bestfitpoint.h"
 
+#include <format>
 #include <iterator>
 #include <vector>
 
@@ -13,12 +14,10 @@ void BestFitPoint::init() {
   this->metaData.name = "BestFitPoint";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg("This function calculates an adjusted point.")
-          .arg(
-              "You can input as many observations as you want which are then "
-              "used to find the best fit 3D point.");
+  this->metaData.description = std::format(
+      "{} {}", "This function calculates an adjusted point.",
+      "You can input as many observations as you want which are then "
+      "used to find the best fit 3D point.");
   this->metaData.iid = FitFunction_iidd;
 
   // set needed elements
@@ -45,11 +44,11 @@ void BestFitPoint::init() {
  * \param point
  * \return
  */
-std::expected<Point, QString> BestFitPoint::exec() {
+std::expected<Point, std::string> BestFitPoint::exec() {
   this->statistic.reset();
   Point point;
   if (!this->setUpResult(point)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return point;
 }
@@ -62,9 +61,9 @@ std::expected<Point, QString> BestFitPoint::exec() {
 bool BestFitPoint::setUpResult(Point& point) {
   // get and check input observations
   if (!this->inputElements.contains(0) || this->inputElements[0].size() < 1) {
-    emit this->sendMessage(
-        QString("Not enough valid observations to fit the point %1")
-            .arg(point.getFeatureName()),
+    this->sendMessage(
+        std::format("Not enough valid observations to fit the point {}",
+                    point.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
@@ -93,9 +92,9 @@ bool BestFitPoint::setUpResult(Point& point) {
   std::vector<oi::Guarded<Observation> > inputObservations;
   filterObservations(allUsableObservations, inputObservations);
   if (inputObservations.size() < 1) {
-    emit this->sendMessage(
-        QString("Not enough valid observations to fit the point %1")
-            .arg(point.getFeatureName()),
+    this->sendMessage(
+        std::format("Not enough valid observations to fit the point {}",
+                    point.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
@@ -130,10 +129,10 @@ bool BestFitPoint::setUpResult(Point& point) {
     x = qxx * c;
     v = a * x - l;
   } catch (const logic_error& e) {
-    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
+    this->sendMessage(e.what(), MessageTypes::eErrorMessage);
     return false;
   } catch (const runtime_error& e) {
-    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
+    this->sendMessage(e.what(), MessageTypes::eErrorMessage);
     return false;
   }
 
@@ -145,7 +144,8 @@ bool BestFitPoint::setUpResult(Point& point) {
     double _vy = x.getAt(1) - observation->getXYZ().getAt(1);
     double _vz = x.getAt(2) - observation->getXYZ().getAt(2);
 
-    double _corr = qSqrt(qPow(_vx, 2) + qPow(_vy, 2) + qPow(_vz, 2));
+    double _corr =
+        std::sqrt(std::pow(_vx, 2) + std::pow(_vy, 2) + std::pow(_vz, 2));
 
     if (oi::contains(inputObservations, observation)) {
       corr.add(_corr);
@@ -157,7 +157,8 @@ bool BestFitPoint::setUpResult(Point& point) {
   // calculate standard deviation
   double stdev = 0.0;
   OiVec::dot(stdev, corr, corr);
-  stdev = qSqrt(stdev / (static_cast<double>(inputObservations.size()) - 1.0));
+  stdev =
+      std::sqrt(stdev / (static_cast<double>(inputObservations.size()) - 1.0));
 
   // set result
   Position position;

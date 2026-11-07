@@ -1,5 +1,6 @@
 #include "p_bestfitcylinder.h"
 
+#include <format>
 #include <vector>
 
 /*!
@@ -10,12 +11,10 @@ void BestFitCylinder::init() {
   this->metaData.name = "BestFitCylinder";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg("This function calculates an adjusted cylinder.")
-          .arg(
-              "You can input as many points as you want which are then used to "
-              "find the best fit cylinder.");
+  this->metaData.description = std::format(
+      "{} {}", "This function calculates an adjusted cylinder.",
+      "You can input as many points as you want which are then used to "
+      "find the best fit cylinder.");
   this->metaData.iid = FitFunction_iidd;
 
   // D12/Stage 7c-ii: cylinder is not a special case - ePointElement with
@@ -51,11 +50,11 @@ void BestFitCylinder::init() {
  * \param cylinder
  * \return
  */
-std::expected<Cylinder, QString> BestFitCylinder::exec() {
+std::expected<Cylinder, std::string> BestFitCylinder::exec() {
   this->statistic.reset();
   Cylinder cylinder;
   if (!BestFitCylinder::setUpResult(cylinder)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return cylinder;
 }
@@ -67,9 +66,9 @@ std::expected<Cylinder, QString> BestFitCylinder::exec() {
  */
 bool BestFitCylinder::setUpResult(Cylinder& cylinder) {
   if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
-    emit this->sendMessage(QString("No points tagged for cylinder %1")
-                               .arg(cylinder.getFeatureName()),
-                           MessageTypes::eWarningMessage);
+    this->sendMessage(std::format("No points tagged for cylinder {}",
+                                  cylinder.getFeatureName()),
+                      MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -94,9 +93,9 @@ bool BestFitCylinder::setUpResult(Cylinder& cylinder) {
     // point-on-axis + 1 DOF radius) - a hint, not a gate: the real
     // validation is whether the fit below actually converges.
     if (inputPoints.size() < 5) {
-      emit this->sendMessage(
-          QString("Not enough valid points to fit the cylinder %1")
-              .arg(cylinder.getFeatureName()),
+      this->sendMessage(
+          std::format("Not enough valid points to fit the cylinder {}",
+                      cylinder.getFeatureName()),
           MessageTypes::eWarningMessage);
       return false;
     }
@@ -126,15 +125,12 @@ void BestFitCylinderAppxDirection::init() {
   this->metaData.name = "BestFitCylinderAppxDirection";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "esc";
-  this->metaData.description =
-      QString("%1 %2 %3")
-          .arg("This function calculates an adjusted cylinder.")
-          .arg(
-              "You can input as many points as you want which are then used to "
-              "find the best fit cylinder.")
-          .arg(
-              "Additionally you should input a direction for approximation, "
-              "this can be done by all vector geometries");
+  this->metaData.description = std::format(
+      "{} {} {}", "This function calculates an adjusted cylinder.",
+      "You can input as many points as you want which are then used to "
+      "find the best fit cylinder.",
+      "Additionally you should input a direction for approximation, "
+      "this can be done by all vector geometries");
   this->metaData.iid = FitFunction_iidd;
 
   // set needed elements
@@ -170,15 +166,12 @@ void BestFitCylinderAppxDummyPoint::init() {
   this->metaData.name = "BestFitCylinderAppxDummyPoint";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "esc";
-  this->metaData.description =
-      QString("%1 %2 %3")
-          .arg("This function calculates an adjusted cylinder.")
-          .arg(
-              "You can input as many points as you want which are then used to "
-              "find the best fit cylinder.")
-          .arg(
-              "Additionally you should input dummy points for approximation, "
-              "this can be done by all point geometries");
+  this->metaData.description = std::format(
+      "{} {} {}", "This function calculates an adjusted cylinder.",
+      "You can input as many points as you want which are then used to "
+      "find the best fit cylinder.",
+      "Additionally you should input dummy points for approximation, "
+      "this can be done by all point geometries");
   this->metaData.iid = FitFunction_iidd;
 
   // set needed elements

@@ -1,5 +1,7 @@
 #include "p_translatebyvalue.h"
 
+#include <format>
+
 #include "containers.h"
 
 /*!
@@ -10,8 +12,8 @@ void TranslateByValue::init() {
   this->metaData.name = "TranslateByValue";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description = QString("%1").arg(
-      "This function shifts the target geometry along the input vector.");
+  this->metaData.description = std::format(
+      "{}", "This function shifts the target geometry along the input vector.");
   this->metaData.iid = ObjectTransformation_iidd;
 
   // set needed elements
@@ -36,10 +38,10 @@ void TranslateByValue::init() {
  * \param point
  * \return
  */
-std::expected<Point, QString> TranslateByValue::exec(const Point& input) {
+std::expected<Point, std::string> TranslateByValue::exec(const Point& input) {
   Point point = input;
   if (!this->setUpResult(point)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return point;
 }
@@ -49,10 +51,10 @@ std::expected<Point, QString> TranslateByValue::exec(const Point& input) {
  * \param input
  * \return
  */
-std::expected<Line, QString> TranslateByValue::exec(const Line& input) {
+std::expected<Line, std::string> TranslateByValue::exec(const Line& input) {
   Line line = input;
   if (!this->setUpResult(line)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return line;
 }
@@ -62,10 +64,10 @@ std::expected<Line, QString> TranslateByValue::exec(const Line& input) {
  * \param input
  * \return
  */
-std::expected<Plane, QString> TranslateByValue::exec(const Plane& input) {
+std::expected<Plane, std::string> TranslateByValue::exec(const Plane& input) {
   Plane plane = input;
   if (!this->setUpResult(plane)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return plane;
 }
@@ -75,10 +77,10 @@ std::expected<Plane, QString> TranslateByValue::exec(const Plane& input) {
  * \param input
  * \return
  */
-std::expected<Sphere, QString> TranslateByValue::exec(const Sphere& input) {
+std::expected<Sphere, std::string> TranslateByValue::exec(const Sphere& input) {
   Sphere sphere = input;
   if (!this->setUpResult(sphere)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return sphere;
 }

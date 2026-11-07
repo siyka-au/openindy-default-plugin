@@ -1,5 +1,7 @@
 #include "p_linefromplanenormal.h"
 
+#include <format>
+
 /*!
  * \brief LineFromPlaneNormal::init
  */
@@ -8,14 +10,12 @@ void LineFromPlaneNormal::init() {
   this->metaData.name = "LineFromPlaneNormal";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "oi";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg(
-              "This function creates a line along the normal of a plane, "
-              "through the plane's position.")
-          .arg(
-              "The line follows the plane: change or re-measure the plane and "
-              "the line updates with it.");
+  this->metaData.description = std::format(
+      "{} {}",
+      "This function creates a line along the normal of a plane, "
+      "through the plane's position.",
+      "The line follows the plane: change or re-measure the plane and "
+      "the line updates with it.");
   this->metaData.iid = ConstructFunction_iidd;
 
   // set needed elements
@@ -34,10 +34,10 @@ void LineFromPlaneNormal::init() {
  * \param line
  * \return
  */
-std::expected<Line, QString> LineFromPlaneNormal::exec() {
+std::expected<Line, std::string> LineFromPlaneNormal::exec() {
   Line line;
   if (!this->setUpResult(line)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return line;
 }
@@ -49,8 +49,8 @@ std::expected<Line, QString> LineFromPlaneNormal::exec() {
  */
 bool LineFromPlaneNormal::setUpResult(Line& line) {
   if (!this->inputElements.contains(0) || this->inputElements[0].size() != 1) {
-    emit this->sendMessage(
-        QString("No plane set for line %1").arg(line.getFeatureName()),
+    this->sendMessage(
+        std::format("No plane set for line {}", line.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
@@ -61,9 +61,9 @@ bool LineFromPlaneNormal::setUpResult(Line& line) {
   // define would be meaningless too
   if (element.plane.isNull() || !element.plane->getIsSolved()) {
     this->setIsUsed(0, element.id, false);
-    emit this->sendMessage(QString("The plane for line %1 is not solved")
-                               .arg(line.getFeatureName()),
-                           MessageTypes::eWarningMessage);
+    this->sendMessage(std::format("The plane for line {} is not solved",
+                                  line.getFeatureName()),
+                      MessageTypes::eWarningMessage);
     return false;
   }
 

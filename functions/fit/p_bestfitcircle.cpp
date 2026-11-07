@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include <QtCore>
+#include <format>
 #include <vector>
 
 /*!
@@ -12,17 +14,14 @@ void BestFitCircle::init() {
   this->metaData.name = "BestFitCircle";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "Michael Loesler - derletztekick.com";
-  this->metaData.description =
-      QString("%1 %2 %3")
-          .arg(
-              "This function estimates a spatial circle usnig a general least "
-              "squares algorithm.")
-          .arg(
-              "Insert at least three non-collinear points, to get the best fit "
-              "circle.")
-          .arg(
-              "The algorithm was taken from the OpenSource FormFittingToolbox "
-              "(c) M.Loesler (GNU-GPL).");
+  this->metaData.description = std::format(
+      "{} {} {}",
+      "This function estimates a spatial circle usnig a general least "
+      "squares algorithm.",
+      "Insert at least three non-collinear points, to get the best fit "
+      "circle.",
+      "The algorithm was taken from the OpenSource FormFittingToolbox "
+      "(c) M.Loesler (GNU-GPL).");
   this->metaData.iid = FitFunction_iidd;
 
   // D12/Stage 7c-ii: plain BestFitCircle had no Points-based twin before
@@ -46,10 +45,10 @@ void BestFitCircle::init() {
  * \brief BestFitCircle::exec
  * \return
  */
-std::expected<Circle, QString> BestFitCircle::exec() {
+std::expected<Circle, std::string> BestFitCircle::exec() {
   Circle circle;
   if (!this->setUpResult(circle)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return circle;
 }
@@ -62,8 +61,8 @@ std::expected<Circle, QString> BestFitCircle::exec() {
 bool BestFitCircle::setUpResult(Circle& circle) {
   // get and check input points
   if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
-    emit this->sendMessage(
-        QString("No points tagged for circle %1").arg(circle.getFeatureName()),
+    this->sendMessage(
+        std::format("No points tagged for circle {}", circle.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
@@ -78,10 +77,9 @@ bool BestFitCircle::setUpResult(Circle& circle) {
     this->setIsUsed(0, element.id, false);
   }
   if (inputPoints.size() < 3) {
-    emit this->sendMessage(
-        QString("Not enough valid points to fit the point %1")
-            .arg(circle.getFeatureName()),
-        MessageTypes::eWarningMessage);
+    this->sendMessage(std::format("Not enough valid points to fit the point {}",
+                                  circle.getFeatureName()),
+                      MessageTypes::eWarningMessage);
     return false;
   }
 

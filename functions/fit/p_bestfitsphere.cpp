@@ -1,5 +1,6 @@
 #include "p_bestfitsphere.h"
 
+#include <format>
 #include <utility>
 #include <vector>
 
@@ -11,12 +12,10 @@ void BestFitSphere::init() {
   this->metaData.name = "BestFitSphere";
   this->metaData.pluginName = "OpenIndy Default Plugin";
   this->metaData.author = "bra";
-  this->metaData.description =
-      QString("%1 %2")
-          .arg("This function calculates an adjusted sphere.")
-          .arg(
-              "You can input as many points as you want which are then used to "
-              "find the best fit sphere.");
+  this->metaData.description = std::format(
+      "{} {}", "This function calculates an adjusted sphere.",
+      "You can input as many points as you want which are then used to "
+      "find the best fit sphere.");
   this->metaData.iid = FitFunction_iidd;
 
   // D12/Stage 7c-ii: consolidates BestFitSphere (raw Observations) and
@@ -40,10 +39,10 @@ void BestFitSphere::init() {
  * \brief BestFitSphere::exec
  * \return
  */
-std::expected<Sphere, QString> BestFitSphere::exec() {
+std::expected<Sphere, std::string> BestFitSphere::exec() {
   Sphere sphere;
   if (!this->setUpResult(sphere)) {
-    return std::unexpected(QString("%1 failed").arg(this->getMetaData().name));
+    return std::unexpected(std::format("{} failed", this->getMetaData().name));
   }
   return sphere;
 }
@@ -57,8 +56,8 @@ bool BestFitSphere::setUpResult(Sphere& sphere) {
   this->statistic.reset();
 
   if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
-    emit this->sendMessage(
-        QString("No points tagged for sphere %1").arg(sphere.getFeatureName()),
+    this->sendMessage(
+        std::format("No points tagged for sphere {}", sphere.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
@@ -77,9 +76,9 @@ bool BestFitSphere::setUpResult(Sphere& sphere) {
     }
   }
   if (inputPoints.size() < 4) {
-    emit this->sendMessage(
-        QString("Not enough valid points to fit the sphere %1")
-            .arg(sphere.getFeatureName()),
+    this->sendMessage(
+        std::format("Not enough valid points to fit the sphere {}",
+                    sphere.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
@@ -151,7 +150,7 @@ bool BestFitSphere::approximate(
   try {
     Q = N.inv();
   } catch (exception& e) {
-    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
+    this->sendMessage(e.what(), MessageTypes::eErrorMessage);
     return false;
   }
 
@@ -162,9 +161,10 @@ bool BestFitSphere::approximate(
   double ym = 0.0;
   double zm = 0.0;
 
-  r = qSqrt(qAbs(0.25 * (a.getAt(0) * a.getAt(0) + a.getAt(1) * a.getAt(1) +
-                         a.getAt(2) * a.getAt(2)) -
-                 a.getAt(3)));
+  r = std::sqrt(
+      std::abs(0.25 * (a.getAt(0) * a.getAt(0) + a.getAt(1) * a.getAt(1) +
+                       a.getAt(2) * a.getAt(2)) -
+               a.getAt(3)));
   xm = -0.5 * a.getAt(0) + centroid.getAt(0);
   ym = -0.5 * a.getAt(1) + centroid.getAt(1);
   zm = -0.5 * a.getAt(2) + centroid.getAt(2);
@@ -206,12 +206,12 @@ bool BestFitSphere::fit(
     for (int i = 0; std::cmp_less(i, inputPoints.size()); i++) {
       const OiVec x = inputPoints.at(i)->getPosition().getVector();
 
-      double r0 = qSqrt((x.getAt(0) + verb.getAt(i * 3) - xm) *
-                            (x.getAt(0) + verb.getAt(i * 3) - xm) +
-                        (x.getAt(1) + verb.getAt(i * 3 + 1) - ym) *
-                            (x.getAt(1) + verb.getAt(i * 3 + 1) - ym) +
-                        (x.getAt(2) + verb.getAt(i * 3 + 2) - zm) *
-                            (x.getAt(2) + verb.getAt(i * 3 + 2) - zm));
+      double r0 = std::sqrt((x.getAt(0) + verb.getAt(i * 3) - xm) *
+                                (x.getAt(0) + verb.getAt(i * 3) - xm) +
+                            (x.getAt(1) + verb.getAt(i * 3 + 1) - ym) *
+                                (x.getAt(1) + verb.getAt(i * 3 + 1) - ym) +
+                            (x.getAt(2) + verb.getAt(i * 3 + 2) - zm) *
+                                (x.getAt(2) + verb.getAt(i * 3 + 2) - zm));
 
       A.setAt(i, 0, -1.0 * (x.getAt(0) + verb.getAt(i * 3) - xm) / r0);
       A.setAt(i, 1, -1.0 * (x.getAt(1) + verb.getAt(i * 3 + 1) - ym) / r0);
@@ -253,7 +253,7 @@ bool BestFitSphere::fit(
     try {
       Q = N.inv();
     } catch (exception& e) {
-      emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
+      this->sendMessage(e.what(), MessageTypes::eErrorMessage);
       return false;
     }
 
@@ -286,8 +286,8 @@ bool BestFitSphere::fit(
   }
 
   if (numIterations >= 101) {
-    emit this->sendMessage("No solution found during 100 iterations",
-                           MessageTypes::eWarningMessage);
+    this->sendMessage("No solution found during 100 iterations",
+                      MessageTypes::eWarningMessage);
     return false;
   }
 
@@ -312,7 +312,7 @@ bool BestFitSphere::fit(
     for (int i = 0; i < verb.getSize(); i++) {
       sum_vv += verb.getAt(i) * verb.getAt(i);
     }
-    stdv = qSqrt(sum_vv / (verb.getSize() - 12));
+    stdv = std::sqrt(sum_vv / (verb.getSize() - 12));
   } else {
     stdv = 0.0;
   }

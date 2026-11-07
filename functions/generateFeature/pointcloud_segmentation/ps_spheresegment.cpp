@@ -1,5 +1,8 @@
 #include "ps_spheresegment.h"
 
+#include <QtCore>
+#include <format>
+
 // CombinationWatcher Sphere::myCombinations;
 OiMat PS_SphereSegment::min_A(4, 4);
 OiMat PS_SphereSegment::min_AReplaced(4, 4);
@@ -32,7 +35,7 @@ PS_SphereSegment::~PS_SphereSegment() {}
  * \param filePath
  * \return
  */
-bool PS_SphereSegment::writeToX3D(const QString& filePath) {
+bool PS_SphereSegment::writeToX3D(const std::string& filePath) {
   QDomDocument document;
 
   QDomElement root = document.createElement("X3D");
@@ -42,22 +45,21 @@ bool PS_SphereSegment::writeToX3D(const QString& filePath) {
   root.appendChild(scene);
 
   QDomElement transformation = document.createElement("Transform");
-  transformation.setAttribute("translation", QString("%1 %2 %3")
-                                                 .arg(this->getXYZ()[0])
-                                                 .arg(this->getXYZ()[1])
-                                                 .arg(this->getXYZ()[2]));
+  transformation.setAttribute(
+      "translation", std::format("{} {} {}", this->getXYZ()[0],
+                                 this->getXYZ()[1], this->getXYZ()[2]));
   scene.appendChild(transformation);
 
   QDomElement shape = document.createElement("Shape");
   transformation.appendChild(shape);
 
   QDomElement sphere = document.createElement("Sphere");
-  sphere.setAttribute("radius", QString("%1").arg(this->getRadius()));
+  sphere.setAttribute("radius", std::format("{}", this->getRadius()));
   shape.appendChild(sphere);
 
   QDomElement appearance = document.createElement("Appearance");
   QDomElement material = document.createElement("Material");
-  material.setAttribute("diffuseColor", QString("0 1 1"));
+  material.setAttribute("diffuseColor", std::string("0 1 1"));
   appearance.appendChild(material);
   shape.appendChild(appearance);
 
@@ -106,7 +108,7 @@ PS_SphereSegment* PS_SphereSegment::detectSphere(
   }
 
   // calculate the number of necessary trials
-  numTrials = (int)ceil(qLn(1.0f - s) / qLn(1.0f - phk));
+  numTrials = (int)ceil(std::log(1.0f - s) / std::log(1.0f - phk));
 
   // qDebug() << "Anzahl Durchgänge: " << numTrials;
 
@@ -185,15 +187,16 @@ int PS_SphereSegment::checkPointsInSphere(PS_SphereSegment* mySphere,
 
         float radiusActual = 0.0f;  // length of the difference vector
 
-        radiusActual = qSqrt(diffVec[0] * diffVec[0] + diffVec[1] * diffVec[1] +
-                             diffVec[2] * diffVec[2]);
+        radiusActual =
+            std::sqrt(diffVec[0] * diffVec[0] + diffVec[1] * diffVec[1] +
+                      diffVec[2] * diffVec[2]);
 
         float distance = 0.0f;
 
         distance = radiusActual - mySphere->getRadius();  // distance error
 
         // add the point to the sphere if the distance is lower than a threshold
-        float absDist = qAbs(distance);
+        float absDist = std::abs(distance);
         if (absDist <
             (((float)toleranceFactor) * param.sphereParams.maxDistance)) {
           mySphere->addPoint(p);
@@ -281,9 +284,9 @@ void PS_SphereSegment::fit() {
       vy = verb.getAt(i * 3 + 1);
       vz = verb.getAt(i * 3 + 2);
 
-      double r0 =
-          qSqrt((x + vx - xm) * (x + vx - xm) + (y + vy - ym) * (y + vy - ym) +
-                (z + vz - zm) * (z + vz - zm));
+      double r0 = std::sqrt((x + vx - xm) * (x + vx - xm) +
+                            (y + vy - ym) * (y + vy - ym) +
+                            (z + vz - zm) * (z + vz - zm));
 
       a1 = (x + vx - xm) / r0;
       a2 = (y + vy - ym) / r0;
@@ -375,9 +378,9 @@ void PS_SphereSegment::fit() {
       vy = verb.getAt(i * 3 + 1);
       vz = verb.getAt(i * 3 + 2);
 
-      double r0 =
-          qSqrt((x + vx - xm) * (x + vx - xm) + (y + vy - ym) * (y + vy - ym) +
-                (z + vz - zm) * (z + vz - zm));
+      double r0 = std::sqrt((x + vx - xm) * (x + vx - xm) +
+                            (y + vy - ym) * (y + vy - ym) +
+                            (z + vz - zm) * (z + vz - zm));
 
       a1 = (x + vx - xm) / r0;
       a2 = (y + vy - ym) / r0;
@@ -418,10 +421,10 @@ void PS_SphereSegment::fit() {
     y = this->myState->myPoints.at(i)->xyz[1];
     z = this->myState->myPoints.at(i)->xyz[2];
 
-    sumVV += (r - qSqrt((xm - x) * (xm - x) + (ym - y) * (ym - y) +
-                        (zm - z) * (zm - z))) *
-             (r - qSqrt((xm - x) * (xm - x) + (ym - y) * (ym - y) +
-                        (zm - z) * (zm - z)));
+    sumVV += (r - std::sqrt((xm - x) * (xm - x) + (ym - y) * (ym - y) +
+                            (zm - z) * (zm - z))) *
+             (r - std::sqrt((xm - x) * (xm - x) + (ym - y) * (ym - y) +
+                            (zm - z) * (zm - z)));
   }
 
   // qDebug() << "fertig " << (clock() - test)/(double)CLOCKS_PER_SEC;
@@ -433,7 +436,7 @@ void PS_SphereSegment::fit() {
   this->myState->mainFocus[0] = centroid[0];
   this->myState->mainFocus[1] = centroid[1];
   this->myState->mainFocus[2] = centroid[2];
-  this->myState->sigma = qSqrt(sumVV / ((double)numPoints - 4.0));
+  this->myState->sigma = std::sqrt(sumVV / ((double)numPoints - 4.0));
   this->myState->isValid = true;
 }
 
@@ -459,7 +462,7 @@ void PS_SphereSegment::fitBySample(int numPoints) {
       //qDebug() << "else";
       QMap<int, QList<PS_Point_PC*> > randomSampleMap;
       PS_GeneralMath::getRandomSubsets(randomSampleMap, 1, numPoints,
-  this->myState->myPoints); if(randomSampleMap.isEmpty()){
+  this->myState->myPoints); if(randomSampleMap.empty()){
           this->myState->isValid = false;
           return;
       }
@@ -474,7 +477,7 @@ void PS_SphereSegment::fitBySample(int numPoints) {
   QMap<int, QList<PS_Point_PC*> > randomSampleMap;
   PS_GeneralMath::getRandomSubsets(randomSampleMap, 1, numPoints,
                                    this->myState->myPoints);
-  if (randomSampleMap.isEmpty()) {
+  if (randomSampleMap.empty()) {
     this->myState->isValid = false;
     return;
   }
@@ -608,9 +611,10 @@ void PS_SphereSegment::fitBySample(int numPoints) {
     return;
   }
 
-  r = qSqrt(qAbs(0.25 * (a.getAt(0) * a.getAt(0) + a.getAt(1) * a.getAt(1) +
-                         a.getAt(2) * a.getAt(2)) -
-                 a.getAt(3)));
+  r = std::sqrt(
+      std::abs(0.25 * (a.getAt(0) * a.getAt(0) + a.getAt(1) * a.getAt(1) +
+                       a.getAt(2) * a.getAt(2)) -
+               a.getAt(3)));
   xm = -0.5 * a.getAt(0) + centroid[0];
   ym = -0.5 * a.getAt(1) + centroid[1];
   zm = -0.5 * a.getAt(2) + centroid[2];
@@ -622,8 +626,9 @@ void PS_SphereSegment::fitBySample(int numPoints) {
       y = this->myState->myPoints.at(i)->xyz[1];
       z = this->myState->myPoints.at(i)->xyz[2];
 
-      sumVV += (r - qSqrt( (xm-x)*(xm-x) + (ym-y)*(ym-y) + (zm-z)*(zm-z) ))
-              * (r - qSqrt( (xm-x)*(xm-x) + (ym-y)*(ym-y) + (zm-z)*(zm-z) ));
+      sumVV += (r - std::sqrt( (xm-x)*(xm-x) + (ym-y)*(ym-y) + (zm-z)*(zm-z) ))
+              * (r - std::sqrt( (xm-x)*(xm-x) + (ym-y)*(ym-y) + (zm-z)*(zm-z)
+  ));
 
   }*/
 
@@ -634,10 +639,10 @@ void PS_SphereSegment::fitBySample(int numPoints) {
     y = randomSample.at(i)->xyz[1];
     z = randomSample.at(i)->xyz[2];
 
-    sumVV += (r - qSqrt((xm - x) * (xm - x) + (ym - y) * (ym - y) +
-                        (zm - z) * (zm - z))) *
-             (r - qSqrt((xm - x) * (xm - x) + (ym - y) * (ym - y) +
-                        (zm - z) * (zm - z)));
+    sumVV += (r - std::sqrt((xm - x) * (xm - x) + (ym - y) * (ym - y) +
+                            (zm - z) * (zm - z))) *
+             (r - std::sqrt((xm - x) * (xm - x) + (ym - y) * (ym - y) +
+                            (zm - z) * (zm - z)));
   }
 
   // qDebug() << "set results";
@@ -650,9 +655,9 @@ void PS_SphereSegment::fitBySample(int numPoints) {
   this->myState->mainFocus[0] = centroidAll[0];
   this->myState->mainFocus[1] = centroidAll[1];
   this->myState->mainFocus[2] = centroidAll[2];
-  // this->myState->sigma = qSqrt( sumVV /
+  // this->myState->sigma = std::sqrt( sumVV /
   // ((double)this->myState->myPoints.size() - 4.0) );
-  this->myState->sigma = qSqrt(sumVV / ((double)numPoints - 4.0));
+  this->myState->sigma = std::sqrt(sumVV / ((double)numPoints - 4.0));
   this->myState->isValid = true;
 }
 
@@ -688,7 +693,7 @@ void PS_SphereSegment::minimumSolution(const QList<PS_Point_PC*>& points) {
   }
 
   // set the sphere's attributes to the calculated values
-  this->mySphereState->radius = qSqrt(
+  this->mySphereState->radius = std::sqrt(
       PS_SphereSegment::min_X.getAt(0) * PS_SphereSegment::min_X.getAt(0) +
       PS_SphereSegment::min_X.getAt(1) * PS_SphereSegment::min_X.getAt(1) +
       PS_SphereSegment::min_X.getAt(2) * PS_SphereSegment::min_X.getAt(2) -
@@ -765,18 +770,20 @@ void PS_SphereSegment::mergeSpheres(
 
       PS_SphereSegment* s2 = detectedSpheres.at(j);  // get the second sphere
 
-      dCentroid2FocusS1 = qSqrt((s2->getXYZ()[0] - s1->getMainFocus()[0]) *
-                                    (s2->getXYZ()[0] - s1->getMainFocus()[0]) +
-                                (s2->getXYZ()[1] - s1->getMainFocus()[1]) *
-                                    (s2->getXYZ()[1] - s1->getMainFocus()[1]) +
-                                (s2->getXYZ()[2] - s1->getMainFocus()[2]) *
-                                    (s2->getXYZ()[2] - s1->getMainFocus()[2]));
-      dCentroid2FocusS2 = qSqrt((s1->getXYZ()[0] - s2->getMainFocus()[0]) *
-                                    (s1->getXYZ()[0] - s2->getMainFocus()[0]) +
-                                (s1->getXYZ()[1] - s2->getMainFocus()[1]) *
-                                    (s1->getXYZ()[1] - s2->getMainFocus()[1]) +
-                                (s1->getXYZ()[2] - s2->getMainFocus()[2]) *
-                                    (s1->getXYZ()[2] - s2->getMainFocus()[2]));
+      dCentroid2FocusS1 =
+          std::sqrt((s2->getXYZ()[0] - s1->getMainFocus()[0]) *
+                        (s2->getXYZ()[0] - s1->getMainFocus()[0]) +
+                    (s2->getXYZ()[1] - s1->getMainFocus()[1]) *
+                        (s2->getXYZ()[1] - s1->getMainFocus()[1]) +
+                    (s2->getXYZ()[2] - s1->getMainFocus()[2]) *
+                        (s2->getXYZ()[2] - s1->getMainFocus()[2]));
+      dCentroid2FocusS2 =
+          std::sqrt((s1->getXYZ()[0] - s2->getMainFocus()[0]) *
+                        (s1->getXYZ()[0] - s2->getMainFocus()[0]) +
+                    (s1->getXYZ()[1] - s2->getMainFocus()[1]) *
+                        (s1->getXYZ()[1] - s2->getMainFocus()[1]) +
+                    (s1->getXYZ()[2] - s2->getMainFocus()[2]) *
+                        (s1->getXYZ()[2] - s2->getMainFocus()[2]));
 
       // qDebug() << "vor condition";
 
@@ -959,7 +966,7 @@ void PS_SphereSegment::verifySpheres(
       }
     }
 
-    planeSigma = qSqrt(eVal / (double)(numPoints - 3.0));
+    planeSigma = std::sqrt(eVal / (double)(numPoints - 3.0));
 
     if (3.0 * planeSigma >
         sphere->getSigma()) {  // 3.0*param.sphereParams.maxDistance ){

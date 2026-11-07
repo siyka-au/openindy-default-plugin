@@ -5,10 +5,10 @@
 #include <QDebug>
 #include <QMap>
 #include <QObject>
-#include <QString>
-#include <QStringList>
 #include <QThread>
 #include <QtGlobal>
+#include <format>
+#include <string>
 
 #include "cylinder.h"
 #include "generatefeaturefunction.h"
@@ -29,8 +29,8 @@ class SegmentationProducer : public QObject {
 
  public slots:
   void startSegmentation(PS_PointCloud myCloud, PS_InputParameter param) {
-    connect(&myCloud, SIGNAL(updateStatus(QString, int)), this,
-            SLOT(updateStatus(QString, int)));
+    connect(&myCloud, SIGNAL(updateStatus(std::string, int)), this,
+            SLOT(updateStatus(std::string, int)));
 
     myCloud.setUpOctree(param);
     myCloud.detectShapes(param);
@@ -41,7 +41,7 @@ class SegmentationProducer : public QObject {
       FeatureWrapper* myFeature = new FeatureWrapper();
       Plane* myPlane = new Plane();
       myPlane->setIsSolved(true);
-      myPlane->setFeatureName(QString("plane_%1").arg(i));
+      myPlane->setFeatureName(std::format("plane_{}", i));
       OiVec xyz(3);
       OiVec ijk(3);
       xyz.setAt(0, p->getDistance() * p->getIJK()[0]);
@@ -54,7 +54,8 @@ class SegmentationProducer : public QObject {
       OiVec::dot(checkA, xyz, ijk);
       OiVec xyz2 = -1.0 * xyz;
       OiVec::dot(checkB, xyz2, ijk);
-      if (qAbs(checkA - p->getDistance()) > qAbs(checkB - p->getDistance())) {
+      if (std::abs(checkA - p->getDistance()) >
+          std::abs(checkB - p->getDistance())) {
         xyz = -1.0 * xyz;
       }
       xyz.add(1.0);
@@ -62,7 +63,7 @@ class SegmentationProducer : public QObject {
       myPlane->xyz = xyz;
       myPlane->ijk = ijk;
       myFeature->setPlane(myPlane);
-      emit this->addFeature(myFeature);
+      this->addFeature(myFeature);
 
       i++;
     }
@@ -73,7 +74,7 @@ class SegmentationProducer : public QObject {
       FeatureWrapper* myFeature = new FeatureWrapper();
       Sphere* mySphere = new Sphere();
       mySphere->setIsSolved(true);
-      mySphere->setFeatureName(QString("sphere_%1").arg(i));
+      mySphere->setFeatureName(std::format("sphere_{}", i));
       OiVec xyz(3);
       double r;
       xyz.setAt(0, s->getXYZ()[0]);
@@ -84,7 +85,7 @@ class SegmentationProducer : public QObject {
       mySphere->xyz = xyz;
       mySphere->radius = r;
       myFeature->setSphere(mySphere);
-      emit this->addFeature(myFeature);
+      this->addFeature(myFeature);
 
       i++;
     }
@@ -95,7 +96,7 @@ class SegmentationProducer : public QObject {
       FeatureWrapper* myFeature = new FeatureWrapper();
       Cylinder* myCylinder = new Cylinder();
       myCylinder->setIsSolved(true);
-      myCylinder->setFeatureName(QString("cylinder_%1").arg(i));
+      myCylinder->setFeatureName(std::format("cylinder_{}", i));
       OiVec xyz(3);
       OiVec ijk(3);
       double r;
@@ -115,24 +116,24 @@ class SegmentationProducer : public QObject {
       myCylinder->ijk = ijk;
       myCylinder->radius = r;
       myFeature->setCylinder(myCylinder);
-      emit this->addFeature(myFeature);
+      this->addFeature(myFeature);
 
       i++;
     }
 
-    disconnect(&myCloud, SIGNAL(updateStatus(QString, int)), this,
-               SLOT(updateStatus(QString, int)));
+    disconnect(&myCloud, SIGNAL(updateStatus(std::string, int)), this,
+               SLOT(updateStatus(std::string, int)));
 
-    emit this->stopThread();
+    this->stopThread();
   }
 
-  void updateStatus(QString msg, int status) {
-    emit this->changeStatus(msg, status);
+  void updateStatus(std::string msg, int status) {
+    this->changeStatus(msg, status);
   }
 
  signals:
   void stopThread();
-  void changeStatus(QString, int);
+  void changeStatus(std::string, int);
   void addFeature(FeatureWrapper*);
 };
 
@@ -155,8 +156,8 @@ class SegmentationConsumer : public QObject {
             mySegmenter,
             SLOT(startSegmentation(PS_PointCloud, PS_InputParameter)));
     connect(mySegmenter, SIGNAL(stopThread()), this, SLOT(stopThread()));
-    connect(mySegmenter, SIGNAL(changeStatus(QString, int)), &this->myDialog,
-            SLOT(setStatus(QString, int)));
+    connect(mySegmenter, SIGNAL(changeStatus(std::string, int)),
+            &this->myDialog, SLOT(setStatus(std::string, int)));
     connect(mySegmenter, SIGNAL(addFeature(FeatureWrapper*)), this,
             SLOT(addFeature(FeatureWrapper*)));
 
@@ -171,7 +172,7 @@ class SegmentationConsumer : public QObject {
   }*/
 
   void startSegmentationTask(PS_PointCloud myCloud, PS_InputParameter param) {
-    emit this->startSegmentation(myCloud, param);
+    this->startSegmentation(myCloud, param);
   }
 
  signals:

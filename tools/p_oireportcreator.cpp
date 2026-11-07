@@ -1,5 +1,7 @@
 #include "p_oireportcreator.h"
 
+#include <format>
+
 /*!
  * \brief BestFitLine::getMetaData
  * \return
@@ -9,7 +11,7 @@ PluginMetaData* OiReportCreator::getMetaData() const {
   metaData->name = "Report Creator";
   metaData->pluginName = "OpenIndy Default Plugin";
   metaData->author = "br";
-  metaData->description = QString("%1").arg("Tool for creating Reports");
+  metaData->description = std::format("{}", "Tool for creating Reports");
   metaData->iid = "de.openIndy.Plugin.OiTool.v001";
   return metaData;
 }

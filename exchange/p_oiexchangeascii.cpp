@@ -1,20 +1,25 @@
 #include "p_oiexchangeascii.h"
 
+#include <QtCore>
+#include <algorithm>
+#include <cstdint>
+#include <format>
 #include <iostream>
 #include <iterator>
 #include <map>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "containers.h"
-#include "qtinterop.h"
+#include "stringutil.h"
 
 struct ColumnData {
-  QString featureName;
-  QString comment;
-  QString groupName;
-  QString oiFeatureCommonState;
+  std::string featureName;
+  std::string comment;
+  std::string groupName;
+  std::string oiFeatureCommonState;
   OiVec position;
   OiVec direction;
 };
@@ -41,14 +46,46 @@ void OiExchangeAscii::init() {
 }
 
 namespace {
+// like QString::toDouble: the value, or 0 with *ok false
+double parseDouble(const std::string& text, bool* ok) {
+  const std::optional<double> value = oi::toDouble(text);
+  *ok = value.has_value();
+  return value.value_or(0.0);
+}
+
+// reads lines off a text, the way QTextStream::readLine does: the line
+// break (LF or CRLF) is not part of the line
+class LineReader {
+ public:
+  explicit LineReader(const std::string& text) : text(text) {}
+  [[nodiscard]] bool atEnd() const {
+    return this->position >= this->text.size();
+  }
+  std::string readLine() {
+    const std::size_t end = this->text.find('\n', this->position);
+    std::string line = this->text.substr(
+        this->position,
+        end == std::string::npos ? std::string::npos : end - this->position);
+    this->position = end == std::string::npos ? this->text.size() : end + 1;
+    if (!line.empty() && line.back() == '\r') {
+      line.pop_back();
+    }
+    return line;
+  }
+
+ private:
+  const std::string& text;
+  std::size_t position{0};
+};
+
 // reads the whole stream from its start
-QString readText(std::iostream* stream) {
+std::string readText(std::iostream* stream) {
   stream->clear();
   stream->seekg(0);
   std::string bytes((std::istreambuf_iterator<char>(*stream)),
                     std::istreambuf_iterator<char>());
   stream->clear();
-  return QString::fromUtf8(bytes.data(), static_cast<qsizetype>(bytes.size()));
+  return std::string(bytes.data(), static_cast<qsizetype>(bytes.size()));
 }
 }  // namespace
 
@@ -68,26 +105,25 @@ OiExchangeAscii::getDefaultColumnOrder(const GeometryTypes& typeOfGeometry) {
     }
 
     // the whole text of the stream (the stream is read from the start)
-    QString text = readText(this->stream);
+    std::string text = readText(this->stream);
 
     // read the first twenty lines to get the maximum number of columns
     int numColumns = 0;
     int sampleSize = 20;
-    QTextStream in(&text);
+    LineReader in(text);
     while (!in.atEnd() && sampleSize >= 0) {
-      QString line = in.readLine();
+      std::string line = in.readLine();
 
-      if (line.startsWith("#")         // skip comment
-          || line.startsWith(";")      // skip comment
-          || line.trimmed().isEmpty()  // skip empty lines
+      if (line.starts_with("#")      // skip comment
+          || line.starts_with(";")   // skip comment
+          || oi::trim(line).empty()  // skip empty lines
       ) {
         continue;
       }
 
       // split the line and compare its column count to the maximum column count
       // found before
-      std::vector<QString> columns =
-          oi::toVector(line.split(this->getDelimiter(this->usedDelimiter)));
+      std::vector<std::string> columns = this->splitLine(line);
       if (std::cmp_greater(columns.size(), numColumns)) {
         numColumns = columns.size();
       }
@@ -151,7 +187,7 @@ OiExchangeAscii::getDefaultColumnOrder(const GeometryTypes& typeOfGeometry) {
     }
 
   } catch (const exception& e) {
-    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
+    this->sendMessage(e.what(), MessageTypes::eErrorMessage);
   }
 
   return defaultColumnOrder;
@@ -162,9 +198,9 @@ OiExchangeAscii::getDefaultColumnOrder(const GeometryTypes& typeOfGeometry) {
  * \param typeOfGeometry
  * \return
  */
-std::map<ExchangeSimpleAscii::ColumnType, std::vector<QVariant>>
+std::map<ExchangeSimpleAscii::ColumnType, std::vector<oi::Value>>
 OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
-  std::map<ExchangeSimpleAscii::ColumnType, std::vector<QVariant>> filePreview;
+  std::map<ExchangeSimpleAscii::ColumnType, std::vector<oi::Value>> filePreview;
 
   // get the default column order
   std::vector<ExchangeSimpleAscii::ColumnType> defaultColumnOrder =
@@ -172,7 +208,7 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
 
   // insert an empty list for each column as default
   for (auto i : defaultColumnOrder) {
-    filePreview.insert_or_assign(i, std::vector<QVariant>());
+    filePreview.insert_or_assign(i, std::vector<oi::Value>());
   }
 
   try {
@@ -182,23 +218,22 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
     }
 
     // the whole text of the stream (the stream is read from the start)
-    QString text = readText(this->stream);
+    std::string text = readText(this->stream);
 
     // get the first twenty lines as preview
     int sampleSize = 20;
-    QTextStream in(&text);
+    LineReader in(text);
     while (!in.atEnd() && sampleSize >= 0) {
-      QString line = in.readLine();
+      std::string line = in.readLine();
 
       // split the line at delimiter
-      std::vector<QString> columns =
-          oi::toVector(line.split(this->getDelimiter(this->usedDelimiter)));
+      std::vector<std::string> columns = this->splitLine(line);
 
       // insert the column entries
       for (int i = 0; std::cmp_less(i, defaultColumnOrder.size()); i++) {
         // add an empty entry if the current row has not enough columns
         if (std::cmp_less_equal(columns.size(), i)) {
-          filePreview[defaultColumnOrder.at(i)].push_back(QString());
+          filePreview[defaultColumnOrder.at(i)].push_back(std::string());
           continue;
         }
 
@@ -210,7 +245,7 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
     }
 
   } catch (const exception& e) {
-    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
+    this->sendMessage(e.what(), MessageTypes::eErrorMessage);
   }
 
   return filePreview;
@@ -241,19 +276,42 @@ OiExchangeAscii::getPossibleColumns(const GeometryTypes& typeOfGeometry) {
 }
 
 /*!
- * \brief OiExchangeAscii::getDelimiter
- * \param delimiterName
- * \return
+ * \brief OiExchangeAscii::splitLine
+ * Splits a line at the delimiter in use. Empty pieces are kept: a line that
+ * starts with whitespace has an empty first column.
  */
-QRegularExpression OiExchangeAscii::getDelimiter(
-    const QString& delimiterName) const {
-  if (delimiterName.compare("whitespace [ ]") == 0) {
-    return QRegularExpression("\\s+");
-  } else if (delimiterName.compare("semicolon [;]") == 0) {
-    return QRegularExpression("[;]");
+std::vector<std::string> OiExchangeAscii::splitLine(
+    const std::string& line) const {
+  if (this->usedDelimiter == "whitespace [ ]") {
+    // runs of whitespace separate
+    std::vector<std::string> columns;
+    std::string current;
+    bool inGap = false;
+    for (const char c : line) {
+      const bool space = c == ' ' || c == '\t' || c == '\n' || c == '\v' ||
+                         c == '\f' || c == '\r';
+      if (space) {
+        if (!inGap) {
+          columns.push_back(current);
+          current.clear();
+          inGap = true;
+        }
+      } else {
+        current.push_back(c);
+        inGap = false;
+      }
+    }
+    columns.push_back(current);
+    return columns;
+  }
+  if (this->usedDelimiter == "semicolon [;]") {
+    return oi::split(line, ";");
   }
 
-  return QRegularExpression(".*");
+  // any other delimiter used to be the pattern ".*", which matches the whole
+  // line: an empty piece before and after it
+  return line.empty() ? std::vector<std::string>{""}
+                      : std::vector<std::string>{"", ""};
 }
 
 /*!
@@ -265,7 +323,7 @@ void OiExchangeAscii::importOiData() {
 
     // check if nominal system is valid
     if (this->nominalSystem.isNull()) {
-      emit this->importFinished(false);
+      this->importFinished(false);
       return;
     }
 
@@ -274,39 +332,39 @@ void OiExchangeAscii::importOiData() {
 
     // check if the stream exists
     if (this->stream == nullptr) {
-      emit this->importFinished(false);
+      this->importFinished(false);
       return;
     }
 
     // the whole text of the stream (the stream is read from the start)
-    QString text = readText(this->stream);
+    std::string text = readText(this->stream);
 
-    qint64 fileSize = text.size();
-    qint64 readSize = 0;
-    qint64 numPoints = 0;
+    std::int64_t fileSize = text.size();
+    std::int64_t readSize = 0;
+    std::int64_t numPoints = 0;
 
     bool notSkipped = this->getSkipFirstLine();
     // read all lines
-    QTextStream in(&text);
+    LineReader in(text);
     while (!in.atEnd()) {
-      QString line = in.readLine();
+      std::string line = in.readLine();
       readSize += line.size();
 
-      if (notSkipped                   // skip first line
-          || line.startsWith("#")      // skip comment
-          || line.startsWith(";")      // skip comment
-          || line.trimmed().isEmpty()  // skip empty lines
+      if (notSkipped                 // skip first line
+          || line.starts_with("#")   // skip comment
+          || line.starts_with(";")   // skip comment
+          || oi::trim(line).empty()  // skip empty lines
       ) {
         notSkipped = false;
         continue;
       }
 
       // convert , to .
-      line.replace(",", ".");  // decimal separator TODO use locale format
+      std::ranges::replace(line, ',',
+                           '.');  // decimal separator TODO use locale format
 
       // split the line at delimiter
-      std::vector<QString> columns =
-          oi::toVector(line.split(this->getDelimiter(this->usedDelimiter)));
+      std::vector<std::string> columns = this->splitLine(line);
 
       bool errorWhileParsing = false;
 
@@ -334,7 +392,7 @@ void OiExchangeAscii::importOiData() {
             break;
           case ExchangeSimpleAscii::eColumnX: {
             double x = 0.0;
-            x = columns.at(i).toDouble(&errorWhileParsing);
+            x = parseDouble(columns.at(i), &errorWhileParsing);
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
@@ -353,7 +411,7 @@ void OiExchangeAscii::importOiData() {
           }
           case ExchangeSimpleAscii::eColumnY: {
             double y = 0.0;
-            y = columns.at(i).toDouble(&errorWhileParsing);
+            y = parseDouble(columns.at(i), &errorWhileParsing);
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
@@ -372,7 +430,7 @@ void OiExchangeAscii::importOiData() {
           }
           case ExchangeSimpleAscii::eColumnZ: {
             double z = 0.0;
-            z = columns.at(i).toDouble(&errorWhileParsing);
+            z = parseDouble(columns.at(i), &errorWhileParsing);
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
@@ -392,7 +450,7 @@ void OiExchangeAscii::importOiData() {
           case ExchangeSimpleAscii::eColumnIgnore:
             break;
           case ExchangeSimpleAscii::eColumnPrimaryI: {
-            double value = columns.at(i).toDouble(&errorWhileParsing);
+            double value = parseDouble(columns.at(i), &errorWhileParsing);
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
@@ -409,7 +467,7 @@ void OiExchangeAscii::importOiData() {
             break;
           }
           case ExchangeSimpleAscii::eColumnPrimaryJ: {
-            double value = columns.at(i).toDouble(&errorWhileParsing);
+            double value = parseDouble(columns.at(i), &errorWhileParsing);
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
@@ -426,7 +484,7 @@ void OiExchangeAscii::importOiData() {
             break;
           }
           case ExchangeSimpleAscii::eColumnPrimaryK: {
-            double value = columns.at(i).toDouble(&errorWhileParsing);
+            double value = parseDouble(columns.at(i), &errorWhileParsing);
             errorWhileParsing = !errorWhileParsing;
 
             // transform the unit of the imported coordinate to [m]
@@ -521,17 +579,17 @@ void OiExchangeAscii::importOiData() {
         progress = 99;
       }
       numPoints++;
-      emit this->updateProgress(progress,
-                                QString("%1 nominal(s) loaded").arg(numPoints));
+      this->updateProgress(progress,
+                           std::format("{} nominal(s) loaded", numPoints));
       readSize += 2;
     }
 
-    // emit import finished signal
-    emit this->importFinished(true);
+    // import finished signal
+    this->importFinished(true);
 
   } catch (const exception& e) {
-    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage,
-                           MessageDestinations::eMessageBoxMessage);
+    this->sendMessage(e.what(), MessageTypes::eErrorMessage,
+                      MessageDestinations::eMessageBoxMessage);
   }
 }
 
@@ -541,16 +599,15 @@ void OiExchangeAscii::importOiData() {
 void OiExchangeAscii::exportOiData() {
   try {
     if (this->stream != nullptr) {
-      QString outText;
-      QTextStream out(&outText);
+      std::string outText;
 
       for (const oi::Guarded<FeatureWrapper>& fw :
            this->currentJob->getGeometriesList()) {
         if (fw->getGeometry()->getIsSolved() &&
             fw->getGeometry()->getOwnerDescription().has_value()) {
           // write to file
-          QString line = "";
-          // QString delimiter = this->getDelimiter(this->usedDelimiter);
+          std::string line = "";
+          // std::string delimiter = this->getDelimiter(this->usedDelimiter);
           for (int i = 0; std::cmp_less(i, this->userDefinedColumns.size());
                i++) {
             if (i > 0) {
@@ -562,7 +619,7 @@ void OiExchangeAscii::exportOiData() {
                 break;
               case eColumnX:
                 if (fw->getGeometry()->hasPosition()) {
-                  line.append(QString::number(
+                  line.append(oi::number(
                       convertFromDefault(
                           fw->getGeometry()->getPosition().getVector().getAt(0),
                           this->units[DimensionType::eMetric]),
@@ -573,7 +630,7 @@ void OiExchangeAscii::exportOiData() {
                 break;
               case eColumnY:
                 if (fw->getGeometry()->hasPosition()) {
-                  line.append(QString::number(
+                  line.append(oi::number(
                       convertFromDefault(
                           fw->getGeometry()->getPosition().getVector().getAt(1),
                           this->units[DimensionType::eMetric]),
@@ -584,7 +641,7 @@ void OiExchangeAscii::exportOiData() {
                 break;
               case eColumnZ:
                 if (fw->getGeometry()->hasPosition()) {
-                  line.append(QString::number(
+                  line.append(oi::number(
                       convertFromDefault(
                           fw->getGeometry()->getPosition().getVector().getAt(2),
                           this->units[DimensionType::eMetric]),
@@ -595,7 +652,7 @@ void OiExchangeAscii::exportOiData() {
                 break;
               case eColumnPrimaryI:
                 if (fw->getGeometry()->hasDirection()) {
-                  line.append(QString::number(
+                  line.append(oi::number(
                       fw->getGeometry()->getDirection().getVector().getAt(0),
                       'f', this->getAngleDigits()));
                 } else {
@@ -604,7 +661,7 @@ void OiExchangeAscii::exportOiData() {
                 break;
               case eColumnPrimaryJ:
                 if (fw->getGeometry()->hasDirection()) {
-                  line.append(QString::number(
+                  line.append(oi::number(
                       fw->getGeometry()->getDirection().getVector().getAt(1),
                       'f', this->getAngleDigits()));
                 } else {
@@ -613,7 +670,7 @@ void OiExchangeAscii::exportOiData() {
                 break;
               case eColumnPrimaryK:
                 if (fw->getGeometry()->hasDirection()) {
-                  line.append(QString::number(
+                  line.append(oi::number(
                       fw->getGeometry()->getDirection().getVector().getAt(2),
                       'f', this->getAngleDigits()));
                 } else {
@@ -622,11 +679,11 @@ void OiExchangeAscii::exportOiData() {
                 break;
               case eColumnRadiusA:
                 if (fw->getGeometry()->hasRadius()) {
-                  line.append(QString::number(
-                      convertFromDefault(
-                          fw->getGeometry()->getRadius().getRadius(),
-                          this->units[DimensionType::eMetric]),
-                      'f', this->getDistanceDigits()));
+                  line.append(
+                      oi::number(convertFromDefault(
+                                     fw->getGeometry()->getRadius().getRadius(),
+                                     this->units[DimensionType::eMetric]),
+                                 'f', this->getDistanceDigits()));
                 } else {
                   line.append("-");
                 }
@@ -637,22 +694,21 @@ void OiExchangeAscii::exportOiData() {
             }
           }
           // write to file
-          out << line;
+          outText += line;
         }
       }
-      out.flush();
-      *this->stream << outText.toStdString();
+      *this->stream << outText;
       this->stream->flush();
-      emit this->exportFinished(this->stream->good());
+      this->exportFinished(this->stream->good());
 
     } else {
-      emit this->sendMessage("export stream is not set",
-                             MessageTypes::eErrorMessage);
-      emit this->exportFinished(false);
+      this->sendMessage("export stream is not set",
+                        MessageTypes::eErrorMessage);
+      this->exportFinished(false);
     }
 
   } catch (const exception& e) {
-    emit this->sendMessage(e.what(), MessageTypes::eErrorMessage,
-                           MessageDestinations::eMessageBoxMessage);
+    this->sendMessage(e.what(), MessageTypes::eErrorMessage,
+                      MessageDestinations::eMessageBoxMessage);
   }
 }

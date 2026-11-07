@@ -41,7 +41,7 @@ class SimplePolarMeasurement : public SimulationModel {
 
  private:
   // all supported distributions;
-  std::vector<QString> distributions;
+  std::vector<std::string> distributions;
 
   double variance{};
   double expectation{};

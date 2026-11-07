@@ -1,5 +1,6 @@
 #include "configuredfunction.h"
 
+#include <QtCore>
 #include <vector>
 
 #include "cfvisitor.h"
@@ -22,7 +23,7 @@ void ConfiguredFunction::init() {
   this->neededElements = config.getNeededElements();
 }
 
-std::expected<void, QString> ConfiguredFunction::execChecked(
+std::expected<void, std::string> ConfiguredFunction::execChecked(
     const oi::Guarded<FeatureWrapper>& feature) {
   try {
     ListVisitor visitors;
@@ -55,14 +56,14 @@ std::expected<void, QString> ConfiguredFunction::execChecked(
 
     return {};
   } catch (exception& e) {
-    emit sendMessage(e.what(), MessageTypes::eErrorMessage,
-                     MessageDestinations::eConsoleMessage);
-    return std::unexpected(QString(e.what()));
+    sendMessage(e.what(), MessageTypes::eErrorMessage,
+                MessageDestinations::eConsoleMessage);
+    return std::unexpected(std::string(e.what()));
   }
 }
 
-QString ConfiguredFunction::prettyPrint() {
-  QString s;
+std::string ConfiguredFunction::prettyPrint() {
+  std::string s;
   s += "function: '" + this->getMetaData().name + "', featureFunctions: [ ";
   for (oi::Guarded<Function> f : this->functions) {
     if (auto* configured = dynamic_cast<ConfiguredFunction*>(f.data())) {

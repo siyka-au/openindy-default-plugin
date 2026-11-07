@@ -4,12 +4,12 @@
 #include <QDebug>
 #include <QFile>
 #include <QObject>
-#include <QString>
 #include <QThread>
 #include <QtGlobal>
 #include <atomic>
 #include <cmath>
 #include <map>
+#include <string>
 #include <vector>
 
 #include "lasertracker.h"
@@ -33,7 +33,7 @@ class PseudoTracker : public LaserTracker {
   // sensor state and actions
   // ########################
 
-  bool doSelfDefinedAction(const QString& action) override;
+  bool doSelfDefinedAction(const std::string& action) override;
   bool abortAction() override;
 
   //! connect app with laser tracker
@@ -47,8 +47,7 @@ class PseudoTracker : public LaserTracker {
       const MeasurementConfig& mConfig) override;
 
   //! stream
-  std::map<QString, QVariant> readingStream(
-      const ReadingTypes& streamFormat) override;
+  oi::ValueMap readingStream(const ReadingTypes& streamFormat) override;
 
   //! getConnectionState
   bool getConnectionState() override;
@@ -57,7 +56,7 @@ class PseudoTracker : public LaserTracker {
   bool getIsReadyForMeasurement() override;
 
   //! sensor stats
-  std::map<QString, QString> getSensorStatus() override;
+  std::map<std::string, std::string> getSensorStatus() override;
 
   //! checks if sensor is busy
   bool getIsBusy() override;

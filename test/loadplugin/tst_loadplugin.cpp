@@ -1,7 +1,7 @@
 #include <QPointer>
-#include <QString>
 #include <QtTest>
 #include <map>
+#include <string>
 #include <vector>
 
 #include "chooselalib.h"
@@ -46,13 +46,13 @@ void LoadPluginTest::initTestCase() {
  * -> ???
  */
 void LoadPluginTest::testLoadPlugin() {
-  QString pluginPath = PLUGIN_PATH;
+  const QString pluginPath = PLUGIN_PATH;
 
-  QVERIFY2(QFile::exists(pluginPath), pluginPath.toLatin1().data());
+  QVERIFY2(QFile::exists(pluginPath), pluginPath.toUtf8().constData());
   QPluginLoader pluginLoader(pluginPath);
 
   QObject* plugin = pluginLoader.instance();
-  QVERIFY2(plugin, pluginLoader.errorString().toLatin1().data());
+  QVERIFY2(plugin, pluginLoader.errorString().toUtf8().constData());
 
   Plugin* oiPlugin = qobject_cast<Plugin*>(plugin);
   QVERIFY2(oiPlugin, "qobject_cast");
@@ -61,13 +61,13 @@ void LoadPluginTest::testLoadPlugin() {
   QVERIFY2(functions.size() > 0, "no functions found");
 }
 void LoadPluginTest::testPseudoTracker_eCartesianReading() {
-  QString pluginPath = PLUGIN_PATH;
+  const QString pluginPath = PLUGIN_PATH;
 
-  QVERIFY2(QFile::exists(pluginPath), pluginPath.toLatin1().data());
+  QVERIFY2(QFile::exists(pluginPath), pluginPath.toUtf8().constData());
   QPluginLoader pluginLoader(pluginPath);
 
   QObject* plugin = pluginLoader.instance();
-  QVERIFY2(plugin, pluginLoader.errorString().toLatin1().data());
+  QVERIFY2(plugin, pluginLoader.errorString().toUtf8().constData());
 
   Plugin* oiPlugin = qobject_cast<Plugin*>(plugin);
   QVERIFY2(oiPlugin, "qobject_cast");
@@ -79,7 +79,7 @@ void LoadPluginTest::testPseudoTracker_eCartesianReading() {
   MeasurementConfig config;
   config.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
   SensorConfiguration sc = sensor->getSensorConfiguration();
-  std::map<QString, QString> sp = sc.getStringParameter();
+  std::map<std::string, std::string> sp = sc.getStringParameter();
   sp.insert_or_assign("reading type", "cartesian");
   sc.setStringParameter(sp);
   sensor->setSensorConfiguration(sc);

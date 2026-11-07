@@ -1,8 +1,12 @@
 #include "ps_pointcloud.h"
 
+#include <QtCore>
+#include <format>
+
 #include "ps_cylindersegment.h"
 #include "ps_planesegment.h"
 #include "ps_spheresegment.h"
+#include "stringutil.h"
 
 QList<PS_Node*> PS_PointCloud::mergedNodes;
 
@@ -48,7 +52,7 @@ PS_PointCloud& PS_PointCloud::operator=(const PS_PointCloud& copy) {
  * Load a point cloud from PTS
  * \param fileName
  */
-bool PS_PointCloud::loadPointCloud(QString fileName) {
+bool PS_PointCloud::loadPointCloud(std::string fileName) {
   QFile file(fileName);
 
   if (!file.open(QIODevice::ReadOnly)) {
@@ -61,9 +65,9 @@ bool PS_PointCloud::loadPointCloud(QString fileName) {
     QTextStream in(&file);
 
     while (!in.atEnd()) {
-      QString line = in.readLine();
+      std::string line = in.readLine();
 
-      QStringList fields = line.split(' ');
+      std::vector<std::string> fields = line.split(' ');
 
       if (fields.length() >= 3) {
         // create a new point and add it to the point cloud
@@ -147,7 +151,7 @@ bool PS_PointCloud::setUpOctree(PS_InputParameter param) {
  */
 bool PS_PointCloud::detectShapes(PS_InputParameter param) {
   if (this->myOctree->getIsValid()) {
-    emit this->updateStatus("Octree successfully created", 1);
+    this->updateStatus("Octree successfully created", 1);
 
     c1 = clock();
 
@@ -182,11 +186,11 @@ bool PS_PointCloud::detectShapes(PS_InputParameter param) {
                 for(int j = 0; j < leafs->at(i)->points.size(); j++){
                     //if(!leafs->at(i)->points.at(j)->isUsed){
                         streama <<
-    QString::number(leafs->at(i)->points.at(j)->xyz[0])
+    oi::number(leafs->at(i)->points.at(j)->xyz[0])
                                 << " " <<
-    QString::number(leafs->at(i)->points.at(j)->xyz[1])
+    oi::number(leafs->at(i)->points.at(j)->xyz[1])
                                 << " " <<
-    QString::number(leafs->at(i)->points.at(j)->xyz[2])
+    oi::number(leafs->at(i)->points.at(j)->xyz[2])
                                 << " " << r << " " << g << " " << b
                                 << endl;
                         //leafs->at(i)->points.at(j)->isUsed = true;
@@ -237,11 +241,11 @@ bool PS_PointCloud::detectShapes(PS_InputParameter param) {
               for(int j = 0; j < leafs->at(i)->points.size(); j++){
                   if(!leafs->at(i)->points.at(j)->isUsed){
                       streama <<
-      QString::number(leafs->at(i)->points.at(j)->xyz[0])
+      oi::number(leafs->at(i)->points.at(j)->xyz[0])
                               << " " <<
-      QString::number(leafs->at(i)->points.at(j)->xyz[1])
+      oi::number(leafs->at(i)->points.at(j)->xyz[1])
                               << " " <<
-      QString::number(leafs->at(i)->points.at(j)->xyz[2])
+      oi::number(leafs->at(i)->points.at(j)->xyz[2])
                               << " " << r << " " << g << " " << b
                               << endl;
                       //leafs->at(i)->points.at(j)->isUsed = true;
@@ -390,7 +394,8 @@ bool PS_PointCloud::detectShapes(PS_InputParameter param) {
 
           // print sphere
           /*QFile fileS(
-          QString("D:/UNI/Master/Semester_04/Masterarbeit/pointcloudSegmentation/result/minSphere%1.pts").arg(i)
+          std::format("D:/UNI/Master/Semester_04/Masterarbeit/pointcloudSegmentation/result/minSphere{}.pts",
+          i)
           ); if ( fileS.open(QIODevice::ReadWrite | QIODevice::Truncate) ){
 
               float r = 0.0;
@@ -407,11 +412,11 @@ bool PS_PointCloud::detectShapes(PS_InputParameter param) {
                   r = distribution(generator);
                   g = distribution(generator);
                   b = distribution(generator);
-                  streama << QString::number(s->getPoints().at(k)->xyz[0])
+                  streama << oi::number(s->getPoints().at(k)->xyz[0])
                           << " " <<
-          QString::number(s->getPoints().at(k)->xyz[1])
+          oi::number(s->getPoints().at(k)->xyz[1])
                           << " " <<
-          QString::number(s->getPoints().at(k)->xyz[2])
+          oi::number(s->getPoints().at(k)->xyz[2])
                           << " " << r << " " << g << " " << b
                           << endl;
               }
@@ -545,11 +550,9 @@ bool PS_PointCloud::detectShapes(PS_InputParameter param) {
         }
         PS_PointCloud::mergedNodes.clear();
 
-        emit this->updateStatus(
-            QString("%1 of %2 leaf nodes considered")
-                .arg(i)
-                .arg(this->myOctree->getLeafs()->size()),
-            1 + 59 * (i / this->myOctree->getLeafs()->size()));
+        this->updateStatus(std::format("{} of {} leaf nodes considered", i,
+                                       this->myOctree->getLeafs()->size()),
+                           1 + 59 * (i / this->myOctree->getLeafs()->size()));
 
         // cout << "test continue: " << (clock() - test)/(double)CLOCKS_PER_SEC
         // << " seconds." << endl;
@@ -561,8 +564,7 @@ bool PS_PointCloud::detectShapes(PS_InputParameter param) {
       }
     }
 
-    emit this->updateStatus("All leafs considered, starting with review...",
-                            60);
+    this->updateStatus("All leafs considered, starting with review...", 60);
 
     // fileOctree.close();
 
@@ -575,7 +577,7 @@ bool PS_PointCloud::detectShapes(PS_InputParameter param) {
     PS_SphereSegment::reviewNodes(this->detectedSpheres, param);
     PS_CylinderSegment::reviewNodes(this->detectedCylinders, param);
 
-    emit this->updateStatus("Review completed, starting with merge...", 67);
+    this->updateStatus("Review completed, starting with merge...", 67);
 
     qDebug() << "spheres " << this->detectedSpheres.size();
 
@@ -599,7 +601,7 @@ bool PS_PointCloud::detectShapes(PS_InputParameter param) {
     PS_PlaneSegment::mergePlanes(this->detectedPlanes, mergedPlanes, param);
     this->detectedPlanes = mergedPlanes;
 
-    emit this->updateStatus("Merge completed, starting to verify...", 80);
+    this->updateStatus("Merge completed, starting to verify...", 80);
 
     cout << "Ende Merge: " << (clock() - c1) / (double)CLOCKS_PER_SEC
          << " seconds." << endl;
@@ -618,7 +620,7 @@ bool PS_PointCloud::detectShapes(PS_InputParameter param) {
                                         verifiedCylinders, param);
     this->detectedCylinders = verifiedCylinders;
 
-    emit this->updateStatus(
+    this->updateStatus(
         "Verify completed, starting with final sort out and fit...", 90);
 
     qDebug() << "spheres nach verify " << this->detectedSpheres.size();
@@ -694,15 +696,15 @@ bool PS_PointCloud::detectShapes(PS_InputParameter param) {
       }
     }
 
-    QString path = qApp->applicationDirPath().append("/result");
+    std::string path = qApp->applicationDirPath().append("/result");
     qDebug() << path;
     QDir dir(path);
     if (!dir.exists()) {
       dir.mkpath(path);
     }
 
-    emit this->updateStatus(
-        QString("Segmentation done, writing output files to %1").arg(path), 99);
+    this->updateStatus(
+        std::format("Segmentation done, writing output files to {}", path), 99);
 
     double processingTime = (clock() - c1) / (double)CLOCKS_PER_SEC;
 
@@ -1378,39 +1380,38 @@ void PS_PointCloud::acceptShapeCandidates(PS_PlaneSegment* p,
  * Print output files with results of the segmentation
  * \param filePath
  */
-void PS_PointCloud::printOutput(QString filePath, double processingTime,
+void PS_PointCloud::printOutput(std::string filePath, double processingTime,
                                 PS_InputParameter param) {
   // print x3d sphapes
   /*for(unsigned int i = 0; i < this->detectedSpheres.size(); i++){
       this->detectedSpheres.at(i)->writeToX3D(
-                  QString("%1/sphere_%2.x3d").arg(filePath).arg(QString::number(i+1)));
+                  std::format("{}/sphere_{}.x3d", filePath, oi::number(i+1)));
   }
   for(unsigned int i = 0; i < this->detectedSpheres.size(); i++){
       this->detectedSpheres.at(i)->writeToX3D(
-                  QString("%1/sphere_%2.x3d").arg(filePath).arg(QString::number(i+1)));
+                  std::format("{}/sphere_{}.x3d", filePath, oi::number(i+1)));
   }
   for(unsigned int i = 0; i < this->detectedCylinders.size(); i++){
       this->detectedCylinders.at(i)->writeToX3D(
-                  QString("%1/cylinder_%2.x3d").arg(filePath).arg(QString::number(i+1)));
+                  std::format("{}/cylinder_{}.x3d", filePath, oi::number(i+1)));
   }*/
 
   // write pts files
   for (unsigned int i = 0; i < this->detectedPlanes.size(); i++) {
     this->detectedPlanes.at(i)->writeToPts(
-        QString("%1/plane_%2.pts").arg(filePath).arg(QString::number(i + 1)));
+        std::format("{}/plane_{}.pts", filePath, oi::number(i + 1)));
   }
   for (unsigned int i = 0; i < this->detectedSpheres.size(); i++) {
     this->detectedSpheres.at(i)->writeToPts(
-        QString("%1/sphere_%2.pts").arg(filePath).arg(QString::number(i + 1)));
+        std::format("{}/sphere_{}.pts", filePath, oi::number(i + 1)));
   }
   for (unsigned int i = 0; i < this->detectedCylinders.size(); i++) {
-    this->detectedCylinders.at(i)->writeToPts(QString("%1/cylinder_%2.pts")
-                                                  .arg(filePath)
-                                                  .arg(QString::number(i + 1)));
+    this->detectedCylinders.at(i)->writeToPts(
+        std::format("{}/cylinder_{}.pts", filePath, oi::number(i + 1)));
   }
 
   // write result protocol
-  QFile file(QString("%1/segmentationProtocol.txt").arg(filePath));
+  QFile file(std::format("{}/segmentationProtocol.txt", filePath));
   if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
     QTextStream stream(&file);
 
@@ -1424,69 +1425,70 @@ void PS_PointCloud::printOutput(QString filePath, double processingTime,
            << endl;
     stream << "Author:" << "\t" << "Benedikt Rauls" << endl;
     stream << "point cloud:" << "\t" << this->filePath
-           << QString(" (%1 points)").arg(this->myPoints->size()) << endl;
-    stream << "Processing time:" << "\t"
-           << QString::number(processingTime, 'f', 4) << " sec." << endl;
+           << std::format(" ({} points)", this->myPoints->size()) << endl;
+    stream << "Processing time:" << "\t" << oi::number(processingTime, 'f', 4)
+           << " sec." << endl;
     stream << "Number of detected Shapes:" << "\t"
-           << QString::number(this->detectedPlanes.size() +
-                              this->detectedSpheres.size() +
-                              this->detectedCylinders.size())
-           << QString(" (planes: %1, spheres: %2, cylinders: %3)")
-                  .arg(this->detectedPlanes.size())
-                  .arg(this->detectedSpheres.size())
-                  .arg(this->detectedCylinders.size())
+           << oi::number(this->detectedPlanes.size() +
+                         this->detectedSpheres.size() +
+                         this->detectedCylinders.size())
+           << std::format(" (planes: {}, spheres: {}, cylinders: {})",
+                          this->detectedPlanes.size(),
+                          this->detectedSpheres.size(),
+                          this->detectedCylinders.size())
            << endl;
     stream << "" << endl;
     stream << "Input parameters" << endl;
     stream << "----------------------" << endl;
-    stream << "leafSize:" << "\t" << QString::number(param.leafSize) << endl;
+    stream << "leafSize:" << "\t" << oi::number(param.leafSize) << endl;
     stream << "outlierPercentage:" << "\t"
-           << QString::number(param.outlierPercentage, 'f', 2) << endl;
-    stream << "fitSampleSize:" << "\t" << QString::number(param.fitSampleSize)
+           << oi::number(param.outlierPercentage, 'f', 2) << endl;
+    stream << "fitSampleSize:" << "\t" << oi::number(param.fitSampleSize)
            << endl;
-    stream << "finalFit:" << "\t" << QString(param.finalFit ? "true" : "false")
-           << endl;
+    stream << "finalFit:" << "\t"
+           << std::string(param.finalFit ? "true" : "false") << endl;
     stream << "detectPlanes:" << "\t"
-           << QString(param.planeParams.detectPlanes ? "true" : "false")
+           << std::string(param.planeParams.detectPlanes ? "true" : "false")
            << endl;
     stream << "detectSpheres:" << "\t"
-           << QString(param.sphereParams.detectSpheres ? "true" : "false")
+           << std::string(param.sphereParams.detectSpheres ? "true" : "false")
            << endl;
     stream << "detectCylinders:" << "\t"
-           << QString(param.cylinderParams.detectCylinders ? "true" : "false")
+           << std::string(param.cylinderParams.detectCylinders ? "true"
+                                                               : "false")
            << endl;
     if (param.planeParams.detectPlanes) {
       stream << "maxDistance (plane):" << "\t"
-             << QString::number(param.planeParams.maxDistance, 'f', 4) << " m"
+             << oi::number(param.planeParams.maxDistance, 'f', 4) << " m"
              << endl;
       stream << "minPoints (plane):" << "\t"
-             << QString::number(param.planeParams.minPoints) << endl;
+             << oi::number(param.planeParams.minPoints) << endl;
     }
     if (param.sphereParams.detectSpheres) {
       stream << "maxDistance (sphere):" << "\t"
-             << QString::number(param.sphereParams.maxDistance, 'f', 4) << " m"
+             << oi::number(param.sphereParams.maxDistance, 'f', 4) << " m"
              << endl;
       stream << "maxRadius (sphere):" << "\t"
-             << QString::number(param.sphereParams.maxRadius, 'f', 4) << " m"
+             << oi::number(param.sphereParams.maxRadius, 'f', 4) << " m"
              << endl;
       stream << "minRadius (sphere):" << "\t"
-             << QString::number(param.sphereParams.minRadius, 'f', 4) << " m"
+             << oi::number(param.sphereParams.minRadius, 'f', 4) << " m"
              << endl;
       stream << "minPoints (sphere):" << "\t"
-             << QString::number(param.sphereParams.minPoints) << endl;
+             << oi::number(param.sphereParams.minPoints) << endl;
     }
     if (param.cylinderParams.detectCylinders) {
       stream << "maxDistance (cylinder):" << "\t"
-             << QString::number(param.cylinderParams.maxDistance, 'f', 4)
-             << " m" << endl;
+             << oi::number(param.cylinderParams.maxDistance, 'f', 4) << " m"
+             << endl;
       stream << "maxRadius (cylinder):" << "\t"
-             << QString::number(param.cylinderParams.maxRadius, 'f', 4) << " m"
+             << oi::number(param.cylinderParams.maxRadius, 'f', 4) << " m"
              << endl;
       stream << "minRadius (cylinder):" << "\t"
-             << QString::number(param.cylinderParams.minRadius, 'f', 4) << " m"
+             << oi::number(param.cylinderParams.minRadius, 'f', 4) << " m"
              << endl;
       stream << "minPoints (cylinders):" << "\t"
-             << QString::number(param.cylinderParams.minPoints) << endl;
+             << oi::number(param.cylinderParams.minPoints) << endl;
     }
     stream << "" << endl;
     stream << "Extracted Planes" << endl;
@@ -1495,16 +1497,13 @@ void PS_PointCloud::printOutput(QString filePath, double processingTime,
            << "d[m]" << "\t" << "numPoints" << "\t" << "stdev[m]" << endl;
     for (int i = 0; i < this->detectedPlanes.size(); ++i) {
       float* ijk = this->detectedPlanes.at(i)->getIJK();
-      stream << QString("plane_%1").arg(i + 1) << "\t"
-             << QString::number(ijk[0], 'f', 6) << "\t"
-             << QString::number(ijk[1], 'f', 6) << "\t"
-             << QString::number(ijk[2], 'f', 6) << "\t"
-             << QString::number(this->detectedPlanes.at(i)->getDistance(), 'f',
-                                4)
+      stream << std::format("plane_{}", i + 1) << "\t"
+             << oi::number(ijk[0], 'f', 6) << "\t" << oi::number(ijk[1], 'f', 6)
+             << "\t" << oi::number(ijk[2], 'f', 6) << "\t"
+             << oi::number(this->detectedPlanes.at(i)->getDistance(), 'f', 4)
+             << "\t" << oi::number(this->detectedPlanes.at(i)->getPointCount())
              << "\t"
-             << QString::number(this->detectedPlanes.at(i)->getPointCount())
-             << "\t"
-             << QString::number(this->detectedPlanes.at(i)->getSigma(), 'f', 4)
+             << oi::number(this->detectedPlanes.at(i)->getSigma(), 'f', 4)
              << endl;
     }
     stream << "" << endl;
@@ -1515,16 +1514,13 @@ void PS_PointCloud::printOutput(QString filePath, double processingTime,
            << endl;
     for (int i = 0; i < this->detectedSpheres.size(); ++i) {
       float* xyz = this->detectedSpheres.at(i)->getXYZ();
-      stream << QString("sphere_%1").arg(i + 1) << "\t"
-             << QString::number(xyz[0], 'f', 4) << "\t"
-             << QString::number(xyz[1], 'f', 4) << "\t"
-             << QString::number(xyz[2], 'f', 4) << "\t"
-             << QString::number(this->detectedSpheres.at(i)->getRadius(), 'f',
-                                4)
+      stream << std::format("sphere_{}", i + 1) << "\t"
+             << oi::number(xyz[0], 'f', 4) << "\t" << oi::number(xyz[1], 'f', 4)
+             << "\t" << oi::number(xyz[2], 'f', 4) << "\t"
+             << oi::number(this->detectedSpheres.at(i)->getRadius(), 'f', 4)
+             << "\t" << oi::number(this->detectedSpheres.at(i)->getPointCount())
              << "\t"
-             << QString::number(this->detectedSpheres.at(i)->getPointCount())
-             << "\t"
-             << QString::number(this->detectedSpheres.at(i)->getSigma(), 'f', 4)
+             << oi::number(this->detectedSpheres.at(i)->getSigma(), 'f', 4)
              << endl;
     }
     stream << "" << endl;
@@ -1537,20 +1533,16 @@ void PS_PointCloud::printOutput(QString filePath, double processingTime,
       float ijk[3], x0[3];
       this->detectedCylinders.at(i)->getIJK(ijk);
       this->detectedCylinders.at(i)->getX0(x0);
-      stream << QString("cylinder_%1").arg(i + 1) << "\t"
-             << QString::number(ijk[0], 'f', 6) << "\t"
-             << QString::number(ijk[1], 'f', 6) << "\t"
-             << QString::number(ijk[2], 'f', 6) << "\t"
-             << QString::number(x0[0], 'f', 4) << "\t"
-             << QString::number(x0[1], 'f', 4) << "\t"
-             << QString::number(x0[2], 'f', 4) << "\t"
-             << QString::number(this->detectedCylinders.at(i)->getRadius(), 'f',
-                                4)
+      stream << std::format("cylinder_{}", i + 1) << "\t"
+             << oi::number(ijk[0], 'f', 6) << "\t" << oi::number(ijk[1], 'f', 6)
+             << "\t" << oi::number(ijk[2], 'f', 6) << "\t"
+             << oi::number(x0[0], 'f', 4) << "\t" << oi::number(x0[1], 'f', 4)
+             << "\t" << oi::number(x0[2], 'f', 4) << "\t"
+             << oi::number(this->detectedCylinders.at(i)->getRadius(), 'f', 4)
              << "\t"
-             << QString::number(this->detectedCylinders.at(i)->getPointCount())
+             << oi::number(this->detectedCylinders.at(i)->getPointCount())
              << "\t"
-             << QString::number(this->detectedCylinders.at(i)->getSigma(), 'f',
-                                4)
+             << oi::number(this->detectedCylinders.at(i)->getSigma(), 'f', 4)
              << endl;
     }
 
