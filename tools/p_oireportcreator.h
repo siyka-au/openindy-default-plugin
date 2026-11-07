@@ -9,7 +9,7 @@ class OiReportCreator : public OiTool {
   PluginMetaData* getMetaData() const;
 
  public slots:
-  void customXMLRequest(OiRequestResponse* request);
+  void customRequest(OiRequestResponse* request);
   void watchWindowKeyPressed(Qt::Key);
 };
 
