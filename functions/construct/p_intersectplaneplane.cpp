@@ -25,11 +25,11 @@ void IntersectPlanePlane::init() {
       "Select another plane to calculate the line intersection.";
   param2.infinite = false;
   param2.typeOfElement = ElementTypes::ePlaneElement;
-  this->neededElements.append(param1);
-  this->neededElements.append(param2);
+  this->neededElements.push_back(param1);
+  this->neededElements.push_back(param2);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::eLineFeature);
+  this->applicableFor.push_back(FeatureTypes::eLineFeature);
 }
 
 /*!
@@ -58,8 +58,8 @@ bool IntersectPlanePlane::setUpResult(Line& line) {
   }
 
   // check if input elements are equal
-  if (this->inputElements[0].first().plane->getId() ==
-      this->inputElements[1].first().plane->getId()) {
+  if (this->inputElements[0].front().plane->getId() ==
+      this->inputElements[1].front().plane->getId()) {
     emit this->sendMessage(QString("Input geometries are equal."),
                            MessageTypes::eWarningMessage);
     return false;

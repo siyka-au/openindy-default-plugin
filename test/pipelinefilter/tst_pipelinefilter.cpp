@@ -1,7 +1,9 @@
 #include <QtTest>
 #include <cmath>
+#include <vector>
 
 #include "chooselalib.h"
+#include "containers.h"
 #include "featurewrapper.h"
 #include "geometry/plane.h"
 #include "geometry/point.h"
@@ -89,18 +91,19 @@ oi::Guarded<OiJob> PipelineFilterTest::makeJobWithActiveStation(
 // does not have, exactly as that test's own comment explains.
 oi::Guarded<Point> PipelineFilterTest::measureOnePoint(
     const oi::Guarded<OiJob>& job, int targetId, double x, double y, double z) {
-  const QList<oi::Guarded<FeatureWrapper> > before = job->getFeaturesList();
+  const std::vector<oi::Guarded<FeatureWrapper> > before =
+      job->getFeaturesList();
 
-  QList<oi::Guarded<Reading> > readings;
-  readings << makeCartesianReading(x, y, z);
+  std::vector<oi::Guarded<Reading> > readings;
+  readings.push_back(makeCartesianReading(x, y, z));
   job->addMeasurementResults(targetId, readings);
 
   oi::Guarded<Point> measured;
-  foreach (const oi::Guarded<FeatureWrapper>& fw, job->getFeaturesList()) {
+  for (const oi::Guarded<FeatureWrapper>& fw : job->getFeaturesList()) {
     if (fw.isNull() || fw->getPoint().isNull()) {
       continue;
     }
-    if (!before.contains(fw)) {
+    if (!oi::contains(before, fw)) {
       measured = fw->getPoint();
     }
   }
@@ -109,7 +112,7 @@ oi::Guarded<Point> PipelineFilterTest::measureOnePoint(
     return measured;
   }
 
-  foreach (const oi::Guarded<Observation>& obs, measured->getObservations()) {
+  for (const oi::Guarded<Observation>& obs : measured->getObservations()) {
     OiVec xyz(4);
     xyz.setAt(0, x);
     xyz.setAt(1, y);
@@ -171,16 +174,16 @@ void PipelineFilterTest::
   struct Pt {
     double x, y, z;
   };
-  QList<Pt> pts;
-  pts.append(Pt{0.0, 0.0, 0.0});
-  pts.append(Pt{1.0, 0.0, 0.5});
-  pts.append(Pt{0.0, 1.0, 0.25});
+  std::vector<Pt> pts;
+  pts.push_back(Pt{0.0, 0.0, 0.0});
+  pts.push_back(Pt{1.0, 0.0, 0.5});
+  pts.push_back(Pt{0.0, 1.0, 0.25});
   for (int x = 0; x < 8; x++) {
     for (int y = 0; y < 8; y++) {
       if ((x == 0 && y == 0) || (x == 1 && y == 0) || (x == 0 && y == 1)) {
         continue;  // already added above
       }
-      pts.append(Pt{double(x), double(y), 0.5 * x + 0.25 * y});
+      pts.push_back(Pt{double(x), double(y), 0.5 * x + 0.25 * y});
     }
   }
   // two deliberate outliers - large relative to the good points'
@@ -190,8 +193,8 @@ void PipelineFilterTest::
   // eigenvector *is* the smallest, which is a different failure mode
   // than "a 3-sigma filter fails to flag it" - see domain-model.md S9
   // for why bestFitPlane's degeneracy checks are a hint, not a gate)
-  pts.append(Pt{1.0, 1.0, 8.75});   // true z=0.75, deliberate outlier 1
-  pts.append(Pt{2.0, 3.0, -4.25});  // true z=1.75, deliberate outlier 2
+  pts.push_back(Pt{1.0, 1.0, 8.75});   // true z=0.75, deliberate outlier 1
+  pts.push_back(Pt{2.0, 3.0, -4.25});  // true z=1.75, deliberate outlier 2
 
   //--- without the filter: the outliers must degrade the fit ---
   {
@@ -209,10 +212,10 @@ void PipelineFilterTest::
     plane->addFunction(function);
 
     const int targetId = planeFeature->getFeature()->getId();
-    foreach (const Pt& p, pts) {
+    for (const Pt& p : pts) {
       QVERIFY(!this->measureOnePoint(job, targetId, p.x, p.y, p.z).isNull());
     }
-    QCOMPARE(function->getInputElements().value(0).size(), pts.size());
+    QCOMPARE(oi::value(function->getInputElements(), 0).size(), pts.size());
 
     plane->recalc();
     QVERIFY2(plane->getIsSolved(),
@@ -240,20 +243,19 @@ void PipelineFilterTest::
 
     oi::Guarded<Function> function = new BestFitPlane();
     function->init();
-    function->setPipeline(0,
-                          QList<PipelineStage>()
-                              << PipelineStage::residualOutlierRejection(3.0));
+    function->setPipeline(0, std::vector<PipelineStage>{
+                                 PipelineStage::residualOutlierRejection(3.0)});
     plane->addFunction(function);
 
     const int targetId = planeFeature->getFeature()->getId();
-    QList<oi::Guarded<Point> > measured;
-    foreach (const Pt& p, pts) {
+    std::vector<oi::Guarded<Point> > measured;
+    for (const Pt& p : pts) {
       oi::Guarded<Point> m =
           this->measureOnePoint(job, targetId, p.x, p.y, p.z);
       QVERIFY(!m.isNull());
-      measured.append(m);
+      measured.push_back(m);
     }
-    QCOMPARE(function->getInputElements().value(0).size(), pts.size());
+    QCOMPARE(oi::value(function->getInputElements(), 0).size(), pts.size());
 
     plane->recalc();
     QVERIFY2(plane->getIsSolved(),
@@ -269,7 +271,7 @@ void PipelineFilterTest::
     // the two deliberate outliers are the last two measured points -
     // both must be excluded, and both must be individually reportable
     // with a reason (traceability requirement)
-    const QList<PipelineExclusion> exclusions =
+    const std::vector<PipelineExclusion> exclusions =
         function->getPipelineExclusions(0);
     QVERIFY2(exclusions.size() >= 2,
              qPrintable(QString("expected at least 2 exclusions, got %1")
@@ -278,7 +280,7 @@ void PipelineFilterTest::
     const int outlier1Id = measured.at(measured.size() - 2)->getId();
     const int outlier2Id = measured.at(measured.size() - 1)->getId();
     bool found1 = false, found2 = false;
-    foreach (const PipelineExclusion& excl, exclusions) {
+    for (const PipelineExclusion& excl : exclusions) {
       if (excl.elementId == outlier1Id) {
         found1 = true;
         QVERIFY(!excl.reason.isEmpty());
@@ -293,7 +295,7 @@ void PipelineFilterTest::
              "reason");
 
     // and every genuinely good point must still be in use
-    foreach (const Pt& p, pts) {
+    for (const Pt& p : pts) {
       Q_UNUSED(p);
     }
     for (int i = 0; i < measured.size() - 2; i++) {
@@ -315,8 +317,8 @@ void PipelineFilterTest::addingANewOutlierLaterReTriggersTheFilterAndTheFit() {
 
   oi::Guarded<Function> function = new BestFitPlane();
   function->init();
-  function->setPipeline(0, QList<PipelineStage>()
-                               << PipelineStage::residualOutlierRejection(3.0));
+  function->setPipeline(0, std::vector<PipelineStage>{
+                               PipelineStage::residualOutlierRejection(3.0)});
   plane->addFunction(function);
 
   const int targetId = planeFeature->getFeature()->getId();
@@ -328,24 +330,24 @@ void PipelineFilterTest::addingANewOutlierLaterReTriggersTheFilterAndTheFit() {
   struct Pt {
     double x, y, z;
   };
-  QList<Pt> pts;
-  pts.append(Pt{0.0, 0.0, 0.0});
-  pts.append(Pt{1.0, 0.0, 0.5});
-  pts.append(Pt{0.0, 1.0, 0.25});
+  std::vector<Pt> pts;
+  pts.push_back(Pt{0.0, 0.0, 0.0});
+  pts.push_back(Pt{1.0, 0.0, 0.5});
+  pts.push_back(Pt{0.0, 1.0, 0.25});
   for (int x = 0; x < 6; x++) {
     for (int y = 0; y < 6; y++) {
       if ((x == 0 && y == 0) || (x == 1 && y == 0) || (x == 0 && y == 1)) {
         continue;
       }
-      pts.append(Pt{double(x), double(y), 0.5 * x + 0.25 * y});
+      pts.push_back(Pt{double(x), double(y), 0.5 * x + 0.25 * y});
     }
   }
-  foreach (const Pt& p, pts) {
+  for (const Pt& p : pts) {
     QVERIFY(!this->measureOnePoint(job, targetId, p.x, p.y, p.z).isNull());
   }
 
   plane->recalc();
-  QVERIFY(function->getPipelineExclusions(0).isEmpty());
+  QVERIFY(function->getPipelineExclusions(0).empty());
   QVERIFY2(this->planeAngleErrorDeg(plane) < 0.1,
            "clean data must fit correctly before any outlier arrives");
 
@@ -385,15 +387,15 @@ void PipelineFilterTest::
 
   oi::Guarded<Function> function = new BestFitPoint();
   function->init();
-  function->setPipeline(0, QList<PipelineStage>()
-                               << PipelineStage::residualOutlierRejection(3.0));
+  function->setPipeline(0, std::vector<PipelineStage>{
+                               PipelineStage::residualOutlierRejection(3.0)});
   point->addFunction(function);
 
   // 20 good readings clustered tightly around (10, 20, 30), plus one
   // grossly mis-aimed reading. eObservationElement, position 0 - the
   // same NeededElement::pipeline mechanism, no plugin-side code touched
   // to make BestFitPoint honour it.
-  QList<oi::Guarded<Observation> > observations;
+  std::vector<oi::Guarded<Observation> > observations;
   auto addReading = [&](double x, double y, double z) {
     oi::Guarded<Reading> reading = makeCartesianReading(x, y, z);
     oi::Guarded<Observation> observation = new Observation();
@@ -407,7 +409,7 @@ void PipelineFilterTest::
     observation->setXYZ(xyz);
     observation->setIsSolved(true);
     point->addObservation(observation);
-    observations.append(observation);
+    observations.push_back(observation);
     InputElement element(observation->getId());
     element.typeOfElement = ElementTypes::eObservationElement;
     element.observation = observation;
@@ -429,14 +431,14 @@ void PipelineFilterTest::
           QString("expected z near 30 with the bad reading filtered, got %1")
               .arg(point->getPosition().getVector().getAt(2))));
 
-  const int badId = observations.last()->getId();
+  const int badId = observations.back()->getId();
   QVERIFY2(!function->getShouldBeUsed(0, badId),
            "the mis-aimed reading must be excluded");
 
-  const QList<PipelineExclusion> exclusions =
+  const std::vector<PipelineExclusion> exclusions =
       function->getPipelineExclusions(0);
   bool found = false;
-  foreach (const PipelineExclusion& excl, exclusions) {
+  for (const PipelineExclusion& excl : exclusions) {
     if (excl.elementId == badId) {
       found = true;
       QVERIFY(!excl.reason.isEmpty());

@@ -1,5 +1,7 @@
 #ifndef FUNCTIONCONFIGPARSER_H
 #define FUNCTIONCONFIGPARSER_H
+#include <map>
+#include <vector>
 
 #include "cfcontext.h"
 #include "cfcparameter.h"
@@ -16,24 +18,24 @@ using namespace oi;
  */
 class FunctionConfigParser {
  public:
-  QList<ConfiguredFunctionConfig> readConfigFromJson(QString filename);
-  QList<ConfiguredFunctionConfig> readConfigFromJson();
+  std::vector<ConfiguredFunctionConfig> readConfigFromJson(QString filename);
+  std::vector<ConfiguredFunctionConfig> readConfigFromJson();
 
  private:
-  QList<QPointer<Node> > parameter(QJsonValue value);
+  std::vector<QPointer<Node> > parameter(QJsonValue value);
 
-  QMultiMap<int, InputElementMapping> inputElementsMapping(
+  std::multimap<int, InputElementMapping> inputElementsMapping(
       ConfiguredFunctionConfig config, QJsonValue value);
 
-  QList<QString> functionNames(QJsonValue value);
+  std::vector<QString> functionNames(QJsonValue value);
 
   ElementTypes typeOfElement(QJsonValue value);
 
-  QList<QPair<QString, NeededElement> > neededElements(QJsonValue value);
+  std::vector<QPair<QString, NeededElement> > neededElements(QJsonValue value);
 
-  QList<FeatureTypes> applicableFor(QJsonValue value);
+  std::vector<FeatureTypes> applicableFor(QJsonValue value);
 
-  QList<ConfiguredFunctionConfig> readConfigFromJson(QJsonObject json);
+  std::vector<ConfiguredFunctionConfig> readConfigFromJson(QJsonObject json);
 };
 
 #endif  // FUNCTIONCONFIGPARSER_H

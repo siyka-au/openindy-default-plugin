@@ -1,10 +1,9 @@
 #ifndef CFCONTEXT_H
 #define CFCONTEXT_H
-
-#include <QList>
-#include <QMultiMap>
 #include <QPointer>
 #include <QString>
+#include <map>
+#include <vector>
 
 #include "configuredfunction.h"
 #include "featurewrapper.h"
@@ -36,14 +35,14 @@ class CFContext {
 
  public:
   ConfiguredFunctionConfig config;
-  QMap<int, QList<InputElement> > inputElements;
+  std::map<int, std::vector<InputElement> > inputElements;
   // all necessary funktions
-  QList<oi::Guarded<Function> > functions;
+  std::vector<oi::Guarded<Function> > functions;
 
   oi::Guarded<Function> baseFunction;
   oi::Guarded<FeatureWrapper> baseFeature;
 
-  QMap<int, QList<InputElement> > global_inputElements;
+  std::map<int, std::vector<InputElement> > global_inputElements;
   oi::Guarded<FeatureWrapper> global_feature;
 };
 

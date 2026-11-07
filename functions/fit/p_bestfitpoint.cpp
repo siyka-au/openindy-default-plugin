@@ -1,5 +1,10 @@
 #include "p_bestfitpoint.h"
 
+#include <iterator>
+#include <vector>
+
+#include "containers.h"
+
 /*!
  * \brief BestFitPoint::init
  */
@@ -23,15 +28,16 @@ void BestFitPoint::init() {
       "Select at least one observation to calculate the best fit point.";
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::eObservationElement;
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::ePointFeature);
+  this->applicableFor.push_back(FeatureTypes::ePointFeature);
 
-  this->stringParameters.insert(key, value_no);
-  this->stringParameters.insert(key, value_yes);
+  this->stringParameters.emplace(key, value_no);
+  this->stringParameters.emplace(key, value_yes);
   this->scalarInputParams.isValid = true;
-  this->scalarInputParams.stringParameter.insert(key, value_no);  // default
+  this->scalarInputParams.stringParameter.insert_or_assign(
+      key, value_no);  // default
 }
 
 /*!
@@ -64,27 +70,27 @@ bool BestFitPoint::setUpResult(Point& point) {
   }
 
   if (this->scalarInputParams.stringParameter.contains(key) &&
-      this->scalarInputParams.stringParameter.value(key).compare(value_yes) ==
-          0) {
+      oi::value(this->scalarInputParams.stringParameter, key)
+              .compare(value_yes) == 0) {
     for (int sideInt = static_cast<int>(SensorFaces::eFrontSide);
          sideInt <= static_cast<int>(SensorFaces::eUndefinedSide); sideInt++) {
       SensorFaces side = static_cast<SensorFaces>(sideInt);
-      QList<int> obsIds;  // observation ids
-      foreach (InputElement e, this->inputElements[0]) {
+      std::vector<int> obsIds;  // observation ids
+      for (InputElement e : this->inputElements[0]) {
         if (e.observation->getReading()->getFace() == side) {
-          obsIds.append(e.id);
+          obsIds.push_back(e.id);
         }
       }
       std::sort(obsIds.begin(), obsIds.end());  // sort by id
-      for (int i = 0; i < (obsIds.count() - 1); ++i) {
+      for (int i = 0; i < std::ssize(obsIds) - 1; ++i) {
         // disable all observations but last one
         this->setShouldBeUsed(0, obsIds[i], false);
       }
     }
   }
 
-  QList<oi::Guarded<Observation> > allUsableObservations;
-  QList<oi::Guarded<Observation> > inputObservations;
+  std::vector<oi::Guarded<Observation> > allUsableObservations;
+  std::vector<oi::Guarded<Observation> > inputObservations;
   filterObservations(allUsableObservations, inputObservations);
   if (inputObservations.size() < 1) {
     emit this->sendMessage(
@@ -96,7 +102,7 @@ bool BestFitPoint::setUpResult(Point& point) {
 
   // fill l vector
   OiVec l;
-  foreach (const oi::Guarded<Observation>& obs, inputObservations) {
+  for (const oi::Guarded<Observation>& obs : inputObservations) {
     l.add(obs->getXYZ().getAt(0));
     l.add(obs->getXYZ().getAt(1));
     l.add(obs->getXYZ().getAt(2));
@@ -134,14 +140,14 @@ bool BestFitPoint::setUpResult(Point& point) {
   // calculate point based corrections
   OiVec corr;
 
-  foreach (const oi::Guarded<Observation>& observation, allUsableObservations) {
+  for (const oi::Guarded<Observation>& observation : allUsableObservations) {
     double _vx = x.getAt(0) - observation->getXYZ().getAt(0);
     double _vy = x.getAt(1) - observation->getXYZ().getAt(1);
     double _vz = x.getAt(2) - observation->getXYZ().getAt(2);
 
     double _corr = qSqrt(qPow(_vx, 2) + qPow(_vy, 2) + qPow(_vz, 2));
 
-    if (inputObservations.contains(observation)) {
+    if (oi::contains(inputObservations, observation)) {
       corr.add(_corr);
     }
 

@@ -1,5 +1,7 @@
 #include "configuredfunctionconfig.h"
 
+#include <vector>
+
 ConfiguredFunctionConfig::ConfiguredFunctionConfig() {}
 
 bool ConfiguredFunctionConfig::isNeededElement(QString name) {
@@ -19,12 +21,12 @@ bool ConfiguredFunctionConfig::isFunction(QString name) {
  * @brief getFunctionNames
  * @return all necessary funktions for this config
  */
-QList<QString> ConfiguredFunctionConfig::getFunctionNames() {
+std::vector<QString> ConfiguredFunctionConfig::getFunctionNames() {
   switch (version) {
     case 1:
       return functionNames;
     case 2:
-      QList<QString> list;
+      std::vector<QString> list;
 
       collectFunctionNames(parameter->getSubnodes(), list);
       return list;
@@ -34,27 +36,27 @@ QList<QString> ConfiguredFunctionConfig::getFunctionNames() {
 }
 
 void ConfiguredFunctionConfig::collectFunctionNames(
-    QList<QPointer<Node> >& parameter, QList<QString>& names) {
-  foreach (QPointer<Node> p, parameter) {
+    std::vector<QPointer<Node> >& parameter, std::vector<QString>& names) {
+  for (QPointer<Node> p : parameter) {
     if (!isNeededElement(p->getName())) {
-      names.append(p->getName());
+      names.push_back(p->getName());
     }
     this->collectFunctionNames(p->getSubnodes(), names);
   }
 }
 
-QList<NeededElement> ConfiguredFunctionConfig::getNeededElements() {
-  QList<NeededElement> list;
+std::vector<NeededElement> ConfiguredFunctionConfig::getNeededElements() {
+  std::vector<NeededElement> list;
   for (auto& neededElement : this->neededElements) {
-    list.append(neededElement.second);
+    list.push_back(neededElement.second);
   }
   return list;
 }
 
-QList<QString> ConfiguredFunctionConfig::getNeededElementNames() {
-  QList<QString> list;
+std::vector<QString> ConfiguredFunctionConfig::getNeededElementNames() {
+  std::vector<QString> list;
   for (auto& neededElement : this->neededElements) {
-    list.append(neededElement.first);
+    list.push_back(neededElement.first);
   }
   return list;
 }

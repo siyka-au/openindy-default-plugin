@@ -1,9 +1,10 @@
-#include <QList>
 #include <QPointer>
 #include <QString>
 #include <QtTest>
+#include <vector>
 
 #include "chooselalib.h"
+#include "containers.h"
 #include "featurewrapper.h"
 #include "messagesink.h"
 #include "p_bestfitcircleinplane.h"
@@ -19,6 +20,7 @@
 #include "p_rectifytopoint.h"
 #include "p_rectifytovector.h"
 #include "p_register.h"
+#include "qtinterop.h"
 #include "test_defines.h"
 #include "types.h"
 
@@ -204,7 +206,7 @@ void FunctionTest::addInputObservations(QString data,
                                         bool shouldBeUsed = true) {
   QTextStream stream(data.toUtf8());
   while (!stream.atEnd()) {
-    QStringList xyz = stream.readLine().split(" ");
+    std::vector<QString> xyz = oi::toVector(stream.readLine().split(" "));
     if (xyz.size() == 0) {
       continue;
     }
@@ -248,7 +250,7 @@ void FunctionTest::addInputPoints(QString data, oi::Guarded<Function> function,
                                   bool shouldBeUsed = true) {
   QTextStream stream(data.toUtf8());
   while (!stream.atEnd()) {
-    QStringList xyz = stream.readLine().split(" ");
+    std::vector<QString> xyz = oi::toVector(stream.readLine().split(" "));
     if (xyz.size() == 0) {
       continue;
     }
@@ -650,7 +652,8 @@ void FunctionTest::testVRadial() {
   addInputPoints(data, function);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("approximation", "guess axis");
+  scalarInputParams.stringParameter.insert_or_assign("approximation",
+                                                     "guess axis");
   function->setScalarInputParams(scalarInputParams);
 
   bool res = function->exec(cylinderFeature);
@@ -662,36 +665,36 @@ void FunctionTest::testVRadial() {
   COMPARE_DOUBLE(cylinder->getStatistic().getStdev(), 0.03, 0.01);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1000).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1000).corrections,
+                "vr", -1),
       0.026, 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1001).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1001).corrections,
+                "vr", -1),
       (-0.007), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1002).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1002).corrections,
+                "vr", -1),
       (-0.037), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1003).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1003).corrections,
+                "vr", -1),
       0.010, 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1004).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1004).corrections,
+                "vr", -1),
       (-0.003), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1005).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1005).corrections,
+                "vr", -1),
       (-0.007), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1006).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1006).corrections,
+                "vr", -1),
       0.030, 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1007).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1007).corrections,
+                "vr", -1),
       (-0.012), 0.001);
 
   COMPARE_DOUBLE(function->getStatistic().getFormError(), 0.067, 0.001);
@@ -733,7 +736,8 @@ void FunctionTest::testVRadial3() {
   addInputPoints("-3305.0 -65.0 15.", function, 5000, 0, false);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("approximation", "guess axis");
+  scalarInputParams.stringParameter.insert_or_assign("approximation",
+                                                     "guess axis");
   function->setScalarInputParams(scalarInputParams);
 
   bool res = function->exec(cylinderFeature);
@@ -745,41 +749,41 @@ void FunctionTest::testVRadial3() {
   COMPARE_DOUBLE(cylinder->getStatistic().getStdev(), 0.03, 0.01);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1000).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1000).corrections,
+                "vr", -1),
       0.026, 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1001).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1001).corrections,
+                "vr", -1),
       (-0.007), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1002).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1002).corrections,
+                "vr", -1),
       (-0.037), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1003).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1003).corrections,
+                "vr", -1),
       0.010, 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1004).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1004).corrections,
+                "vr", -1),
       (-0.003), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1005).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1005).corrections,
+                "vr", -1),
       (-0.007), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1006).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1006).corrections,
+                "vr", -1),
       0.030, 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1007).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1007).corrections,
+                "vr", -1),
       (-0.012), 0.001);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(5000).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(5000).corrections,
+                "vr", -1),
       (140.563), 0.001);
 
   COMPARE_DOUBLE(function->getStatistic().getFormError(), 0.067, 0.001);
@@ -983,7 +987,8 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_3() {
   addInputPoints(data, function);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("approximation", "guess axis");
+  scalarInputParams.stringParameter.insert_or_assign("approximation",
+                                                     "guess axis");
   function->setScalarInputParams(scalarInputParams);
 
   bool res = function->exec(cylinderFeature);
@@ -1063,7 +1068,8 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_2() {
   addInputPoints(data, function);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("approximation", "guess axis");
+  scalarInputParams.stringParameter.insert_or_assign("approximation",
+                                                     "guess axis");
   function->setScalarInputParams(scalarInputParams);
 
   bool res = function->exec(cylinderFeature);
@@ -1105,7 +1111,8 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_1() {
   addInputPoints(data, function);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("approximation", "guess axis");
+  scalarInputParams.stringParameter.insert_or_assign("approximation",
+                                                     "guess axis");
   function->setScalarInputParams(scalarInputParams);
 
   bool res = function->exec(cylinderFeature);
@@ -1147,7 +1154,8 @@ void FunctionTest::testBestFitCylinder2_guess_axis() {
   addInputPoints(data, function);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("approximation", "guess axis");
+  scalarInputParams.stringParameter.insert_or_assign("approximation",
+                                                     "guess axis");
   function->setScalarInputParams(scalarInputParams);
 
   bool res = function->exec(cylinderFeature);
@@ -1253,7 +1261,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_no() {
   function->setMessageSink(this);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert(
+  scalarInputParams.stringParameter.insert_or_assign(
       "disable all observations but last one", "no");
   function->setScalarInputParams(scalarInputParams);
 
@@ -1293,7 +1301,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_yes() {
   function->setMessageSink(this);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert(
+  scalarInputParams.stringParameter.insert_or_assign(
       "disable all observations but last one", "yes");
   function->setScalarInputParams(scalarInputParams);
 
@@ -1333,7 +1341,7 @@ void FunctionTest::testDisableAllObservationsButLastOne_2side_yes() {
   function->setMessageSink(this);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert(
+  scalarInputParams.stringParameter.insert_or_assign(
       "disable all observations but last one", "yes");
   function->setScalarInputParams(scalarInputParams);
 
@@ -1866,7 +1874,8 @@ void FunctionTest::testIntersectLineLine_intersect1_atfirstline() {
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("intersection", "at first line");
+  scalarInputParams.stringParameter.insert_or_assign("intersection",
+                                                     "at first line");
   function->setScalarInputParams(scalarInputParams);
 
   addInputLine(1., 1., 1., 0.5772, 0.5772, 0.5772, function, 2000, 0);
@@ -1897,7 +1906,8 @@ void FunctionTest::testIntersectLineLine_intersect1_atsecondline() {
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("intersection", "at second line");
+  scalarInputParams.stringParameter.insert_or_assign("intersection",
+                                                     "at second line");
   function->setScalarInputParams(scalarInputParams);
 
   addInputLine(1., 1., 1., 0.5772, 0.5772, 0.5772, function, 2000, 0);
@@ -1928,7 +1938,8 @@ void FunctionTest::testIntersectLineLine_intersect1_midpoint() {
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("intersection", "midpoint");
+  scalarInputParams.stringParameter.insert_or_assign("intersection",
+                                                     "midpoint");
   function->setScalarInputParams(scalarInputParams);
 
   addInputLine(1., 1., 1., 0.5772, 0.5772, 0.5772, function, 2000, 0);
@@ -1959,7 +1970,8 @@ void FunctionTest::testIntersectLineLine_intersect2_atfirstline() {
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("intersection", "at first line");
+  scalarInputParams.stringParameter.insert_or_assign("intersection",
+                                                     "at first line");
   function->setScalarInputParams(scalarInputParams);
 
   addInputLine(1., 1., 1., 0.5773, 0.5773, 0.5773, function, 2000, 0);
@@ -1990,7 +2002,8 @@ void FunctionTest::testIntersectLineLine_intersect2_atsecondline() {
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("intersection", "at second line");
+  scalarInputParams.stringParameter.insert_or_assign("intersection",
+                                                     "at second line");
   function->setScalarInputParams(scalarInputParams);
 
   addInputLine(1., 1., 1., 0.5773, 0.5773, 0.5773, function, 2000, 0);
@@ -2022,7 +2035,8 @@ void FunctionTest::testIntersectLineLine_intersect2_midpoint() {
   pointFeature->setPoint(point);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("intersection", "midpoint");
+  scalarInputParams.stringParameter.insert_or_assign("intersection",
+                                                     "midpoint");
   function->setScalarInputParams(scalarInputParams);
 
   addInputLine(1., 1., 1., 0.5773, 0.5773, 0.5773, function, 2000, 0);
@@ -2053,8 +2067,8 @@ void FunctionTest::testRectifyToPoint_Plane_negative() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputPoint(1., 1., -5., function);
@@ -2083,8 +2097,8 @@ void FunctionTest::testRectifyToPoint_Plane_positive() {
 
   const bool sense = true;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputPoint(1., 1., -5., function);
@@ -2113,8 +2127,8 @@ void FunctionTest::testRectifyToPoint_Plane_Station() {
 
   const bool sense = true;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputPoint(1., 1., -5., function);
@@ -2144,8 +2158,8 @@ void FunctionTest::testRectifyToPoint_Circle_negative() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputPoint(1., 1., -5., function);
@@ -2175,8 +2189,8 @@ void FunctionTest::testRectifyToPoint_Line_negative() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputPoint(1., 1., -5., function);
@@ -2206,8 +2220,8 @@ void FunctionTest::testRectifyToPoint_Cylinder_negative() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputPoint(1., 1., -5., function);
@@ -2237,8 +2251,8 @@ void FunctionTest::testRectifyToVector_PlaneToPlane_negative() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputStation(0, 0, 0, -0.001042, 0.000211, 0.999999, function, 3000, 1);
@@ -2266,8 +2280,8 @@ void FunctionTest::testRectifyToVector_PlaneToStation() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputStation(0, 0, 0, -0.001042, 0.000211, 0.999999, function, 3000, 1);
@@ -2296,8 +2310,8 @@ void FunctionTest::testRectifyToVector_CircleToStation() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputStation(0, 0, 0, -0.001042, 0.000211, 0.999999, function, 3000, 1);
@@ -2326,8 +2340,8 @@ void FunctionTest::testRectifyToVector_LineToStation() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputStation(0, 0, 0, -0.001042, 0.000211, 0.999999, function, 3000, 1);
@@ -2356,8 +2370,8 @@ void FunctionTest::testRectifyToVector_CylinderToStation() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputStation(0, 0, 0, -0.001042, 0.000211, 0.999999, function, 3000, 1);
@@ -2387,8 +2401,8 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_zAxis() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
   function->setScalarInputParams(scalarInputParams);
 
   addInputCoordinateSystem(0, 0, 0, -0.001042, 0.000211, 0.999999, function,
@@ -2419,9 +2433,9 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_xAxis() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
-  scalarInputParams.stringParameter.insert(
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
       "rectify to station / coordinate system", "xAxis");
   function->setScalarInputParams(scalarInputParams);
 
@@ -2470,9 +2484,9 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_yAxis() {
 
   const bool sense = false;
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("sense",
-                                           sense ? "positive" : "negative");
-  scalarInputParams.stringParameter.insert(
+  scalarInputParams.stringParameter.insert_or_assign(
+      "sense", sense ? "positive" : "negative");
+  scalarInputParams.stringParameter.insert_or_assign(
       "rectify to station / coordinate system", "yAxis");
   function->setScalarInputParams(scalarInputParams);
 
@@ -2576,16 +2590,16 @@ void FunctionTest::testBestFitPoint_residuals() {
   COMPARE_DOUBLE(feature->getStatistic().getStdev(), 1.42, 0.01);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1000).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1000).corrections,
+                "v", -1),
       (0.825), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1001).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1001).corrections,
+                "v", -1),
       (0.814), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1002).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1002).corrections,
+                "v", -1),
       (1.639), 0.001);
 
   delete function.data();
@@ -2665,24 +2679,24 @@ void FunctionTest::testBestFitPlane_residuals() {
   COMPARE_DOUBLE(feature->getStatistic().getStdev(), 0.39, 0.01);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1000).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1000).corrections,
+                "v", -1),
       (-0.1595), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1001).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1001).corrections,
+                "v", -1),
       (-0.1595), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1002).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1002).corrections,
+                "v", -1),
       (0.0000), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1003).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1003).corrections,
+                "v", -1),
       (0.3191), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(3000).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(3000).corrections,
+                "v", -1),
       (101.6470), 0.001);  // shouldInUse == false
 
   delete function.data();
@@ -2726,24 +2740,24 @@ void FunctionTest::testBestFitLine_residuals() {
   COMPARE_DOUBLE(feature->getStatistic().getStdev(), 0.0069, 0.001);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1000).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1000).corrections,
+                "v", -1),
       (0.0040), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1001).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1001).corrections,
+                "v", -1),
       (0.0017), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1002).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1002).corrections,
+                "v", -1),
       (0.0079), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1003).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1003).corrections,
+                "v", -1),
       (0.0039), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(3000).corrections.value("v",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(3000).corrections,
+                "v", -1),
       (141.4227), 0.001);  // shouldInUse == false
 
   delete function.data();
@@ -2787,35 +2801,35 @@ void FunctionTest::testBestFitCircleInPlane_residuals() {
   COMPARE_DOUBLE(feature->getStatistic().getStdev(), 0.0023, 0.001);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1000).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1000).corrections,
+                "vr", -1),
       (0.0000), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1001).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1001).corrections,
+                "vr", -1),
       (0.0025), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1002).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1002).corrections,
+                "vr", -1),
       (0.0000), 0.001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1003).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1003).corrections,
+                "vr", -1),
       (-0.0025), 0.001);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(3000).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(3000).corrections,
+                "vr", -1),
       (141.4381), 0.001);  // shouldInUse == false
 
   // - sign
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(3001).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(3001).corrections,
+                "vr", -1),
       (-565.684), 0.001);  // shouldInUse == false
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(3002).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(3002).corrections,
+                "vr", -1),
       (-141.4171), 0.001);  // shouldInUse == false
 
   delete function.data();
@@ -2866,60 +2880,60 @@ void FunctionTest::testBestFitCircleInPlane_residuals2() {
   COMPARE_DOUBLE(feature->getStatistic().getStdev(), 0.0028, 0.001);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1000).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1000).corrections,
+                "vr", -1),
       (0.000036), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1001).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1001).corrections,
+                "vr", -1),
       (0.000012), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1002).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1002).corrections,
+                "vr", -1),
       (-0.000018), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1003).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1003).corrections,
+                "vr", -1),
       (0.003728), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1004).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1004).corrections,
+                "vr", -1),
       (-0.001841), 0.00001);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1005).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1005).corrections,
+                "vr", -1),
       (-0.002945), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1006).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1006).corrections,
+                "vr", -1),
       (0.003018), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1007).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1007).corrections,
+                "vr", -1),
       (-0.001744), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1008).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1008).corrections,
+                "vr", -1),
       (-0.003492), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1009).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1009).corrections,
+                "vr", -1),
       (-0.001170), 0.00001);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(3000).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(3000).corrections,
+                "vr", -1),
       (141.4381), 0.001);  // shouldInUse == false
 
   // - sign
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(3001).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(3001).corrections,
+                "vr", -1),
       (-565.684), 0.001);  // shouldInUse == false
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(3002).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(3002).corrections,
+                "vr", -1),
       (-141.4171), 0.001);  // shouldInUse == false
 
   delete function.data();
@@ -2985,141 +2999,141 @@ void FunctionTest::testBestFitSphere_residuals() {
   COMPARE_DOUBLE(feature->getStatistic().getStdev(), 0.0017, 0.001);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1000).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1000).corrections,
+                "vr", -1),
       (0.00444691), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1001).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1001).corrections,
+                "vr", -1),
       (3.63613e-05), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1002).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1002).corrections,
+                "vr", -1),
       (0.00253134), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1003).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1003).corrections,
+                "vr", -1),
       (-0.00392647), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1004).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1004).corrections,
+                "vr", -1),
       (-0.00442589), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1005).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1005).corrections,
+                "vr", -1),
       (-0.00309323), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1006).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1006).corrections,
+                "vr", -1),
       (-0.00450207), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1007).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1007).corrections,
+                "vr", -1),
       (0.00133826), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1008).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1008).corrections,
+                "vr", -1),
       (0.00246314), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1009).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1009).corrections,
+                "vr", -1),
       (0.00131537), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1010).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1010).corrections,
+                "vr", -1),
       (-0.00257008), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1011).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1011).corrections,
+                "vr", -1),
       (0.00240058), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1012).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1012).corrections,
+                "vr", -1),
       (0.00574177), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1013).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1013).corrections,
+                "vr", -1),
       (-0.00336107), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1014).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1014).corrections,
+                "vr", -1),
       (0.00351136), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1015).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1015).corrections,
+                "vr", -1),
       (-0.00290309), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1016).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1016).corrections,
+                "vr", -1),
       (0.000282451), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1017).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1017).corrections,
+                "vr", -1),
       (-0.00115781), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1018).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1018).corrections,
+                "vr", -1),
       (0.000196467), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1019).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1019).corrections,
+                "vr", -1),
       (0.00131781), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1020).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1020).corrections,
+                "vr", -1),
       (0.00312561), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1021).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1021).corrections,
+                "vr", -1),
       (8.52707e-05), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1022).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1022).corrections,
+                "vr", -1),
       (-0.0017174), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1023).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1023).corrections,
+                "vr", -1),
       (0.00406236), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1024).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1024).corrections,
+                "vr", -1),
       (-9.17723e-05), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1025).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1025).corrections,
+                "vr", -1),
       (-0.00199328), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1026).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1026).corrections,
+                "vr", -1),
       (0.000105884), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1027).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1027).corrections,
+                "vr", -1),
       (0.000110564), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1028).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1028).corrections,
+                "vr", -1),
       (-0.00178949), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1029).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1029).corrections,
+                "vr", -1),
       (-0.00499809), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1030).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1030).corrections,
+                "vr", -1),
       (0.00181768), 0.00001);
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(1031).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(1031).corrections,
+                "vr", -1),
       (0.00164056), 0.00001);
 
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(3000).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(3000).corrections,
+                "vr", -1),
       (2.45744), 0.00001);  // shouldInUse == false
   COMPARE_DOUBLE(
-      function->getStatistic().getDisplayResidual(3001).corrections.value("vr",
-                                                                          -1),
+      oi::value(function->getStatistic().getDisplayResidual(3001).corrections,
+                "vr", -1),
       (-0.140637), 0.00001);  // shouldInUse == false
 
   delete function.data();
@@ -3163,9 +3177,9 @@ void FunctionTest::
 
   ScalarInputParams params;
   params.isValid = true;
-  params.doubleParameter.insert("x [m]", 1000.6609);
-  params.doubleParameter.insert("y [m]", 2000.3247);
-  params.doubleParameter.insert("z [m]", 3000.3180);
+  params.doubleParameter.insert_or_assign("x [m]", 1000.6609);
+  params.doubleParameter.insert_or_assign("y [m]", 2000.3247);
+  params.doubleParameter.insert_or_assign("z [m]", 3000.3180);
   function->setScalarInputParams(params);
 
   oi::Guarded<Point> feature = new Point();
@@ -3193,7 +3207,7 @@ void FunctionTest::testNominalPoint_declaresNoNeededElements() {
   function->init();
 
   QVERIFY2(
-      function->getNeededElements().isEmpty(),
+      function->getNeededElements().empty(),
       "a nominal function takes scalar parameters only - this absence is what "
       "Geometry::getOwnerDescription reads to know the result is not owned by "
       "a fit");
@@ -3623,7 +3637,8 @@ void FunctionTest::testNotSolved_guessAxis() {
   addInputPoints(data, function);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("approximation", "guess axis");
+  scalarInputParams.stringParameter.insert_or_assign("approximation",
+                                                     "guess axis");
   function->setScalarInputParams(scalarInputParams);
 
   bool res = function->exec(cylinderFeature);
@@ -3658,7 +3673,8 @@ void FunctionTest::testNotSolved_firstTwoPoints() {
   addInputPoints(data, function);
 
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("approximation", "first two points");
+  scalarInputParams.stringParameter.insert_or_assign("approximation",
+                                                     "first two points");
   function->setScalarInputParams(scalarInputParams);
 
   bool res = function->exec(cylinderFeature);

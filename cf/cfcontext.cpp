@@ -1,5 +1,9 @@
 #include "cfcontext.h"
 
+#include <vector>
+
+#include "containers.h"
+
 CFContext::CFContext() {}
 
 /**
@@ -11,7 +15,8 @@ oi::Guarded<Function> CFContext::getFunction(QString name) {
   for (int index = 0; index < functions.size(); index++) {
     if (!functions[index].isNull() &&
         functions[index]->getMetaData().name.compare(name) == 0) {
-      oi::Guarded<Function> f = functions.takeAt(index);  // remove from list
+      oi::Guarded<Function> f = functions[static_cast<std::size_t>(index)];
+      functions.erase(functions.begin() + index);  // remove from list
       return f;
     }
   }
@@ -21,8 +26,9 @@ oi::Guarded<Function> CFContext::getFunction(QString name) {
 }
 
 InputElement CFContext::getInputElement(QString name) {
-  QList<InputElement> ies = this->global_inputElements.value(
-      config.getNeededElementNames().indexOf(name));
+  std::vector<InputElement> ies =
+      oi::value(this->global_inputElements,
+                oi::indexOf(config.getNeededElementNames(), name));
   if (ies.size() == 0) {
     throw logic_error(QString("invalid count (%1) of InputElements: %2")
                           .arg(ies.size())
@@ -30,7 +36,7 @@ InputElement CFContext::getInputElement(QString name) {
                           .toLocal8Bit()
                           .data());
   }
-  return ies.first();
+  return ies.front();
 }
 
 /**

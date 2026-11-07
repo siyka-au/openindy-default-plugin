@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include "containers.h"
+
 /*!
  * \brief RectifyToPoint::init
  */
@@ -21,24 +23,24 @@ void RectifyToPoint::init() {
       "Select a position used for the orientation of the target geometry.";
   param1.infinite = false;
   param1.typeOfElement = ElementTypes::ePositionElement;
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   NeededElement param2;
   param2.description =
       "Select a station used for the orientation of the target geometry.";
   param2.infinite = false;
   param2.typeOfElement = ElementTypes::eStationElement;
-  this->neededElements.append(param2);
+  this->neededElements.push_back(param2);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::ePlaneFeature);
-  this->applicableFor.append(FeatureTypes::eCircleFeature);
-  this->applicableFor.append(FeatureTypes::eLineFeature);
-  this->applicableFor.append(FeatureTypes::eCylinderFeature);
+  this->applicableFor.push_back(FeatureTypes::ePlaneFeature);
+  this->applicableFor.push_back(FeatureTypes::eCircleFeature);
+  this->applicableFor.push_back(FeatureTypes::eLineFeature);
+  this->applicableFor.push_back(FeatureTypes::eCylinderFeature);
 
   // set string parameter
-  this->stringParameters.insert("sense", "negative");
-  this->stringParameters.insert("sense", "positive");
+  this->stringParameters.emplace("sense", "negative");
+  this->stringParameters.emplace("sense", "positive");
 }
 
 /*!
@@ -137,8 +139,8 @@ bool RectifyToPoint::setUpResult(Geometry& geometry) {
   // get the sense (positive or negative)
   double sense = 1.0;
   if (this->scalarInputParams.stringParameter.contains("sense")) {
-    if (this->scalarInputParams.stringParameter.value("sense").compare(
-            "negative") == 0) {
+    if (oi::value(this->scalarInputParams.stringParameter, "sense")
+            .compare("negative") == 0) {
       sense = -1.0;
     }
   }

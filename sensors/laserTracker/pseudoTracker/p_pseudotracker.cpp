@@ -1,5 +1,10 @@
 #include "p_pseudotracker.h"
 
+#include <map>
+#include <vector>
+
+#include "containers.h"
+
 /*!
  * \brief PseudoTracker::init
  */
@@ -12,29 +17,29 @@ void PseudoTracker::init() {
   this->metaData.iid = LaserTracker_iidd;
 
   // set supported reading types
-  this->supportedReadingTypes.append(ReadingTypes::eCartesianReading);
-  this->supportedReadingTypes.append(ReadingTypes::ePolarReading);
-  this->supportedReadingTypes.append(ReadingTypes::eDirectionReading);
-  this->supportedReadingTypes.append(ReadingTypes::eDistanceReading);
-  this->supportedReadingTypes.append(ReadingTypes::eLevelReading);
-  this->supportedReadingTypes.append(ReadingTypes::eTemperatureReading);
-  this->supportedReadingTypes.append(ReadingTypes::eLevelReading);
+  this->supportedReadingTypes.push_back(ReadingTypes::eCartesianReading);
+  this->supportedReadingTypes.push_back(ReadingTypes::ePolarReading);
+  this->supportedReadingTypes.push_back(ReadingTypes::eDirectionReading);
+  this->supportedReadingTypes.push_back(ReadingTypes::eDistanceReading);
+  this->supportedReadingTypes.push_back(ReadingTypes::eLevelReading);
+  this->supportedReadingTypes.push_back(ReadingTypes::eTemperatureReading);
+  this->supportedReadingTypes.push_back(ReadingTypes::eLevelReading);
 
   // set supported sensor actions
-  this->supportedSensorActions.append(SensorFunctions::eConnect);
-  this->supportedSensorActions.append(SensorFunctions::eDisconnect);
-  this->supportedSensorActions.append(SensorFunctions::eMeasure);
-  this->supportedSensorActions.append(SensorFunctions::eHome);
-  this->supportedSensorActions.append(SensorFunctions::eInitialize);
-  this->supportedSensorActions.append(SensorFunctions::eMoveAngle);
-  this->supportedSensorActions.append(SensorFunctions::eMoveXYZ);
-  this->supportedSensorActions.append(SensorFunctions::eToggleSight);
-  this->supportedSensorActions.append(SensorFunctions::eCompensation);
-  this->supportedSensorActions.append(SensorFunctions::eMotorState);
-  this->supportedSensorActions.append(SensorFunctions::eSearch);
+  this->supportedSensorActions.push_back(SensorFunctions::eConnect);
+  this->supportedSensorActions.push_back(SensorFunctions::eDisconnect);
+  this->supportedSensorActions.push_back(SensorFunctions::eMeasure);
+  this->supportedSensorActions.push_back(SensorFunctions::eHome);
+  this->supportedSensorActions.push_back(SensorFunctions::eInitialize);
+  this->supportedSensorActions.push_back(SensorFunctions::eMoveAngle);
+  this->supportedSensorActions.push_back(SensorFunctions::eMoveXYZ);
+  this->supportedSensorActions.push_back(SensorFunctions::eToggleSight);
+  this->supportedSensorActions.push_back(SensorFunctions::eCompensation);
+  this->supportedSensorActions.push_back(SensorFunctions::eMotorState);
+  this->supportedSensorActions.push_back(SensorFunctions::eSearch);
 
   // this simulator only fabricates readings on demand; there is no live stream
-  this->supportedAcquisitionModes.append(AcquisitionMode::eDiscrete);
+  this->supportedAcquisitionModes.push_back(AcquisitionMode::eDiscrete);
 
   // publish this driver's own config catalog - PluginRepository tags each
   // with this sensor's type when it scans the plugin, so a config selected
@@ -50,7 +55,7 @@ void PseudoTracker::init() {
     fastPoint.setMeasurementMode(MeasurementModes::eFast_MeasurementMode);
     fastPoint.setMeasureTwoSides(false);
     fastPoint.makeStandardConfig();
-    this->supportedMeasurementConfigs.append(fastPoint);
+    this->supportedMeasurementConfigs.push_back(fastPoint);
 
     MeasurementConfig stdPoint;
     stdPoint.setName("StdPoint");
@@ -59,7 +64,7 @@ void PseudoTracker::init() {
     stdPoint.setMeasurementMode(MeasurementModes::eStandard_MeasurementMode);
     stdPoint.setMeasureTwoSides(false);
     stdPoint.makeStandardConfig();
-    this->supportedMeasurementConfigs.append(stdPoint);
+    this->supportedMeasurementConfigs.push_back(stdPoint);
 
     MeasurementConfig precisePoint;
     precisePoint.setName("PrecisePoint");
@@ -69,7 +74,7 @@ void PseudoTracker::init() {
     precisePoint.setMeasurementMode(MeasurementModes::ePrecise_MeasurementMode);
     precisePoint.setMeasureTwoSides(false);
     precisePoint.makeStandardConfig();
-    this->supportedMeasurementConfigs.append(precisePoint);
+    this->supportedMeasurementConfigs.push_back(precisePoint);
 
     MeasurementConfig stdTwoSide;
     stdTwoSide.setName("StdTwoSide");
@@ -79,7 +84,7 @@ void PseudoTracker::init() {
     stdTwoSide.setMeasurementMode(MeasurementModes::eStandard_MeasurementMode);
     stdTwoSide.setMeasureTwoSides(true);
     stdTwoSide.makeStandardConfig();
-    this->supportedMeasurementConfigs.append(stdTwoSide);
+    this->supportedMeasurementConfigs.push_back(stdTwoSide);
 
     // level readings are declared in supportedReadingTypes above and
     // implemented (measureLevel) - LeicaTachymeter doesn't support this
@@ -91,42 +96,42 @@ void PseudoTracker::init() {
     level.setMeasurementMode(MeasurementModes::eFast_MeasurementMode);
     level.setMeasureTwoSides(false);
     level.makeStandardConfig();
-    this->supportedMeasurementConfigs.append(level);
+    this->supportedMeasurementConfigs.push_back(level);
   }
 
   // set supported connection types
-  this->supportedConnectionTypes.append(ConnectionKind::network());
-  this->supportedConnectionTypes.append(ConnectionKind::serial());
+  this->supportedConnectionTypes.push_back(ConnectionKind::network());
+  this->supportedConnectionTypes.push_back(ConnectionKind::serial());
 
   // set double parameter
-  this->doubleParameters.insert("lambda [mm]", 0.000403);
-  this->doubleParameters.insert("mu", 0.000005);
-  this->doubleParameters.insert("ex [mm]", 0.0000122);
-  this->doubleParameters.insert("by [mm]", 0.0000654);
-  this->doubleParameters.insert("bz [mm]", 0.0000974);
-  this->doubleParameters.insert("alpha [arc sec]", 0.128);
-  this->doubleParameters.insert("gamma [arc sec]", 0.079);
-  this->doubleParameters.insert("Aa1 [arc sec]", 0.064);
-  this->doubleParameters.insert("Ba1 [arc sec]", 0.080);
-  this->doubleParameters.insert("Aa2 [arc sec]", 0.073);
-  this->doubleParameters.insert("Ba2 [arc sec]", 0.090);
-  this->doubleParameters.insert("Ae0 [arc sec]", 0.223);
-  this->doubleParameters.insert("Ae1 [arc sec]", 0.152);
-  this->doubleParameters.insert("Be1 [arc sec]", 0.183);
-  this->doubleParameters.insert("Ae2 [arc sec]", 0.214);
-  this->doubleParameters.insert("Be2 [arc sec]", 0.179);
+  this->doubleParameters.insert_or_assign("lambda [mm]", 0.000403);
+  this->doubleParameters.insert_or_assign("mu", 0.000005);
+  this->doubleParameters.insert_or_assign("ex [mm]", 0.0000122);
+  this->doubleParameters.insert_or_assign("by [mm]", 0.0000654);
+  this->doubleParameters.insert_or_assign("bz [mm]", 0.0000974);
+  this->doubleParameters.insert_or_assign("alpha [arc sec]", 0.128);
+  this->doubleParameters.insert_or_assign("gamma [arc sec]", 0.079);
+  this->doubleParameters.insert_or_assign("Aa1 [arc sec]", 0.064);
+  this->doubleParameters.insert_or_assign("Ba1 [arc sec]", 0.080);
+  this->doubleParameters.insert_or_assign("Aa2 [arc sec]", 0.073);
+  this->doubleParameters.insert_or_assign("Ba2 [arc sec]", 0.090);
+  this->doubleParameters.insert_or_assign("Ae0 [arc sec]", 0.223);
+  this->doubleParameters.insert_or_assign("Ae1 [arc sec]", 0.152);
+  this->doubleParameters.insert_or_assign("Be1 [arc sec]", 0.183);
+  this->doubleParameters.insert_or_assign("Ae2 [arc sec]", 0.214);
+  this->doubleParameters.insert_or_assign("Be2 [arc sec]", 0.179);
 
   // set string parameter
-  this->stringParameters.insert("active probe", "0.5''");
-  this->stringParameters.insert("active probe", "1.0''");
-  this->stringParameters.insert("active probe", "1.5''");
-  this->stringParameters.insert("reading type", "polar");
-  this->stringParameters.insert("reading type", "cartesian");
+  this->stringParameters.emplace("active probe", "0.5''");
+  this->stringParameters.emplace("active probe", "1.0''");
+  this->stringParameters.emplace("active probe", "1.5''");
+  this->stringParameters.emplace("reading type", "polar");
+  this->stringParameters.emplace("reading type", "cartesian");
 
   // set self defined actions
-  this->selfDefinedActions.append("echo(Alt+E)");
-  this->selfDefinedActions.append("stopMeasure");  // e.g. finish scanning
-  this->selfDefinedActions.append(
+  this->selfDefinedActions.push_back("echo(Alt+E)");
+  this->selfDefinedActions.push_back("stopMeasure");  // e.g. finish scanning
+  this->selfDefinedActions.push_back(
       "toggle return readings");  // for tests, if set to false then OpenIndy
                                   // responds with an incorrect measurement
 
@@ -296,9 +301,9 @@ bool PseudoTracker::compensation() {
  * \param mConfig
  * \return
  */
-QList<oi::Guarded<Reading> > PseudoTracker::measure(
+std::vector<oi::Guarded<Reading> > PseudoTracker::measure(
     const MeasurementConfig& mConfig) {
-  QList<oi::Guarded<Reading> > readings;
+  std::vector<oi::Guarded<Reading> > readings;
 
   if (!this->returnReading) {
     return readings;
@@ -323,23 +328,23 @@ QList<oi::Guarded<Reading> > PseudoTracker::measure(
     for (int face = 0; face < faceCount; face++) {
       switch (getReadingType(mConfig)) {
         case ReadingTypes::ePolarReading: {
-          readings += measurePolar(mConfig);
+          oi::appendAll(readings, measurePolar(mConfig));
           break;
         }
         case ReadingTypes::eDistanceReading: {
-          readings += measureDistance(mConfig);
+          oi::appendAll(readings, measureDistance(mConfig));
           break;
         }
         case ReadingTypes::eDirectionReading: {
-          readings += measureDirection(mConfig);
+          oi::appendAll(readings, measureDirection(mConfig));
           break;
         }
         case ReadingTypes::eCartesianReading: {
-          readings += measureCartesian(mConfig);
+          oi::appendAll(readings, measureCartesian(mConfig));
           break;
         }
         case ReadingTypes::eLevelReading: {
-          readings += measureLevel(mConfig);
+          oi::appendAll(readings, measureLevel(mConfig));
           break;
         }
       }
@@ -362,8 +367,8 @@ QList<oi::Guarded<Reading> > PseudoTracker::measure(
       delete this->lastReading.second;
     }
 
-    this->lastReading.first = readings.last()->getTypeOfReading();
-    oi::Guarded<Reading> r = new Reading(*readings.last().data());
+    this->lastReading.first = readings.back()->getTypeOfReading();
+    oi::Guarded<Reading> r = new Reading(*readings.back().data());
     this->lastReading.second = r;
   }
 
@@ -375,7 +380,8 @@ QList<oi::Guarded<Reading> > PseudoTracker::measure(
  * \param streamFormat
  * \return
  */
-QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
+std::map<QString, QVariant> PseudoTracker::readingStream(
+    const ReadingTypes& streamFormat) {
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
@@ -383,7 +389,7 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
   double azimuth = 0.0;
   double zenith = 0.0;
 
-  QVariantMap m;
+  std::map<QString, QVariant> m;
 
   oi::Guarded<Reading> r(nullptr);
 
@@ -393,9 +399,9 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
       r = new Reading(rPolar);
 
-      m.insert("azimuth", rPolar.azimuth);
-      m.insert("zenith", rPolar.zenith);
-      m.insert("distance", rPolar.distance);
+      m.insert_or_assign("azimuth", rPolar.azimuth);
+      m.insert_or_assign("zenith", rPolar.zenith);
+      m.insert_or_assign("distance", rPolar.distance);
 
       break;
     }
@@ -404,9 +410,9 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
       r = new Reading(rPolar);
 
-      m.insert("x", r->getCartesianReading().xyz.getAt(0));
-      m.insert("y", r->getCartesianReading().xyz.getAt(1));
-      m.insert("z", r->getCartesianReading().xyz.getAt(2));
+      m.insert_or_assign("x", r->getCartesianReading().xyz.getAt(0));
+      m.insert_or_assign("y", r->getCartesianReading().xyz.getAt(1));
+      m.insert_or_assign("z", r->getCartesianReading().xyz.getAt(2));
 
       break;
     }
@@ -417,7 +423,7 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
       r = new Reading(rDistance);
 
-      m.insert("distance", r->getDistanceReading().distance);
+      m.insert_or_assign("distance", r->getDistanceReading().distance);
 
       break;
     }
@@ -429,8 +435,8 @@ QVariantMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
       r = new Reading(rDirection);
 
-      m.insert("azimuth", r->getDirectionReading().azimuth);
-      m.insert("zenith", r->getDirectionReading().zenith);
+      m.insert_or_assign("azimuth", r->getDirectionReading().azimuth);
+      m.insert_or_assign("zenith", r->getDirectionReading().zenith);
 
       break;
     }
@@ -481,17 +487,17 @@ bool PseudoTracker::getIsReadyForMeasurement() { return true; }
  * \brief PseudoTracker::getSensorStats
  * \return
  */
-QMap<QString, QString> PseudoTracker::getSensorStatus() {
-  QMap<QString, QString> stats;
+std::map<QString, QString> PseudoTracker::getSensorStatus() {
+  std::map<QString, QString> stats;
 
-  stats.insert("connected", QString::number(isConnected));
-  stats.insert("side", QString::number(side));
-  stats.insert("myAzimuth", QString::number(myAzimuth));
-  stats.insert("myZenith", QString::number(myZenith));
-  stats.insert("myDistance", QString::number(myDistance));
-  stats.insert("myMotor", QString::number(myMotor));
-  stats.insert("myInit", QString::number(myInit));
-  stats.insert("myCompIt", QString::number(myCompIt));
+  stats.insert_or_assign("connected", QString::number(isConnected));
+  stats.insert_or_assign("side", QString::number(side));
+  stats.insert_or_assign("myAzimuth", QString::number(myAzimuth));
+  stats.insert_or_assign("myZenith", QString::number(myZenith));
+  stats.insert_or_assign("myDistance", QString::number(myDistance));
+  stats.insert_or_assign("myMotor", QString::number(myMotor));
+  stats.insert_or_assign("myInit", QString::number(myInit));
+  stats.insert_or_assign("myCompIt", QString::number(myCompIt));
 
   QThread::msleep(300);
 
@@ -509,9 +515,9 @@ bool PseudoTracker::getIsBusy() { return false; }
  * \param mConfig
  * \return
  */
-QList<oi::Guarded<Reading> > PseudoTracker::measurePolar(
+std::vector<oi::Guarded<Reading> > PseudoTracker::measurePolar(
     const MeasurementConfig& mConfig) {
-  QList<oi::Guarded<Reading> > readings;
+  std::vector<oi::Guarded<Reading> > readings;
 
   const ReadingPolar rPolar = this->simulateAim();
 
@@ -531,7 +537,7 @@ QList<oi::Guarded<Reading> > PseudoTracker::measurePolar(
 
   QThread::msleep(this->measureTime);
 
-  readings.append(p);
+  readings.push_back(p);
 
   return readings;
 }
@@ -541,11 +547,11 @@ QList<oi::Guarded<Reading> > PseudoTracker::measurePolar(
  * \param mConfig
  * \return
  */
-QList<oi::Guarded<Reading> > PseudoTracker::measureDistance(
+std::vector<oi::Guarded<Reading> > PseudoTracker::measureDistance(
     const MeasurementConfig& mConfig) {
   Q_UNUSED(mConfig)
 
-  QList<oi::Guarded<Reading> > readings;
+  std::vector<oi::Guarded<Reading> > readings;
 
   // share the same modelled polar draw as every other reading type instead
   // of an independent, unmodelled noise stub - distance-only readings
@@ -567,7 +573,7 @@ QList<oi::Guarded<Reading> > PseudoTracker::measureDistance(
 
   QThread::msleep(1000);
 
-  readings.append(p);
+  readings.push_back(p);
 
   return readings;
 }
@@ -577,11 +583,11 @@ QList<oi::Guarded<Reading> > PseudoTracker::measureDistance(
  * \param mConfig
  * \return
  */
-QList<oi::Guarded<Reading> > PseudoTracker::measureDirection(
+std::vector<oi::Guarded<Reading> > PseudoTracker::measureDirection(
     const MeasurementConfig& mConfig) {
   Q_UNUSED(mConfig)
 
-  QList<oi::Guarded<Reading> > readings;
+  std::vector<oi::Guarded<Reading> > readings;
 
   const ReadingPolar rPolar = this->simulateAim();
 
@@ -602,7 +608,7 @@ QList<oi::Guarded<Reading> > PseudoTracker::measureDirection(
 
   QThread::msleep(1000);
 
-  readings.append(p);
+  readings.push_back(p);
 
   return readings;
 }
@@ -612,9 +618,9 @@ QList<oi::Guarded<Reading> > PseudoTracker::measureDirection(
  * \param mConfig
  * \return
  */
-QList<oi::Guarded<Reading> > PseudoTracker::measureCartesian(
+std::vector<oi::Guarded<Reading> > PseudoTracker::measureCartesian(
     const MeasurementConfig& mConfig) {
-  QList<oi::Guarded<Reading> > readings;
+  std::vector<oi::Guarded<Reading> > readings;
 
   // build from a noisy polar draw and let Reading's own polar->cartesian
   // propagation (Reading::errorPropagationPolarToCartesian, a proper
@@ -639,7 +645,7 @@ QList<oi::Guarded<Reading> > PseudoTracker::measureCartesian(
 
   QThread::msleep(this->measureTime);
 
-  readings.append(p);
+  readings.push_back(p);
 
   return readings;
 }
@@ -656,24 +662,24 @@ QList<oi::Guarded<Reading> > PseudoTracker::measureCartesian(
  */
 ReadingPolar PseudoTracker::simulateAim() const {
   TrackerErrorTerms terms;
-  const QMap<QString, double> params =
+  const std::map<QString, double> params =
       this->sensorConfiguration.getDoubleParameter();
-  terms.lambdaMm = params.value("lambda [mm]");
-  terms.mu = params.value("mu");
-  terms.exMm = params.value("ex [mm]");
-  terms.byMm = params.value("by [mm]");
-  terms.bzMm = params.value("bz [mm]");
-  terms.alphaArcsec = params.value("alpha [arc sec]");
-  terms.gammaArcsec = params.value("gamma [arc sec]");
-  terms.Aa1Arcsec = params.value("Aa1 [arc sec]");
-  terms.Ba1Arcsec = params.value("Ba1 [arc sec]");
-  terms.Aa2Arcsec = params.value("Aa2 [arc sec]");
-  terms.Ba2Arcsec = params.value("Ba2 [arc sec]");
-  terms.Ae0Arcsec = params.value("Ae0 [arc sec]");
-  terms.Ae1Arcsec = params.value("Ae1 [arc sec]");
-  terms.Be1Arcsec = params.value("Be1 [arc sec]");
-  terms.Ae2Arcsec = params.value("Ae2 [arc sec]");
-  terms.Be2Arcsec = params.value("Be2 [arc sec]");
+  terms.lambdaMm = oi::value(params, "lambda [mm]");
+  terms.mu = oi::value(params, "mu");
+  terms.exMm = oi::value(params, "ex [mm]");
+  terms.byMm = oi::value(params, "by [mm]");
+  terms.bzMm = oi::value(params, "bz [mm]");
+  terms.alphaArcsec = oi::value(params, "alpha [arc sec]");
+  terms.gammaArcsec = oi::value(params, "gamma [arc sec]");
+  terms.Aa1Arcsec = oi::value(params, "Aa1 [arc sec]");
+  terms.Ba1Arcsec = oi::value(params, "Ba1 [arc sec]");
+  terms.Aa2Arcsec = oi::value(params, "Aa2 [arc sec]");
+  terms.Ba2Arcsec = oi::value(params, "Ba2 [arc sec]");
+  terms.Ae0Arcsec = oi::value(params, "Ae0 [arc sec]");
+  terms.Ae1Arcsec = oi::value(params, "Ae1 [arc sec]");
+  terms.Be1Arcsec = oi::value(params, "Be1 [arc sec]");
+  terms.Ae2Arcsec = oi::value(params, "Ae2 [arc sec]");
+  terms.Be2Arcsec = oi::value(params, "Be2 [arc sec]");
 
   const TrackerErrorModel model(terms);
   return model.apply(this->myAzimuth, this->myZenith, this->myDistance);
@@ -686,9 +692,9 @@ bool PseudoTracker::search() {
   return true;
 }
 
-QList<oi::Guarded<Reading> > PseudoTracker::measureLevel(
+std::vector<oi::Guarded<Reading> > PseudoTracker::measureLevel(
     const MeasurementConfig& mConfig) {
-  QList<oi::Guarded<Reading> > readings;
+  std::vector<oi::Guarded<Reading> > readings;
 
   ReadingLevel rLevel;
   rLevel.i = ((double)rand() / RAND_MAX) / 1000.;
@@ -709,7 +715,7 @@ QList<oi::Guarded<Reading> > PseudoTracker::measureLevel(
 
   QThread::msleep(1000);
 
-  readings.append(p);
+  readings.push_back(p);
 
   return readings;
 }

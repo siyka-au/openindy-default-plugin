@@ -9,18 +9,18 @@ XYZFilter::XYZFilter(QString name, bool removeX, bool removeY, bool removeZ)
 }
 
 void XYZFilter::init() {
-  this->applicableFor.append(FeatureTypes::ePointFeature);
+  this->applicableFor.push_back(FeatureTypes::ePointFeature);
 }
 
 std::expected<Point, QString> XYZFilter::exec(const Point& input) {
-  if (this->inputElements[0].isEmpty()) {
+  if (this->inputElements[0].empty()) {
     emit this->sendMessage("inputElements[0] is empty",
                            MessageTypes::eWarningMessage);
     return std::unexpected(QString("XYZFilter: inputElements[0] is empty"));
   }
 
   oi::math::OiVec p =
-      this->inputElements[0].first().geometry->getPosition().getVector();
+      this->inputElements[0].front().geometry->getPosition().getVector();
 
   Point point = input;
 

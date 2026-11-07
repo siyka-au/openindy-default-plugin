@@ -1,5 +1,7 @@
 #include "p_bestfitplane.h"
 
+#include <vector>
+
 /*!
  * \brief BestFitPlane::init
  */
@@ -31,17 +33,17 @@ void BestFitPlane::init() {
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   NeededElement param2;
   param2.description = "Dummy point to indicate plane normal.";
   param2.infinite = true;
   param2.typeOfElement = ElementTypes::ePointElement;
   param2.roleName = "dummyPoint";
-  this->neededElements.append(param2);
+  this->neededElements.push_back(param2);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::ePlaneFeature);
+  this->applicableFor.push_back(FeatureTypes::ePlaneFeature);
 }
 
 /*!
@@ -63,7 +65,7 @@ std::expected<Plane, QString> BestFitPlane::exec() {
  * \return
  */
 bool BestFitPlane::setUpResult(Plane& plane) {
-  if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
+  if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
     emit this->sendMessage(
         QString("No points tagged for plane %1").arg(plane.getFeatureName()),
         MessageTypes::eWarningMessage);
@@ -73,9 +75,9 @@ bool BestFitPlane::setUpResult(Plane& plane) {
   // only solved points count as usable; among those, only shouldBeUsed
   // ones enter the fit itself - the same used/usable split
   // filterObservations used to provide for the observation-based version
-  QList<Position> usedPositions;
-  QList<IdPoint> points;
-  foreach (const InputElement& element, this->inputElements[0]) {
+  std::vector<Position> usedPositions;
+  std::vector<IdPoint> points;
+  for (const InputElement& element : this->inputElements[0]) {
     if (element.point.isNull() || !element.point->getIsSolved()) {
       this->setIsUsed(0, element.id, false);
       continue;
@@ -85,12 +87,12 @@ bool BestFitPlane::setUpResult(Plane& plane) {
       continue;
     }
 
-    usedPositions.append(element.point->getPosition());
+    usedPositions.push_back(element.point->getPosition());
 
     IdPoint point;
     point.id = element.id;
     point.xyz = element.point->getPosition().getVector();
-    points.append(point);
+    points.push_back(point);
   }
 
   // three is the geometric minimum for a plane. It is not sufficient:
@@ -147,7 +149,7 @@ bool BestFitPlane::setUpResult(Plane& plane) {
   // calculate display residuals for every solved point, whether or not it
   // was actually used in the fit (matches the observation-based version's
   // allUsableObservations behaviour)
-  foreach (const InputElement& element, this->inputElements[0]) {
+  for (const InputElement& element : this->inputElements[0]) {
     if (element.point.isNull() || !element.point->getIsSolved()) {
       continue;
     }

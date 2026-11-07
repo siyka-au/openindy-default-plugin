@@ -1,6 +1,5 @@
 #include "cfvisitor.h"
 
-#include <QList>
 #include <stdexcept>
 
 #include "cfcparameter.h"

@@ -1,5 +1,7 @@
 #include "p_translatebyvalue.h"
 
+#include "containers.h"
+
 /*!
  * \brief TranslateByValue::init
  */
@@ -17,16 +19,16 @@ void TranslateByValue::init() {
   param1.description = "Select a geometry that has a vector.";
   param1.infinite = false;
   param1.typeOfElement = ElementTypes::eDirectionElement;
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::ePointFeature);
-  this->applicableFor.append(FeatureTypes::eLineFeature);
-  this->applicableFor.append(FeatureTypes::ePlaneFeature);
-  this->applicableFor.append(FeatureTypes::eSphereFeature);
+  this->applicableFor.push_back(FeatureTypes::ePointFeature);
+  this->applicableFor.push_back(FeatureTypes::eLineFeature);
+  this->applicableFor.push_back(FeatureTypes::ePlaneFeature);
+  this->applicableFor.push_back(FeatureTypes::eSphereFeature);
 
   // set double parameter
-  this->doubleParameters.insert("offset [mm]", 0.0);
+  this->doubleParameters.insert_or_assign("offset [mm]", 0.0);
 }
 
 /*!
@@ -100,10 +102,10 @@ bool TranslateByValue::setUpResult(Point& point) {
   // get and check offset
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
-    offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
+    offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
     offset = offset / 1000.0;
   } else {
-    offset = this->doubleParameters.value("offset [mm]");
+    offset = oi::value(this->doubleParameters, "offset [mm]");
     offset = offset / 1000.0;
   }
 
@@ -142,10 +144,10 @@ bool TranslateByValue::setUpResult(Line& line) {
   // get and check offset
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
-    offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
+    offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
     offset = offset / 1000.0;
   } else {
-    offset = this->doubleParameters.value("offset [mm]");
+    offset = oi::value(this->doubleParameters, "offset [mm]");
     offset = offset / 1000.0;
   }
 
@@ -184,10 +186,10 @@ bool TranslateByValue::setUpResult(Plane& plane) {
   // get and check offset
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
-    offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
+    offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
     offset = offset / 1000.0;
   } else {
-    offset = this->doubleParameters.value("offset [mm]");
+    offset = oi::value(this->doubleParameters, "offset [mm]");
     offset = offset / 1000.0;
   }
 
@@ -226,10 +228,10 @@ bool TranslateByValue::setUpResult(Sphere& sphere) {
   // get and check offset
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
-    offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
+    offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
     offset = offset / 1000.0;
   } else {
-    offset = this->doubleParameters.value("offset [mm]");
+    offset = oi::value(this->doubleParameters, "offset [mm]");
     offset = offset / 1000.0;
   }
 

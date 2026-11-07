@@ -1,5 +1,9 @@
 #include "p_helmert7Param.h"
 
+#include <vector>
+
+#include "containers.h"
+
 /*!
  * \brief Helmert7Param::init
  */
@@ -23,31 +27,31 @@ void Helmert7Param::init() {
   param1.description = "Select points for calculating the transformation.";
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePointElement;
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::eTrafoParamFeature);
+  this->applicableFor.push_back(FeatureTypes::eTrafoParamFeature);
 
   // scale type
-  this->stringParameters.insert("calculate scale", "yes");
-  this->stringParameters.insert("calculate scale", "no");
+  this->stringParameters.emplace("calculate scale", "yes");
+  this->stringParameters.emplace("calculate scale", "no");
 
-  this->stringParameters.insert("use temperature", "yes");
-  this->stringParameters.insert("use temperature", "no");
+  this->stringParameters.emplace("use temperature", "yes");
+  this->stringParameters.emplace("use temperature", "no");
 
   // temperatures
-  this->doubleParameters.insert("reference", 20.0);
-  this->doubleParameters.insert("actual", 20.0);
+  this->doubleParameters.insert_or_assign("reference", 20.0);
+  this->doubleParameters.insert_or_assign("actual", 20.0);
 
   // controll reference temeprature
-  this->stringParameters.insert("use reference temperature", "yes");
-  this->stringParameters.insert("use reference temperature", "no");
+  this->stringParameters.emplace("use reference temperature", "yes");
+  this->stringParameters.emplace("use reference temperature", "no");
 
   // materials
-  QList<QString> materials = getMaterials();
+  std::vector<QString> materials = getMaterials();
 
   for (const auto& material : materials) {
-    this->stringParameters.insert("material", material);
+    this->stringParameters.emplace("material", material);
   }
 }
 
@@ -77,13 +81,13 @@ bool Helmert7Param::setUpResult(TrafoParam& trafoParam) {
 
   this->getScaleType();
 
-  if (locSystem.count() == refSystem.count() &&
-      locSystem.count() > 2) {  // if enough common points available
+  if (locSystem.size() == refSystem.size() &&
+      locSystem.size() > 2) {  // if enough common points available
     if (this->scaleType == ScaleTypes::pointScale) {
       if (this->calc_7p(trafoParam)) {
-        if (locSystem.count() > 3) {
+        if (locSystem.size() > 3) {
           return this->adjust_7p(trafoParam);
-        } else if (locSystem.count() == 3) {
+        } else if (locSystem.size() == 3) {
           return true;
         }
       }
@@ -103,16 +107,17 @@ bool Helmert7Param::setUpResult(TrafoParam& trafoParam) {
  */
 void Helmert7Param::getScaleType() {
   if (this->scalarInputParams.stringParameter.contains("calculate scale")) {
-    if (this->scalarInputParams.stringParameter.value("calculate scale")
+    if (oi::value(this->scalarInputParams.stringParameter, "calculate scale")
             .compare("yes") == 0) {
       if (this->scalarInputParams.stringParameter.contains("use temperature")) {
-        if (this->scalarInputParams.stringParameter.value("use temperature")
+        if (oi::value(this->scalarInputParams.stringParameter,
+                      "use temperature")
                 .compare("no") == 0) {
           this->scaleType = ScaleTypes::pointScale;
           return;
         } else {
-          if (this->scalarInputParams.stringParameter
-                  .value("use reference temperature")
+          if (oi::value(this->scalarInputParams.stringParameter,
+                        "use reference temperature")
                   .compare("no") == 0) {
             this->scalarInputParams.doubleParameter["reference"] = 20.0;
           }
@@ -139,9 +144,9 @@ void Helmert7Param::initPoints() {
       this->inputPointsStartSystem.size() ==
           this->inputPointsDestinationSystem.size()) {
     for (int i = 0; i < this->inputPointsStartSystem.size(); i++) {
-      this->locSystem.append(
+      this->locSystem.push_back(
           this->inputPointsStartSystem.at(i).getPosition().getVector());
-      this->refSystem.append(
+      this->refSystem.push_back(
           this->inputPointsDestinationSystem.at(i).getPosition().getVector());
     }
   }
@@ -187,29 +192,27 @@ vector<OiVec> Helmert7Param::calcCentroidCoord() {
   vector<OiVec> result;
   // centroid for destination system
   OiVec centroidLoc(3);
-  foreach (OiVec loc, this->locSystem) {
+  for (OiVec loc : this->locSystem) {
     OiVec coord;
     coord.add(loc.getAt(0));
     coord.add(loc.getAt(1));
     coord.add(loc.getAt(2));
     centroidLoc = centroidLoc + coord;
   }
-  if (this->locSystem.count() > 0) {
-    result.push_back(centroidLoc /
-                     static_cast<double>(this->locSystem.count()));
+  if (this->locSystem.size() > 0) {
+    result.push_back(centroidLoc / static_cast<double>(this->locSystem.size()));
   }
   // centroid for target system
   OiVec centroidRef(3);
-  foreach (OiVec ref, this->refSystem) {
+  for (OiVec ref : this->refSystem) {
     OiVec coord;
     coord.add(ref.getAt(0));
     coord.add(ref.getAt(1));
     coord.add(ref.getAt(2));
     centroidRef = centroidRef + coord;
   }
-  if (refSystem.count() > 0) {
-    result.push_back(centroidRef /
-                     static_cast<double>(this->refSystem.count()));
+  if (refSystem.size() > 0) {
+    result.push_back(centroidRef / static_cast<double>(this->refSystem.size()));
   }
   return result;
 }
@@ -221,10 +224,10 @@ vector<OiVec> Helmert7Param::calcCentroidCoord() {
  * \param centroid
  * \return
  */
-vector<OiVec> Helmert7Param::centroidReducedCoord(QList<OiVec> input,
+vector<OiVec> Helmert7Param::centroidReducedCoord(std::vector<OiVec> input,
                                                   OiVec centroid) {
   vector<OiVec> result;
-  foreach (OiVec coord, input) {
+  for (OiVec coord : input) {
     OiVec c;
     c.add(coord.getAt(0));
     c.add(coord.getAt(1));
@@ -274,7 +277,7 @@ vector<OiMat> Helmert7Param::modelMatrix(vector<OiVec> locC,
  */
 OiMat Helmert7Param::normalEquationMatrix(vector<OiMat> vecA) {
   OiMat result(4, 4);
-  foreach (OiMat a, vecA) {
+  for (OiMat a : vecA) {
     result += a.t() * a;
   }
   return result;
@@ -480,9 +483,8 @@ bool Helmert7Param::adjust_7p(TrafoParam& tp) {
   // if(iterations < 100){ //adjustment successful
   OiVec v = a * x - l_diff;
   OiVec vtv = v.t() * v;
-  double s0_post =
-      sqrt(vtv.getAt(0) /
-           (3.0 * static_cast<double>(this->locSystem.length()) - 7.0));
+  double s0_post = sqrt(
+      vtv.getAt(0) / (3.0 * static_cast<double>(this->locSystem.size()) - 7.0));
   OiMat sxx = s0_post * s0_post * qxx;
   // tp.getStatistic()->stdev = s0_post;
   result = true;
@@ -499,8 +501,8 @@ bool Helmert7Param::adjust_7p(TrafoParam& tp) {
  * \return
  */
 OiMat Helmert7Param::fillAMatrix(OiVec x0) {
-  OiMat a(locSystem.length() * 3, 7);
-  for (int row = 0; row < locSystem.length() * 3; row++) {
+  OiMat a(locSystem.size() * 3, 7);
+  for (int row = 0; row < locSystem.size() * 3; row++) {
     if ((row + 1) % 3 == 1) {  // observation of x
       a.setAt(row, 0, 0);
       a.setAt(row, 1, -locSystem.at(row / 3).getAt(2) * x0.getAt(3));
@@ -545,8 +547,8 @@ OiMat Helmert7Param::fillAMatrix(OiVec x0) {
  * \return
  */
 OiVec Helmert7Param::fillLVector() {
-  OiVec l(this->locSystem.length() * 3);
-  for (int row = 0; row < this->locSystem.length() * 3; row++) {
+  OiVec l(this->locSystem.size() * 3);
+  for (int row = 0; row < this->locSystem.size() * 3; row++) {
     if ((row + 1) % 3 == 1) {  // observation of x
       l.setAt(row, this->locSystem.at(row / 3).getAt(0));
     } else if ((row + 1) % 3 == 2) {  // observation of y
@@ -565,8 +567,8 @@ OiVec Helmert7Param::fillLVector() {
  * \return
  */
 OiVec Helmert7Param::fillL0Vector(OiVec x0) {
-  OiVec l0(this->locSystem.length() * 3);
-  for (int row = 0; row < this->locSystem.length() * 3; row++) {
+  OiVec l0(this->locSystem.size() * 3);
+  for (int row = 0; row < this->locSystem.size() * 3; row++) {
     if ((row + 1) % 3 == 1) {  // observation of x
       l0.setAt(
           row,
@@ -672,8 +674,8 @@ bool Helmert7Param::calc_6p(TrafoParam& tp) {
 
   OiVec v = a * x - l_diff;
   OiVec vtv = v.t() * v;
-  double s0_post = sqrt(
-      vtv.getAt(0) / (3 * static_cast<double>(this->locSystem.length()) - 6));
+  double s0_post = sqrt(vtv.getAt(0) /
+                        (3 * static_cast<double>(this->locSystem.size()) - 6));
   OiMat sxx = s0_post * s0_post * qxx;
 
   // tp.getStatistic()->stdev = s0_post;
@@ -714,12 +716,12 @@ bool Helmert7Param::calc_6p(TrafoParam& tp) {
  * \return
  */
 OiMat Helmert7Param::p6_fillAMatrix(OiVec x0) {
-  OiMat a(locSystem.length() * 3, 6);
+  OiMat a(locSystem.size() * 3, 6);
 
   // loc system is transformed with approx values of translation and rotation,
   // so this should be approxed enough for the pre transformation. That´s why I
   // can use the rotation matrix for small angles.
-  for (int row = 0; row < locSystem.length() * 3; row++) {
+  for (int row = 0; row < locSystem.size() * 3; row++) {
     if ((row + 1) % 3 == 1) {  // x
       a.setAt(row, 0, 0.0);
       a.setAt(row, 1, -locSystem.at(row / 3).getAt(2));
@@ -751,8 +753,8 @@ OiMat Helmert7Param::p6_fillAMatrix(OiVec x0) {
  * \return
  */
 OiVec Helmert7Param::p6_fillLVector() {
-  OiVec l(this->locSystem.length() * 3);
-  for (int row = 0; row < this->locSystem.length() * 3; row++) {
+  OiVec l(this->locSystem.size() * 3);
+  for (int row = 0; row < this->locSystem.size() * 3; row++) {
     if ((row + 1) % 3 == 1) {  // x observation
       l.setAt(row, this->locSystem.at(row / 3).getAt(0));
     }
@@ -772,8 +774,8 @@ OiVec Helmert7Param::p6_fillLVector() {
  * \return
  */
 OiVec Helmert7Param::p6_fillL0Vector(OiVec x0) {
-  OiVec l(this->locSystem.length() * 3);
-  for (int row = 0; row < this->locSystem.length() * 3; row++) {
+  OiVec l(this->locSystem.size() * 3);
+  for (int row = 0; row < this->locSystem.size() * 3; row++) {
     if ((row + 1) % 3 == 1) {  // x observation
       l.setAt(row, this->locSystem.at(row / 3).getAt(0));
     }
@@ -797,7 +799,7 @@ void Helmert7Param::p6_preliminaryTransformation() {
   this->locSystem = this->extendVector(this->locSystem);
   this->refSystem = this->extendVector(this->refSystem);
 
-  QList<OiVec> tmpLoc;
+  std::vector<OiVec> tmpLoc;
   for (auto tmp : this->locSystem) {
     // get vector point i
     // rotate the point
@@ -806,7 +808,7 @@ void Helmert7Param::p6_preliminaryTransformation() {
     // add translation
     OiVec tmptrafo = this->p6_translation + rt;
     tmptrafo.setAt(3, 1.0);
-    tmpLoc.append(tmptrafo);
+    tmpLoc.push_back(tmptrafo);
   }
   this->locSystem = tmpLoc;
 }
@@ -996,10 +998,11 @@ double Helmert7Param::setScaleValue() {
   if (this->scaleType == ScaleTypes::noScale) {
     scale = 1.0;
   } else {
-    double act = this->scalarInputParams.doubleParameter.value("actual");
-    double ref = this->scalarInputParams.doubleParameter.value("reference");
+    double act = oi::value(this->scalarInputParams.doubleParameter, "actual");
+    double ref =
+        oi::value(this->scalarInputParams.doubleParameter, "reference");
     QString material =
-        this->scalarInputParams.stringParameter.value("material");
+        oi::value(this->scalarInputParams.stringParameter, "material");
 
     return oi::getTemperatureExpansion(material, act, ref);
   }
@@ -1010,12 +1013,12 @@ double Helmert7Param::setScaleValue() {
  * \brief Helmert7Param::extendVector
  * \param vec
  */
-QList<OiVec> Helmert7Param::extendVector(QList<OiVec> vec) {
-  QList<OiVec> result;
+std::vector<OiVec> Helmert7Param::extendVector(std::vector<OiVec> vec) {
+  std::vector<OiVec> result;
 
   for (auto v : vec) {
     v.add(1.0);
-    result.append(v);
+    result.push_back(v);
   }
   return result;
 }

@@ -1,16 +1,16 @@
 #ifndef P_PSEUDOTRACKER_H
 #define P_PSEUDOTRACKER_H
-
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
-#include <QMap>
 #include <QObject>
 #include <QString>
 #include <QThread>
 #include <QtGlobal>
 #include <atomic>
 #include <cmath>
+#include <map>
+#include <vector>
 
 #include "lasertracker.h"
 #include "oimat.h"
@@ -43,11 +43,12 @@ class PseudoTracker : public LaserTracker {
   bool disconnectSensor() override;
 
   //! laser tracker measures a point and returns an observation
-  QList<oi::Guarded<Reading> > measure(
+  std::vector<oi::Guarded<Reading> > measure(
       const MeasurementConfig& mConfig) override;
 
   //! stream
-  QVariantMap readingStream(const ReadingTypes& streamFormat) override;
+  std::map<QString, QVariant> readingStream(
+      const ReadingTypes& streamFormat) override;
 
   //! getConnectionState
   bool getConnectionState() override;
@@ -56,7 +57,7 @@ class PseudoTracker : public LaserTracker {
   bool getIsReadyForMeasurement() override;
 
   //! sensor stats
-  QMap<QString, QString> getSensorStatus() override;
+  std::map<QString, QString> getSensorStatus() override;
 
   //! checks if sensor is busy
   bool getIsBusy() override;
@@ -86,14 +87,16 @@ class PseudoTracker : public LaserTracker {
   bool compensation() override;
 
  private:
-  QList<oi::Guarded<Reading> > measurePolar(const MeasurementConfig& mConfig);
-  QList<oi::Guarded<Reading> > measureDistance(
+  std::vector<oi::Guarded<Reading> > measurePolar(
       const MeasurementConfig& mConfig);
-  QList<oi::Guarded<Reading> > measureDirection(
+  std::vector<oi::Guarded<Reading> > measureDistance(
       const MeasurementConfig& mConfig);
-  QList<oi::Guarded<Reading> > measureCartesian(
+  std::vector<oi::Guarded<Reading> > measureDirection(
       const MeasurementConfig& mConfig);
-  QList<oi::Guarded<Reading> > measureLevel(const MeasurementConfig& mConfig);
+  std::vector<oi::Guarded<Reading> > measureCartesian(
+      const MeasurementConfig& mConfig);
+  std::vector<oi::Guarded<Reading> > measureLevel(
+      const MeasurementConfig& mConfig);
 
   //! the true (noise-free) aim as a noisy polar draw, using this
   //! instance's configured error terms - sigmaAzimuth/sigmaZenith/

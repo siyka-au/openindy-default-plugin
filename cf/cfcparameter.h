@@ -1,5 +1,6 @@
 #ifndef CFCPARAMETER_H
 #define CFCPARAMETER_H
+#include <vector>
 
 #include "treeutil.h"
 
@@ -9,9 +10,9 @@
 class CFCParameter : public Node {
  public:
   CFCParameter(QString name, QString comment, QString feature,
-               QList<QPointer<Node> > subnodes);
+               std::vector<QPointer<Node> > subnodes);
 
-  QList<QPointer<Node> >& getSubnodes() override;
+  std::vector<QPointer<Node> >& getSubnodes() override;
 
   QString getName() override;
 
@@ -23,7 +24,7 @@ class CFCParameter : public Node {
   QString name;
   QString comment;
   QString feature;
-  QList<QPointer<Node> > subnodes;
+  std::vector<QPointer<Node> > subnodes;
 };
 
 #endif  // CFCPARAMETER_H

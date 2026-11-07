@@ -1,5 +1,11 @@
 #include "p_oiexchangeascii.h"
 
+#include <map>
+#include <vector>
+
+#include "containers.h"
+#include "qtinterop.h"
+
 struct ColumnData {
   QString featureName;
   QString comment;
@@ -21,13 +27,13 @@ void OiExchangeAscii::init() {
   this->metaData.iid = ExchangeSimpleAscii_iidd;
 
   // set supported delimiters
-  this->supportedDelimiters.append("whitespace [ ]");
-  this->supportedDelimiters.append("semicolon [;]");
+  this->supportedDelimiters.push_back("whitespace [ ]");
+  this->supportedDelimiters.push_back("semicolon [;]");
 
   // set supported geometries
-  this->supportedGeometries.append(GeometryTypes::ePointGeometry);
-  this->supportedGeometries.append(GeometryTypes::ePlaneGeometry);
-  this->supportedGeometries.append(GeometryTypes::ePlaneLevelGeometry);
+  this->supportedGeometries.push_back(GeometryTypes::ePointGeometry);
+  this->supportedGeometries.push_back(GeometryTypes::ePlaneGeometry);
+  this->supportedGeometries.push_back(GeometryTypes::ePlaneLevelGeometry);
 }
 
 /*!
@@ -35,9 +41,9 @@ void OiExchangeAscii::init() {
  * \param typeOfGeometry
  * \return
  */
-QList<ExchangeSimpleAscii::ColumnType> OiExchangeAscii::getDefaultColumnOrder(
-    const GeometryTypes& typeOfGeometry) {
-  QList<ExchangeSimpleAscii::ColumnType> defaultColumnOrder;
+std::vector<ExchangeSimpleAscii::ColumnType>
+OiExchangeAscii::getDefaultColumnOrder(const GeometryTypes& typeOfGeometry) {
+  std::vector<ExchangeSimpleAscii::ColumnType> defaultColumnOrder;
 
   try {
     // check if device exists
@@ -66,7 +72,8 @@ QList<ExchangeSimpleAscii::ColumnType> OiExchangeAscii::getDefaultColumnOrder(
 
       // split the line and compare its column count to the maximum column count
       // found before
-      QStringList columns = line.split(this->getDelimiter(this->usedDelimiter));
+      std::vector<QString> columns =
+          oi::toVector(line.split(this->getDelimiter(this->usedDelimiter)));
       if (columns.size() > numColumns) {
         numColumns = columns.size();
       }
@@ -81,52 +88,52 @@ QList<ExchangeSimpleAscii::ColumnType> OiExchangeAscii::getDefaultColumnOrder(
       case GeometryTypes::ePlaneGeometry:
       case GeometryTypes::ePlaneLevelGeometry:
         if (numColumns == 7) {
-          defaultColumnOrder.append(OiExchangeAscii::eColumnFeatureName);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnX);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnY);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnZ);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnPrimaryI);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnPrimaryJ);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnPrimaryK);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnFeatureName);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnPrimaryI);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnPrimaryJ);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnPrimaryK);
         }
         break;
       case GeometryTypes::ePointGeometry:
         if (numColumns == 1) {
-          defaultColumnOrder.append(OiExchangeAscii::eColumnX);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
         } else if (numColumns == 2) {
-          defaultColumnOrder.append(OiExchangeAscii::eColumnX);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnY);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
         } else if (numColumns == 3) {
-          defaultColumnOrder.append(OiExchangeAscii::eColumnX);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnY);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnZ);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
         } else if (numColumns == 4) {
-          defaultColumnOrder.append(OiExchangeAscii::eColumnFeatureName);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnX);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnY);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnZ);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnFeatureName);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
         } else if (numColumns == 5) {
-          defaultColumnOrder.append(OiExchangeAscii::eColumnFeatureName);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnX);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnY);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnZ);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnGroupName);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnFeatureName);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnGroupName);
         } else if (numColumns == 6) {
-          defaultColumnOrder.append(OiExchangeAscii::eColumnFeatureName);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnX);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnY);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnZ);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnGroupName);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnComment);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnFeatureName);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnGroupName);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnComment);
         } else if (numColumns > 6) {
-          defaultColumnOrder.append(OiExchangeAscii::eColumnFeatureName);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnX);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnY);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnZ);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnGroupName);
-          defaultColumnOrder.append(OiExchangeAscii::eColumnComment);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnFeatureName);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnGroupName);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnComment);
           for (int i = 6; i < numColumns; i++) {
-            defaultColumnOrder.append(OiExchangeAscii::eColumnIgnore);
+            defaultColumnOrder.push_back(OiExchangeAscii::eColumnIgnore);
           }
         }
         break;
@@ -144,17 +151,17 @@ QList<ExchangeSimpleAscii::ColumnType> OiExchangeAscii::getDefaultColumnOrder(
  * \param typeOfGeometry
  * \return
  */
-QMap<ExchangeSimpleAscii::ColumnType, QVariantList>
+std::map<ExchangeSimpleAscii::ColumnType, std::vector<QVariant>>
 OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
-  QMap<ExchangeSimpleAscii::ColumnType, QVariantList> filePreview;
+  std::map<ExchangeSimpleAscii::ColumnType, std::vector<QVariant>> filePreview;
 
   // get the default column order
-  QList<ExchangeSimpleAscii::ColumnType> defaultColumnOrder =
+  std::vector<ExchangeSimpleAscii::ColumnType> defaultColumnOrder =
       this->getDefaultColumnOrder(typeOfGeometry);
 
   // insert an empty list for each column as default
   for (auto i : defaultColumnOrder) {
-    filePreview.insert(i, QVariantList());
+    filePreview.insert_or_assign(i, std::vector<QVariant>());
   }
 
   try {
@@ -175,20 +182,23 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
       QString line = in.readLine();
 
       // split the line at delimiter
-      QStringList columns = line.split(this->getDelimiter(this->usedDelimiter));
+      std::vector<QString> columns =
+          oi::toVector(line.split(this->getDelimiter(this->usedDelimiter)));
 
       // insert the column entries
       for (int i = 0; i < defaultColumnOrder.size(); i++) {
         // add an empty entry if the current row has not enough columns
         if (columns.size() <= i) {
-          QVariantList rows = filePreview.value(defaultColumnOrder.at(i));
-          rows.append(QString());
+          std::vector<QVariant> rows =
+              oi::value(filePreview, defaultColumnOrder.at(i));
+          rows.push_back(QString());
           continue;
         }
 
         // get the rows that already exist and append the current one
-        QVariantList rows = filePreview.value(defaultColumnOrder.at(i));
-        rows.append(columns.at(i));
+        std::vector<QVariant> rows =
+            oi::value(filePreview, defaultColumnOrder.at(i));
+        rows.push_back(columns.at(i));
       }
 
       sampleSize--;
@@ -209,19 +219,19 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
  * \param typeOfGeometry
  * \return
  */
-QList<ExchangeSimpleAscii::ColumnType> OiExchangeAscii::getPossibleColumns(
-    const GeometryTypes& typeOfGeometry) {
-  QList<ExchangeSimpleAscii::ColumnType> possibleColumns;
+std::vector<ExchangeSimpleAscii::ColumnType>
+OiExchangeAscii::getPossibleColumns(const GeometryTypes& typeOfGeometry) {
+  std::vector<ExchangeSimpleAscii::ColumnType> possibleColumns;
 
   // add all possible columns depending on the type of geometry
   switch (typeOfGeometry) {
     case GeometryTypes::ePointGeometry:
-      possibleColumns.append(ExchangeSimpleAscii::eColumnX);
-      possibleColumns.append(ExchangeSimpleAscii::eColumnY);
-      possibleColumns.append(ExchangeSimpleAscii::eColumnZ);
-      possibleColumns.append(ExchangeSimpleAscii::eColumnFeatureName);
-      possibleColumns.append(ExchangeSimpleAscii::eColumnGroupName);
-      possibleColumns.append(ExchangeSimpleAscii::eColumnComment);
+      possibleColumns.push_back(ExchangeSimpleAscii::eColumnX);
+      possibleColumns.push_back(ExchangeSimpleAscii::eColumnY);
+      possibleColumns.push_back(ExchangeSimpleAscii::eColumnZ);
+      possibleColumns.push_back(ExchangeSimpleAscii::eColumnFeatureName);
+      possibleColumns.push_back(ExchangeSimpleAscii::eColumnGroupName);
+      possibleColumns.push_back(ExchangeSimpleAscii::eColumnComment);
       break;
   }
 
@@ -295,7 +305,8 @@ void OiExchangeAscii::importOiData() {
       line.replace(",", ".");  // decimal separator TODO use locale format
 
       // split the line at delimiter
-      QStringList columns = line.split(this->getDelimiter(this->usedDelimiter));
+      std::vector<QString> columns =
+          oi::toVector(line.split(this->getDelimiter(this->usedDelimiter)));
 
       bool errorWhileParsing = false;
 
@@ -328,10 +339,10 @@ void OiExchangeAscii::importOiData() {
 
             // transform the unit of the imported coordinate to [m]
             if (this->units.contains(DimensionType::eMetric) &&
-                this->units.value(DimensionType::eMetric) !=
+                oi::value(this->units, DimensionType::eMetric) !=
                     UnitType::eUnitMeter) {
-              x = convertToDefault(x,
-                                   this->units.value(DimensionType::eMetric));
+              x = convertToDefault(
+                  x, oi::value(this->units, DimensionType::eMetric));
             }
 
             if (!errorWhileParsing) {
@@ -347,10 +358,10 @@ void OiExchangeAscii::importOiData() {
 
             // transform the unit of the imported coordinate to [m]
             if (this->units.contains(DimensionType::eMetric) &&
-                this->units.value(DimensionType::eMetric) !=
+                oi::value(this->units, DimensionType::eMetric) !=
                     UnitType::eUnitMeter) {
-              y = convertToDefault(y,
-                                   this->units.value(DimensionType::eMetric));
+              y = convertToDefault(
+                  y, oi::value(this->units, DimensionType::eMetric));
             }
 
             if (!errorWhileParsing) {
@@ -366,10 +377,10 @@ void OiExchangeAscii::importOiData() {
 
             // transform the unit of the imported coordinate to [m]
             if (this->units.contains(DimensionType::eMetric) &&
-                this->units.value(DimensionType::eMetric) !=
+                oi::value(this->units, DimensionType::eMetric) !=
                     UnitType::eUnitMeter) {
-              z = convertToDefault(z,
-                                   this->units.value(DimensionType::eMetric));
+              z = convertToDefault(
+                  z, oi::value(this->units, DimensionType::eMetric));
             }
 
             if (!errorWhileParsing) {
@@ -386,10 +397,10 @@ void OiExchangeAscii::importOiData() {
 
             // transform the unit of the imported coordinate to [m]
             if (this->units.contains(DimensionType::eAngular) &&
-                this->units.value(DimensionType::eAngular) !=
+                oi::value(this->units, DimensionType::eAngular) !=
                     UnitType::eUnitDecimalDegree) {
               value = convertToDefault(
-                  value, this->units.value(DimensionType::eAngular));
+                  value, oi::value(this->units, DimensionType::eAngular));
             }
 
             if (!errorWhileParsing) {
@@ -403,10 +414,10 @@ void OiExchangeAscii::importOiData() {
 
             // transform the unit of the imported coordinate to [m]
             if (this->units.contains(DimensionType::eAngular) &&
-                this->units.value(DimensionType::eAngular) !=
+                oi::value(this->units, DimensionType::eAngular) !=
                     UnitType::eUnitDecimalDegree) {
               value = convertToDefault(
-                  value, this->units.value(DimensionType::eAngular));
+                  value, oi::value(this->units, DimensionType::eAngular));
             }
 
             if (!errorWhileParsing) {
@@ -420,10 +431,10 @@ void OiExchangeAscii::importOiData() {
 
             // transform the unit of the imported coordinate to [m]
             if (this->units.contains(DimensionType::eAngular) &&
-                this->units.value(DimensionType::eAngular) !=
+                oi::value(this->units, DimensionType::eAngular) !=
                     UnitType::eUnitDecimalDegree) {
               value = convertToDefault(
-                  value, this->units.value(DimensionType::eAngular));
+                  value, oi::value(this->units, DimensionType::eAngular));
             }
 
             if (!errorWhileParsing) {
@@ -466,7 +477,7 @@ void OiExchangeAscii::importOiData() {
 
             oi::Guarded<FeatureWrapper> myGeometry = new FeatureWrapper();
             myGeometry->setPoint(myNominal);
-            this->features.append(myGeometry);
+            this->features.push_back(myGeometry);
 
             break;
           }
@@ -497,7 +508,7 @@ void OiExchangeAscii::importOiData() {
 
             oi::Guarded<FeatureWrapper> geometry = new FeatureWrapper();
             geometry->setPlane(plane);
-            this->features.append(geometry);
+            this->features.push_back(geometry);
 
             break;
           }
@@ -536,8 +547,8 @@ void OiExchangeAscii::exportOiData() {
       this->device->open(QIODevice::WriteOnly);
       QTextStream out(this->device);
 
-      foreach (oi::Guarded<FeatureWrapper> fw,
-               this->currentJob->getGeometriesList()) {
+      for (const oi::Guarded<FeatureWrapper>& fw :
+           this->currentJob->getGeometriesList()) {
         if (fw->getGeometry()->getIsSolved() &&
             fw->getGeometry()->getOwnerDescription().has_value()) {
           // write to file

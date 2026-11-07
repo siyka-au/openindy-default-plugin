@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include <vector>
+
 /*!
  * \brief BestFitCircle::init
  */
@@ -34,10 +36,10 @@ void BestFitCircle::init() {
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::eCircleFeature);
+  this->applicableFor.push_back(FeatureTypes::eCircleFeature);
 }
 
 /*!
@@ -59,17 +61,17 @@ std::expected<Circle, QString> BestFitCircle::exec() {
  */
 bool BestFitCircle::setUpResult(Circle& circle) {
   // get and check input points
-  if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
+  if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
     emit this->sendMessage(
         QString("No points tagged for circle %1").arg(circle.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
-  QList<oi::Guarded<Point> > inputPoints;
-  foreach (const InputElement& element, this->inputElements[0]) {
+  std::vector<oi::Guarded<Point> > inputPoints;
+  for (const InputElement& element : this->inputElements[0]) {
     if (!element.point.isNull() && element.point->getIsSolved() &&
         element.shouldBeUsed) {
-      inputPoints.append(element.point);
+      inputPoints.push_back(element.point);
       this->setIsUsed(0, element.id, true);
       continue;
     }
@@ -94,7 +96,7 @@ bool BestFitCircle::setUpResult(Circle& circle) {
 
   double xc = 0, yc = 0, zc = 0, rc = 0;
 
-  foreach (const oi::Guarded<Point>& p, inputPoints) {
+  for (const oi::Guarded<Point>& p : inputPoints) {
     const OiVec pos = p->getPosition().getVector();
     x[k] = pos.getAt(0);
     y[k] = pos.getAt(1);
@@ -284,9 +286,9 @@ bool BestFitCircle::setUpResult(Circle& circle) {
   for (int i = 0; i < obsCount; i++) {
     Residual r;
     r.elementId = inputPoints.at(i)->getId();
-    r.corrections.insert("vx", v.getAt(i * 3));
-    r.corrections.insert("vx", v.getAt(3 * i + 1));
-    r.corrections.insert("vx", v.getAt(3 * i + 2));
+    r.corrections.insert_or_assign("vx", v.getAt(i * 3));
+    r.corrections.insert_or_assign("vx", v.getAt(3 * i + 1));
+    r.corrections.insert_or_assign("vx", v.getAt(3 * i + 2));
     r.dimension = DimensionType::eMetric;
     myStats.addDisplayResidual(r);
   }

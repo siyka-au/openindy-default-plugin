@@ -1,5 +1,7 @@
 #include "p_pointfrompoints.h"
 
+#include <vector>
+
 /*!
  * \brief PointFromPoints::init
  */
@@ -22,10 +24,10 @@ void PointFromPoints::init() {
       "Select at least one points to calculate the best fit point.";
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePositionElement;
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::ePointFeature);
+  this->applicableFor.push_back(FeatureTypes::ePointFeature);
 }
 
 /*!
@@ -54,11 +56,11 @@ bool PointFromPoints::setUpResult(Point& point) {
         MessageTypes::eWarningMessage);
     return false;
   }
-  QList<OiVec> inputPoints;
-  foreach (const InputElement& element, this->inputElements[0]) {
+  std::vector<OiVec> inputPoints;
+  for (const InputElement& element : this->inputElements[0]) {
     if (!element.geometry.isNull() && element.geometry->getIsSolved() &&
         element.geometry->hasPosition()) {
-      inputPoints.append(element.geometry->getPosition().getVector());
+      inputPoints.push_back(element.geometry->getPosition().getVector());
       this->setIsUsed(0, element.id, true);
     } else {
       this->setIsUsed(0, element.id, false);
@@ -74,7 +76,7 @@ bool PointFromPoints::setUpResult(Point& point) {
 
   // fill l vector
   OiVec l;
-  foreach (const OiVec p, inputPoints) {
+  for (const OiVec p : inputPoints) {
     l.add(p.getAt(0));
     l.add(p.getAt(1));
     l.add(p.getAt(2));

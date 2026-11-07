@@ -1,6 +1,7 @@
 #include <QPointer>
 #include <QString>
 #include <QtTest>
+#include <vector>
 
 #include "chooselalib.h"
 #include "featurewrapper.h"
@@ -43,18 +44,19 @@ P20	-749.56	2987.57	-453.59\r\n\
   exchange->setSkipFirstLine(true);
   exchange->setDelimiter("whitespace [ ]");
 
-  QList<ExchangeSimpleAscii::ColumnType> columns;
-  columns.append(ExchangeSimpleAscii::eColumnFeatureName);
-  columns.append(ExchangeSimpleAscii::eColumnX);
-  columns.append(ExchangeSimpleAscii::eColumnY);
-  columns.append(ExchangeSimpleAscii::eColumnZ);
+  std::vector<ExchangeSimpleAscii::ColumnType> columns;
+  columns.push_back(ExchangeSimpleAscii::eColumnFeatureName);
+  columns.push_back(ExchangeSimpleAscii::eColumnX);
+  columns.push_back(ExchangeSimpleAscii::eColumnY);
+  columns.push_back(ExchangeSimpleAscii::eColumnZ);
   exchange->setUserDefinedColumns(columns);
 
   QByteArray ba = data.toUtf8();
   exchange->setDevice(QPointer<QIODevice>(new QBuffer(&ba)));
 
-  exchange->setFeatures(QList<oi::Guarded<FeatureWrapper> >());  // only export
-  exchange->setExportObservations(false);                        // only export
+  exchange->setFeatures(
+      std::vector<oi::Guarded<FeatureWrapper> >());  // only export
+  exchange->setExportObservations(false);            // only export
   exchange->setGroupName("Group01");
   exchange->setNominalSystem(oi::Guarded<CoordinateSystem>(new CoordinateSystem(
       oi::Guarded<Station>())) /*features.at(0)->getCoordinateSystem()*/);
@@ -121,8 +123,9 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
   exchange->setUserDefinedColumns(
       exchange->getDefaultColumnOrder(GeometryTypes::ePlaneGeometry));
 
-  exchange->setFeatures(QList<oi::Guarded<FeatureWrapper> >());  // only export
-  exchange->setExportObservations(false);                        // only export
+  exchange->setFeatures(
+      std::vector<oi::Guarded<FeatureWrapper> >());  // only export
+  exchange->setExportObservations(false);            // only export
   exchange->setGroupName("Group01");
   exchange->setNominalSystem(oi::Guarded<CoordinateSystem>(new CoordinateSystem(
       oi::Guarded<Station>())) /*features.at(0)->getCoordinateSystem()*/);

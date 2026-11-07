@@ -1,5 +1,7 @@
 #include "p_changeradius.h"
 
+#include "containers.h"
+
 /*!
  * \brief ChangeRadius::init
  */
@@ -14,12 +16,12 @@ void ChangeRadius::init() {
   this->metaData.iid = ObjectTransformation_iidd;
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::eSphereFeature);
-  this->applicableFor.append(FeatureTypes::eCircleFeature);
-  this->applicableFor.append(FeatureTypes::eCylinderFeature);
+  this->applicableFor.push_back(FeatureTypes::eSphereFeature);
+  this->applicableFor.push_back(FeatureTypes::eCircleFeature);
+  this->applicableFor.push_back(FeatureTypes::eCylinderFeature);
 
   // set double parameter
-  this->doubleParameters.insert("offset [mm]", 0.0);
+  this->doubleParameters.insert_or_assign("offset [mm]", 0.0);
 }
 
 /*!
@@ -70,10 +72,10 @@ bool ChangeRadius::setUpResult(Sphere& sphere) {
   // get and check offset
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
-    offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
+    offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
     offset = offset / 1000.0;
   } else {
-    offset = this->doubleParameters.value("offset [mm]");
+    offset = oi::value(this->doubleParameters, "offset [mm]");
     offset = offset / 1000.0;
   }
 
@@ -97,10 +99,10 @@ bool ChangeRadius::setUpResult(Circle& circle) {
   // get and check offset
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
-    offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
+    offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
     offset = offset / 1000.0;
   } else {
-    offset = this->doubleParameters.value("offset [mm]");
+    offset = oi::value(this->doubleParameters, "offset [mm]");
     offset = offset / 1000.0;
   }
 
@@ -125,10 +127,10 @@ bool ChangeRadius::setUpResult(Cylinder& cylinder) {
   // get and check offset
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
-    offset = this->scalarInputParams.doubleParameter.value("offset [mm]");
+    offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
     offset = offset / 1000.0;
   } else {
-    offset = this->doubleParameters.value("offset [mm]");
+    offset = oi::value(this->doubleParameters, "offset [mm]");
     offset = offset / 1000.0;
   }
 

@@ -49,10 +49,10 @@
   qDebug() << qSetRealNumberPrecision(10) \
            << "distance=" << feature->getDistance();
 
-#define DEBUG_RESIDULAS(function)                                        \
-  foreach (Residual r, function->getStatistic().getDisplayResiduals()) { \
-    qDebug() << qSetRealNumberPrecision(10) << r.elementId << ": "       \
-             << r.corrections;                                           \
+#define DEBUG_RESIDULAS(function)                                            \
+  for (const Residual& r : function->getStatistic().getDisplayResiduals()) { \
+    qDebug() << qSetRealNumberPrecision(10) << r.elementId << ": "           \
+             << r.corrections;                                               \
   }
 
 #define DEBUG_TRAFOPARAM(feature)                                              \

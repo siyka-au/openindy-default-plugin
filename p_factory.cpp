@@ -1,5 +1,7 @@
 #include "p_factory.h"
 
+#include <vector>
+
 using namespace oi;
 
 OiTemplatePlugin::OiTemplatePlugin(QObject* parent) : QObject(parent) {}
@@ -9,10 +11,10 @@ OiTemplatePlugin::OiTemplatePlugin(QObject* parent) : QObject(parent) {}
  * Returns a list with all sensors
  * \return
  */
-QList<oi::Guarded<Sensor> > OiTemplatePlugin::createSensors() {
-  QList<oi::Guarded<Sensor> > resultSet;
+std::vector<oi::Guarded<Sensor> > OiTemplatePlugin::createSensors() {
+  std::vector<oi::Guarded<Sensor> > resultSet;
   oi::Guarded<Sensor> pTracker = new PseudoTracker();
-  resultSet.append(pTracker);
+  resultSet.push_back(pTracker);
   return resultSet;
 }
 
@@ -21,43 +23,43 @@ QList<oi::Guarded<Sensor> > OiTemplatePlugin::createSensors() {
  * Returns a list with all functions
  * \return
  */
-QList<oi::Guarded<Function> > OiTemplatePlugin::createFunctions() {
-  QList<oi::Guarded<Function> > resultSet;
+std::vector<oi::Guarded<Function> > OiTemplatePlugin::createFunctions() {
+  std::vector<oi::Guarded<Function> > resultSet;
 
-  resultSet.append(new NominalPoint());
+  resultSet.push_back(new NominalPoint());
 
-  resultSet.append(new BestFitPoint());
-  resultSet.append(new BestFitLine());
-  resultSet.append(new BestFitPlane());
-  resultSet.append(new BestFitCircle());
-  resultSet.append(new PointFromPoints());
-  resultSet.append(new PlaneFromPlane());
-  resultSet.append(new LineFromPlaneNormal());
-  resultSet.append(new PointFromPlaneOrigin());
-  resultSet.append(new AverageFromPoints());
-  resultSet.append(new PointBetweenTwoPoints());
-  resultSet.append(new IntersectLineLine());
-  resultSet.append(new IntersectLinePlane());
-  resultSet.append(new IntersectPlanePlane());
-  resultSet.append(new ChangeRadius());
-  resultSet.append(new TranslateByValue());
-  resultSet.append(new Register());
-  resultSet.append(new BestFitSphere());
-  resultSet.append(new BestFitCircleInPlane());
-  resultSet.append(new RectifyToPoint());
-  resultSet.append(new RectifyToVector());
-  resultSet.append(new Shift());
-  resultSet.append(new BestFitCylinder());
-  resultSet.append(new BestFitCylinderAppxDirection());
-  resultSet.append(new BestFitCylinderAppxDummyPoint());
-  resultSet.append(new Helmert7Param());
-  resultSet.append(new Helmert6Param());
+  resultSet.push_back(new BestFitPoint());
+  resultSet.push_back(new BestFitLine());
+  resultSet.push_back(new BestFitPlane());
+  resultSet.push_back(new BestFitCircle());
+  resultSet.push_back(new PointFromPoints());
+  resultSet.push_back(new PlaneFromPlane());
+  resultSet.push_back(new LineFromPlaneNormal());
+  resultSet.push_back(new PointFromPlaneOrigin());
+  resultSet.push_back(new AverageFromPoints());
+  resultSet.push_back(new PointBetweenTwoPoints());
+  resultSet.push_back(new IntersectLineLine());
+  resultSet.push_back(new IntersectLinePlane());
+  resultSet.push_back(new IntersectPlanePlane());
+  resultSet.push_back(new ChangeRadius());
+  resultSet.push_back(new TranslateByValue());
+  resultSet.push_back(new Register());
+  resultSet.push_back(new BestFitSphere());
+  resultSet.push_back(new BestFitCircleInPlane());
+  resultSet.push_back(new RectifyToPoint());
+  resultSet.push_back(new RectifyToVector());
+  resultSet.push_back(new Shift());
+  resultSet.push_back(new BestFitCylinder());
+  resultSet.push_back(new BestFitCylinderAppxDirection());
+  resultSet.push_back(new BestFitCylinderAppxDummyPoint());
+  resultSet.push_back(new Helmert7Param());
+  resultSet.push_back(new Helmert6Param());
 
   FunctionConfigParser parser;
-  foreach (ConfiguredFunctionConfig config, parser.readConfigFromJson()) {
-    QList<oi::Guarded<Function> > functions;
+  for (ConfiguredFunctionConfig config : parser.readConfigFromJson()) {
+    std::vector<oi::Guarded<Function> > functions;
     if (config.version == 2) {
-      resultSet.append(new ConfiguredFunction(
+      resultSet.push_back(new ConfiguredFunction(
           config, functions));  // this instance contains only function name!
     }
   }
@@ -70,9 +72,9 @@ QList<oi::Guarded<Function> > OiTemplatePlugin::createFunctions() {
  * Returns a list with all network adjustments
  * \return
  */
-QList<oi::Guarded<BundleAdjustment> >
+std::vector<oi::Guarded<BundleAdjustment> >
 OiTemplatePlugin::createBundleAdjustments() {
-  QList<oi::Guarded<BundleAdjustment> > resultSet;
+  std::vector<oi::Guarded<BundleAdjustment> > resultSet;
   return resultSet;
 }
 
@@ -81,9 +83,10 @@ OiTemplatePlugin::createBundleAdjustments() {
  * Returns a list with all simulations
  * \return
  */
-QList<oi::Guarded<SimulationModel> > OiTemplatePlugin::createSimulations() {
-  QList<oi::Guarded<SimulationModel> > resultSet;
-  resultSet.append(new SimplePolarMeasurement());
+std::vector<oi::Guarded<SimulationModel> >
+OiTemplatePlugin::createSimulations() {
+  std::vector<oi::Guarded<SimulationModel> > resultSet;
+  resultSet.push_back(new SimplePolarMeasurement());
   return resultSet;
 }
 
@@ -91,10 +94,10 @@ QList<oi::Guarded<SimulationModel> > OiTemplatePlugin::createSimulations() {
  * \brief OiTemplatePlugin::createSimpleAsciiExchanges
  * \return
  */
-QList<oi::Guarded<ExchangeSimpleAscii> >
+std::vector<oi::Guarded<ExchangeSimpleAscii> >
 OiTemplatePlugin::createSimpleAsciiExchanges() {
-  QList<oi::Guarded<ExchangeSimpleAscii> > resultSet;
-  resultSet.append(new OiExchangeAscii());
+  std::vector<oi::Guarded<ExchangeSimpleAscii> > resultSet;
+  resultSet.push_back(new OiExchangeAscii());
   return resultSet;
 }
 
@@ -102,9 +105,9 @@ OiTemplatePlugin::createSimpleAsciiExchanges() {
  * \brief OiTemplatePlugin::createDefinedFormatExchanges
  * \return
  */
-QList<oi::Guarded<ExchangeDefinedFormat> >
+std::vector<oi::Guarded<ExchangeDefinedFormat> >
 OiTemplatePlugin::createDefinedFormatExchanges() {
-  QList<oi::Guarded<ExchangeDefinedFormat> > resultSet;
+  std::vector<oi::Guarded<ExchangeDefinedFormat> > resultSet;
   return resultSet;
 }
 
@@ -206,17 +209,17 @@ oi::Guarded<Function> OiTemplatePlugin::createFunctionFromConfig(
   oi::Guarded<Function> function(nullptr);
 
   FunctionConfigParser parser;
-  foreach (ConfiguredFunctionConfig config, parser.readConfigFromJson()) {
+  for (ConfiguredFunctionConfig config : parser.readConfigFromJson()) {
     if (config.name.compare(functionName) == 0) {
-      QList<oi::Guarded<Function> > functions;
-      foreach (QString name, config.getFunctionNames()) {
+      std::vector<oi::Guarded<Function> > functions;
+      for (QString name : config.getFunctionNames()) {
         oi::Guarded<Function> f = createFunction(name);
         if (f.isNull()) {
           throw logic_error(
               QString("no function found: %1").arg(name).toLocal8Bit().data());
         }
         f->init();
-        functions.append(f);
+        functions.push_back(f);
       }
 
       if (config.version == 2) {

@@ -23,10 +23,10 @@ void LineFromPlaneNormal::init() {
   param1.description = "Select the plane whose normal defines the line.";
   param1.infinite = false;
   param1.typeOfElement = ElementTypes::ePlaneElement;
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set applicable for
-  this->applicableFor.append(FeatureTypes::eLineFeature);
+  this->applicableFor.push_back(FeatureTypes::eLineFeature);
 }
 
 /*!
@@ -55,7 +55,7 @@ bool LineFromPlaneNormal::setUpResult(Line& line) {
     return false;
   }
 
-  const InputElement& element = this->inputElements[0].first();
+  const InputElement& element = this->inputElements[0].front();
 
   // an unsolved plane has no meaningful normal yet, so the line it would
   // define would be meaningless too

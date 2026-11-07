@@ -1,7 +1,7 @@
 #ifndef SIMPLEPOLARMEASUREMENT_H
 #define SIMPLEPOLARMEASUREMENT_H
-
 #include <random>
+#include <vector>
 
 #include "simulationmodel.h"
 #define _USE_MATH_DEFINES
@@ -36,12 +36,12 @@ class SimplePolarMeasurement : public SimulationModel {
   bool distort(const oi::Guarded<Reading>& r, const OiMat& objectRelation,
                const bool& newIterationStart) override;
   bool analyseSimulationData(UncertaintyData& d) override;
-  double getCorrelationCoefficient(const QList<double>& x,
-                                   const QList<double>& y) override;
+  double getCorrelationCoefficient(const std::vector<double>& x,
+                                   const std::vector<double>& y) override;
 
  private:
   // all supported distributions;
-  QStringList distributions;
+  std::vector<QString> distributions;
 
   double variance{};
   double expectation{};

@@ -1,11 +1,10 @@
 #ifndef TREEUTIL_H
 #define TREEUTIL_H
-
 #include <QDebug>
-#include <QList>
 #include <QObject>
 #include <QPointer>
 #include <QString>
+#include <vector>
 
 class Node : public QObject {
   Q_OBJECT
@@ -13,7 +12,7 @@ class Node : public QObject {
  public:
   virtual QString getName() = 0;
   virtual QString prettyPrint() = 0;
-  virtual QList<QPointer<Node> >& getSubnodes() = 0;
+  virtual std::vector<QPointer<Node> >& getSubnodes() = 0;
 };
 
 class NodeVisitor : public QObject {
@@ -52,18 +51,18 @@ class PrintVisitor : public NodeVisitor {
 class ListVisitor : public NodeVisitor {
  public:
   void pre(QPointer<Node> node, int index, int level) override {
-    foreach (QPointer<NodeVisitor> v, list) {
+    for (QPointer<NodeVisitor> v : list) {
       v->pre(node, index, level);
     }
   }
 
   void post(QPointer<Node> node, int index, int level) override {
-    foreach (QPointer<NodeVisitor> v, list) {
+    for (QPointer<NodeVisitor> v : list) {
       v->post(node, index, level);
     }
   }
 
-  QList<QPointer<NodeVisitor> > list;
+  std::vector<QPointer<NodeVisitor> > list;
 };
 
 class TreeUtil {

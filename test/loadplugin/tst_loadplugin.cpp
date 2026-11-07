@@ -1,7 +1,8 @@
-#include <QList>
 #include <QPointer>
 #include <QString>
 #include <QtTest>
+#include <map>
+#include <vector>
 
 #include "chooselalib.h"
 #include "plugin.h"
@@ -56,7 +57,7 @@ void LoadPluginTest::testLoadPlugin() {
   Plugin* oiPlugin = qobject_cast<Plugin*>(plugin);
   QVERIFY2(oiPlugin, "qobject_cast");
 
-  QList<oi::Guarded<Function> > functions = oiPlugin->createFunctions();
+  std::vector<oi::Guarded<Function> > functions = oiPlugin->createFunctions();
   QVERIFY2(functions.size() > 0, "no functions found");
 }
 void LoadPluginTest::testPseudoTracker_eCartesianReading() {
@@ -78,11 +79,11 @@ void LoadPluginTest::testPseudoTracker_eCartesianReading() {
   MeasurementConfig config;
   config.setMeasurementType(MeasurementTypes::eSinglePoint_MeasurementType);
   SensorConfiguration sc = sensor->getSensorConfiguration();
-  QMap<QString, QString> sp = sc.getStringParameter();
-  sp.insert("reading type", "cartesian");
+  std::map<QString, QString> sp = sc.getStringParameter();
+  sp.insert_or_assign("reading type", "cartesian");
   sc.setStringParameter(sp);
   sensor->setSensorConfiguration(sc);
-  QList<oi::Guarded<Reading> > readings = sensor->measure(config);
+  std::vector<oi::Guarded<Reading> > readings = sensor->measure(config);
   QVERIFY2(readings.size() > 0, "no readings");
 }
 

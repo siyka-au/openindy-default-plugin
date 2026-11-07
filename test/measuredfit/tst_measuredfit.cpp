@@ -1,7 +1,9 @@
 #include <QtTest>
 #include <cmath>
+#include <vector>
 
 #include "chooselalib.h"
+#include "containers.h"
 #include "featurewrapper.h"
 #include "geometry/cylinder.h"
 #include "geometry/plane.h"
@@ -94,18 +96,19 @@ oi::Guarded<OiJob> MeasuredFitTest::makeJobWithActiveStation(
  */
 oi::Guarded<Point> MeasuredFitTest::measureOnePoint(
     const oi::Guarded<OiJob>& job, int targetId, double x, double y, double z) {
-  const QList<oi::Guarded<FeatureWrapper> > before = job->getFeaturesList();
+  const std::vector<oi::Guarded<FeatureWrapper> > before =
+      job->getFeaturesList();
 
-  QList<oi::Guarded<Reading> > readings;
-  readings << makeCartesianReading(x, y, z);
+  std::vector<oi::Guarded<Reading> > readings;
+  readings.push_back(makeCartesianReading(x, y, z));
   job->addMeasurementResults(targetId, readings);
 
   oi::Guarded<Point> measured;
-  foreach (const oi::Guarded<FeatureWrapper>& fw, job->getFeaturesList()) {
+  for (const oi::Guarded<FeatureWrapper>& fw : job->getFeaturesList()) {
     if (fw.isNull() || fw->getPoint().isNull()) {
       continue;
     }
-    if (!before.contains(fw)) {
+    if (!oi::contains(before, fw)) {
       measured = fw->getPoint();
     }
   }
@@ -114,7 +117,7 @@ oi::Guarded<Point> MeasuredFitTest::measureOnePoint(
     return measured;
   }
 
-  foreach (const oi::Guarded<Observation>& obs, measured->getObservations()) {
+  for (const oi::Guarded<Observation>& obs : measured->getObservations()) {
     OiVec xyz(4);
     xyz.setAt(0, x);
     xyz.setAt(1, y);
@@ -142,7 +145,7 @@ void MeasuredFitTest::measuringIntoAPlaneProducesASolvedPlaneEndToEnd() {
   function->init();
   plane->addFunction(function);
 
-  QVERIFY2(function->getInputElements().value(0).isEmpty(),
+  QVERIFY2(oi::value(function->getInputElements(), 0).empty(),
            "nothing tagged yet");
 
   const int targetId = planeFeature->getFeature()->getId();
@@ -152,9 +155,9 @@ void MeasuredFitTest::measuringIntoAPlaneProducesASolvedPlaneEndToEnd() {
   struct Pt {
     double x, y, z;
   };
-  const QList<Pt> pts = {
+  const std::vector<Pt> pts = {
       {0.0, 0.0, 0.0}, {2.0, 0.0, 1.0}, {0.0, 2.0, 0.5}, {2.0, 2.0, 1.5}};
-  foreach (const Pt& p, pts) {
+  for (const Pt& p : pts) {
     QVERIFY2(!measureOnePoint(job, targetId, p.x, p.y, p.z).isNull(),
              "measuring must create a new point each time");
   }
@@ -162,7 +165,7 @@ void MeasuredFitTest::measuringIntoAPlaneProducesASolvedPlaneEndToEnd() {
   // the acceptance criterion itself: four points arrived in the function's
   // InputElements with no addInputElement call anywhere in this test -
   // tag resolution alone did it
-  QCOMPARE(function->getInputElements().value(0).size(), 4);
+  QCOMPARE(oi::value(function->getInputElements(), 0).size(), 4);
 
   // recalc(), not exec() directly - this is what makes it end to end:
   // the same path the app takes, which is also what actually flips
@@ -216,11 +219,12 @@ void MeasuredFitTest::measuringIntoACylinderProducesASolvedCylinderEndToEnd() {
   oi::Guarded<Function> function = new BestFitCylinder();
   function->init();
   ScalarInputParams scalarInputParams;
-  scalarInputParams.stringParameter.insert("approximation", "guess axis");
+  scalarInputParams.stringParameter.insert_or_assign("approximation",
+                                                     "guess axis");
   function->setScalarInputParams(scalarInputParams);
   cylinder->addFunction(function);
 
-  QVERIFY2(function->getInputElements().value(0).isEmpty(),
+  QVERIFY2(oi::value(function->getInputElements(), 0).empty(),
            "nothing tagged yet");
 
   const int targetId = cylinderFeature->getFeature()->getId();
@@ -228,17 +232,17 @@ void MeasuredFitTest::measuringIntoACylinderProducesASolvedCylinderEndToEnd() {
   struct Pt {
     double x, y, z;
   };
-  const QList<Pt> pts = {
+  const std::vector<Pt> pts = {
       {-3283.654, -79.927, 194.917}, {-3271.578, -84.991, 203.643},
       {-3292.599, -64.647, 196.517}, {-3308.806, -73.417, 213.805},
       {-3301.555, -87.819, 210.971}, {-3289.428, -79.973, 198.027},
       {-3292.505, -57.849, 200.595}, {-3303.342, -63.362, 213.794}};
-  foreach (const Pt& p, pts) {
+  for (const Pt& p : pts) {
     QVERIFY2(!measureOnePoint(job, targetId, p.x, p.y, p.z).isNull(),
              "measuring must create a new point each time");
   }
 
-  QCOMPARE(function->getInputElements().value(0).size(), 8);
+  QCOMPARE(oi::value(function->getInputElements(), 0).size(), 8);
 
   cylinder->recalc();
   QVERIFY2(cylinder->getIsSolved(),

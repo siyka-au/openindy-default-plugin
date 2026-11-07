@@ -1,5 +1,7 @@
 #include "p_nominalpoint.h"
 
+#include "containers.h"
+
 /*!
  * \brief NominalPoint::init
  */
@@ -19,12 +21,12 @@ void NominalPoint::init() {
   this->neededElements.clear();
 
   // set applicable for
-  this->applicableFor.append(FeatureTypes::ePointFeature);
+  this->applicableFor.push_back(FeatureTypes::ePointFeature);
 
   // scalar input parameters, in the job's default unit (metres)
-  this->doubleParameters.insert("x [m]", 0.0);
-  this->doubleParameters.insert("y [m]", 0.0);
-  this->doubleParameters.insert("z [m]", 0.0);
+  this->doubleParameters.insert_or_assign("x [m]", 0.0);
+  this->doubleParameters.insert_or_assign("y [m]", 0.0);
+  this->doubleParameters.insert_or_assign("z [m]", 0.0);
 }
 
 /*!
@@ -37,17 +39,17 @@ std::expected<Point, QString> NominalPoint::exec() {
 
   // user-entered values, falling back to the declared defaults - same
   // pattern as ObjectTransformation::ChangeRadius
-  double x = this->doubleParameters.value("x [m]", 0.0);
-  double y = this->doubleParameters.value("y [m]", 0.0);
-  double z = this->doubleParameters.value("z [m]", 0.0);
+  double x = oi::value(this->doubleParameters, "x [m]", 0.0);
+  double y = oi::value(this->doubleParameters, "y [m]", 0.0);
+  double z = oi::value(this->doubleParameters, "z [m]", 0.0);
   if (this->scalarInputParams.doubleParameter.contains("x [m]")) {
-    x = this->scalarInputParams.doubleParameter.value("x [m]");
+    x = oi::value(this->scalarInputParams.doubleParameter, "x [m]");
   }
   if (this->scalarInputParams.doubleParameter.contains("y [m]")) {
-    y = this->scalarInputParams.doubleParameter.value("y [m]");
+    y = oi::value(this->scalarInputParams.doubleParameter, "y [m]");
   }
   if (this->scalarInputParams.doubleParameter.contains("z [m]")) {
-    z = this->scalarInputParams.doubleParameter.value("z [m]");
+    z = oi::value(this->scalarInputParams.doubleParameter, "z [m]");
   }
 
   point.setPoint(Position(x, y, z));

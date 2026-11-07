@@ -1,5 +1,7 @@
 #include "p_bestfitcircleinplane.h"
 
+#include <vector>
+
 /*!
  * \brief BestFitCircleInPlane::init
  */
@@ -34,17 +36,17 @@ void BestFitCircleInPlane::init() {
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   NeededElement param2;
   param2.description = "Dummy point to indicate circle normal.";
   param2.infinite = true;
   param2.typeOfElement = ElementTypes::ePointElement;
   param2.roleName = "dummyPoint";
-  this->neededElements.append(param2);
+  this->neededElements.push_back(param2);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::eCircleFeature);
+  this->applicableFor.push_back(FeatureTypes::eCircleFeature);
 }
 
 /*!
@@ -67,27 +69,27 @@ std::expected<Circle, QString> BestFitCircleInPlane::exec() {
  * \return
  */
 bool BestFitCircleInPlane::setUpResult(Circle& circle) {
-  if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
+  if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
     emit this->sendMessage(
         QString("No points tagged for circle %1").arg(circle.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
 
-  QList<IdPoint> usablePoints;
-  QList<IdPoint> points;
+  std::vector<IdPoint> usablePoints;
+  std::vector<IdPoint> points;
   {
-    QList<oi::Guarded<Point> > allUsablePoints;
-    QList<oi::Guarded<Point> > inputPoints;
-    foreach (const InputElement& element, this->inputElements[0]) {
+    std::vector<oi::Guarded<Point> > allUsablePoints;
+    std::vector<oi::Guarded<Point> > inputPoints;
+    for (const InputElement& element : this->inputElements[0]) {
       if (element.point.isNull() || !element.point->getIsSolved()) {
         this->setIsUsed(0, element.id, false);
         continue;
       }
-      allUsablePoints.append(element.point);
+      allUsablePoints.push_back(element.point);
       this->setIsUsed(0, element.id, element.shouldBeUsed);
       if (element.shouldBeUsed) {
-        inputPoints.append(element.point);
+        inputPoints.push_back(element.point);
       }
     }
 
@@ -99,17 +101,17 @@ bool BestFitCircleInPlane::setUpResult(Circle& circle) {
       return false;
     }
 
-    foreach (const oi::Guarded<Point>& p, allUsablePoints) {
+    for (const oi::Guarded<Point>& p : allUsablePoints) {
       IdPoint point;
       point.id = p->getId();
       point.xyz = p->getPosition().getVectorH();
-      usablePoints.append(point);
+      usablePoints.push_back(point);
     }
-    foreach (const oi::Guarded<Point>& p, inputPoints) {
+    for (const oi::Guarded<Point>& p : inputPoints) {
       IdPoint point;
       point.id = p->getId();
       point.xyz = p->getPosition().getVectorH();
-      points.append(point);
+      points.push_back(point);
     }
   }
 

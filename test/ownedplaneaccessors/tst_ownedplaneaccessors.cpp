@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <cmath>
+#include <map>
 
 #include "chooselalib.h"
 #include "constructfunction.h"
@@ -41,7 +42,7 @@ class SetPlaneFunction : public ConstructFunction, public Producer<Plane> {
  public:
   SetPlaneFunction() : ConstructFunction() {
     this->metaData.name = "SetPlaneFunction";
-    this->applicableFor.append(FeatureTypes::ePlaneFeature);
+    this->applicableFor.push_back(FeatureTypes::ePlaneFeature);
   }
   Position position;
   Direction direction;
@@ -239,8 +240,8 @@ void OwnedPlaneAccessorsTest::editingAGeneratedAccessorIsRejected() {
 
   // a direct user edit, exactly the entry point the nominal properties
   // dialog uses, must be rejected - it is bound to the plane
-  QMap<GeometryParameters, double> edit;
-  edit.insert(GeometryParameters::eUnknownX, 999.0);
+  std::map<GeometryParameters, double> edit;
+  edit.insert_or_assign(GeometryParameters::eUnknownX, 999.0);
   point->setUnknownParameters(edit);
 
   QCOMPARE(point->getPosition().getVector().getAt(0), 1.0);

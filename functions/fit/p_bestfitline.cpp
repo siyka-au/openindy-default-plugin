@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include <vector>
+
 void BestFitLine::init() {
   // set plugin meta data
   this->metaData.name = "BestFitLine";
@@ -25,10 +27,10 @@ void BestFitLine::init() {
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::eLineFeature);
+  this->applicableFor.push_back(FeatureTypes::eLineFeature);
 }
 
 /*!
@@ -51,24 +53,24 @@ std::expected<Line, QString> BestFitLine::exec() {
  * \param p
  */
 bool BestFitLine::setUpResult(Line& line) {
-  if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
+  if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
     emit this->sendMessage(
         QString("No points tagged for line %1").arg(line.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
 
-  QList<oi::Guarded<Point> > allUsablePoints;
-  QList<oi::Guarded<Point> > inputPoints;
-  foreach (const InputElement& element, this->inputElements[0]) {
+  std::vector<oi::Guarded<Point> > allUsablePoints;
+  std::vector<oi::Guarded<Point> > inputPoints;
+  for (const InputElement& element : this->inputElements[0]) {
     if (element.point.isNull() || !element.point->getIsSolved()) {
       this->setIsUsed(0, element.id, false);
       continue;
     }
-    allUsablePoints.append(element.point);
+    allUsablePoints.push_back(element.point);
     this->setIsUsed(0, element.id, element.shouldBeUsed);
     if (element.shouldBeUsed) {
-      inputPoints.append(element.point);
+      inputPoints.push_back(element.point);
     }
   }
   if (inputPoints.size() < 2) {
@@ -80,7 +82,7 @@ bool BestFitLine::setUpResult(Line& line) {
 
   // centroid
   OiVec centroid(3);
-  foreach (const oi::Guarded<Point>& point, inputPoints) {
+  for (const oi::Guarded<Point>& point : inputPoints) {
     centroid = centroid + point->getPosition().getVector();
   }
   centroid = centroid * (1.0 / static_cast<double>(inputPoints.size()));
@@ -124,7 +126,7 @@ bool BestFitLine::setUpResult(Line& line) {
   rectifyNormalToDirection(r, direction);
 
   // calculate display residuals for each usable point
-  foreach (const oi::Guarded<Point>& point, allUsablePoints) {
+  for (const oi::Guarded<Point>& point : allUsablePoints) {
     double distance = 0.0;
     OiVec v_line(3);
     const OiVec pos = point->getPosition().getVector();

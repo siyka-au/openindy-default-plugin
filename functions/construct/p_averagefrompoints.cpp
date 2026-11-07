@@ -26,10 +26,10 @@ void AverageFromPoints::init() {
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set applicable for
-  this->applicableFor.append(FeatureTypes::ePointFeature);
+  this->applicableFor.push_back(FeatureTypes::ePointFeature);
 }
 
 /*!
@@ -51,7 +51,7 @@ std::expected<Point, QString> AverageFromPoints::exec() {
  * \return
  */
 bool AverageFromPoints::setUpResult(Point& point) {
-  if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
+  if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
     emit this->sendMessage(QString("No points to average for point %1")
                                .arg(point.getFeatureName()),
                            MessageTypes::eWarningMessage);
@@ -64,7 +64,7 @@ bool AverageFromPoints::setUpResult(Point& point) {
   sum.setAt(2, 0.0);
   int usedCount = 0;
 
-  foreach (const InputElement& element, this->inputElements[0]) {
+  for (const InputElement& element : this->inputElements[0]) {
     // degenerate points pass the "at least one" hint just like a
     // collinear set passes a plane's minimum count - reject inside
     // exec(), not by declared count (domain-model.md S9.4)

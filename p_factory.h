@@ -1,9 +1,9 @@
 #ifndef P_FACTORY_H
 #define P_FACTORY_H
-
 #include <QObject>
 #include <QString>
 #include <QtGlobal>
+#include <vector>
 
 #include "bundleadjustment.h"
 #include "configuredfunction.h"
@@ -66,12 +66,13 @@ class OiTemplatePlugin : public QObject, Plugin {
   // create instances of all available plugin types in a plugin
   // ##########################################################
 
-  QList<oi::Guarded<Sensor> > createSensors();
-  QList<oi::Guarded<Function> > createFunctions();
-  QList<oi::Guarded<BundleAdjustment> > createBundleAdjustments();
-  QList<oi::Guarded<SimulationModel> > createSimulations();
-  QList<oi::Guarded<ExchangeSimpleAscii> > createSimpleAsciiExchanges();
-  QList<oi::Guarded<ExchangeDefinedFormat> > createDefinedFormatExchanges();
+  std::vector<oi::Guarded<Sensor> > createSensors();
+  std::vector<oi::Guarded<Function> > createFunctions();
+  std::vector<oi::Guarded<BundleAdjustment> > createBundleAdjustments();
+  std::vector<oi::Guarded<SimulationModel> > createSimulations();
+  std::vector<oi::Guarded<ExchangeSimpleAscii> > createSimpleAsciiExchanges();
+  std::vector<oi::Guarded<ExchangeDefinedFormat> >
+  createDefinedFormatExchanges();
 
   // ###################################################
   // create instances of a plugin type with a given name

@@ -1,7 +1,5 @@
 #ifndef P_SHIFTPLANE_H
 #define P_SHIFTPLANE_H
-
-#include <QList>
 #include <QString>
 
 #include "objecttransformation.h"

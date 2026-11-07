@@ -1,5 +1,7 @@
 #include "p_bestfitsphere.h"
 
+#include <vector>
+
 /*!
  * \brief BestFitSphere::init
  */
@@ -27,10 +29,10 @@ void BestFitSphere::init() {
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::eSphereFeature);
+  this->applicableFor.push_back(FeatureTypes::eSphereFeature);
 }
 
 /*!
@@ -53,24 +55,24 @@ std::expected<Sphere, QString> BestFitSphere::exec() {
 bool BestFitSphere::setUpResult(Sphere& sphere) {
   this->statistic.reset();
 
-  if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
+  if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
     emit this->sendMessage(
         QString("No points tagged for sphere %1").arg(sphere.getFeatureName()),
         MessageTypes::eWarningMessage);
     return false;
   }
 
-  QList<oi::Guarded<Point> > allUsablePoints;
-  QList<oi::Guarded<Point> > inputPoints;
-  foreach (const InputElement& element, this->inputElements[0]) {
+  std::vector<oi::Guarded<Point> > allUsablePoints;
+  std::vector<oi::Guarded<Point> > inputPoints;
+  for (const InputElement& element : this->inputElements[0]) {
     if (element.point.isNull() || !element.point->getIsSolved()) {
       this->setIsUsed(0, element.id, false);
       continue;
     }
-    allUsablePoints.append(element.point);
+    allUsablePoints.push_back(element.point);
     this->setIsUsed(0, element.id, element.shouldBeUsed);
     if (element.shouldBeUsed) {
-      inputPoints.append(element.point);
+      inputPoints.push_back(element.point);
     }
   }
   if (inputPoints.size() < 4) {
@@ -94,8 +96,8 @@ bool BestFitSphere::setUpResult(Sphere& sphere) {
  * \param inputPoints
  * \return
  */
-bool BestFitSphere::approximate(Sphere& sphere,
-                                const QList<oi::Guarded<Point> >& inputPoints) {
+bool BestFitSphere::approximate(
+    Sphere& sphere, const std::vector<oi::Guarded<Point> >& inputPoints) {
   // calculate centroid coordinates
   OiVec centroid(3);
   for (const auto& inputPoint : inputPoints) {
@@ -182,9 +184,9 @@ bool BestFitSphere::approximate(Sphere& sphere,
  * \param inputPoints
  * \return
  */
-bool BestFitSphere::fit(Sphere& sphere,
-                        const QList<oi::Guarded<Point> >& inputPoints,
-                        const QList<oi::Guarded<Point> >& allUsablePoints) {
+bool BestFitSphere::fit(
+    Sphere& sphere, const std::vector<oi::Guarded<Point> >& inputPoints,
+    const std::vector<oi::Guarded<Point> >& allUsablePoints) {
   int numIterations = 0;
 
   // set approximation values

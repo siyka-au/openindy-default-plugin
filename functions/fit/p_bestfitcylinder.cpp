@@ -1,5 +1,7 @@
 #include "p_bestfitcylinder.h"
 
+#include <vector>
+
 /*!
  * \brief BestFitCylinder::init
  */
@@ -31,16 +33,16 @@ void BestFitCylinder::init() {
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::eCylinderFeature);
+  this->applicableFor.push_back(FeatureTypes::eCylinderFeature);
 
-  this->stringParameters.insert("approximation", "first two points");
-  this->stringParameters.insert("approximation", "guess axis");
+  this->stringParameters.emplace("approximation", "first two points");
+  this->stringParameters.emplace("approximation", "guess axis");
 
   this->scalarInputParams.isValid = true;
-  this->scalarInputParams.stringParameter.insert(
+  this->scalarInputParams.stringParameter.insert_or_assign(
       "approximation", "first two points");  // default
 }
 
@@ -64,27 +66,27 @@ std::expected<Cylinder, QString> BestFitCylinder::exec() {
  * \return
  */
 bool BestFitCylinder::setUpResult(Cylinder& cylinder) {
-  if (!this->inputElements.contains(0) || this->inputElements[0].isEmpty()) {
+  if (!this->inputElements.contains(0) || this->inputElements[0].empty()) {
     emit this->sendMessage(QString("No points tagged for cylinder %1")
                                .arg(cylinder.getFeatureName()),
                            MessageTypes::eWarningMessage);
     return false;
   }
 
-  QList<IdPoint> usablePoints;
-  QList<IdPoint> points;
+  std::vector<IdPoint> usablePoints;
+  std::vector<IdPoint> points;
   {
-    QList<oi::Guarded<Point> > allUsablePoints;
-    QList<oi::Guarded<Point> > inputPoints;
-    foreach (const InputElement& element, this->inputElements[0]) {
+    std::vector<oi::Guarded<Point> > allUsablePoints;
+    std::vector<oi::Guarded<Point> > inputPoints;
+    for (const InputElement& element : this->inputElements[0]) {
       if (element.point.isNull() || !element.point->getIsSolved()) {
         this->setIsUsed(0, element.id, false);
         continue;
       }
-      allUsablePoints.append(element.point);
+      allUsablePoints.push_back(element.point);
       this->setIsUsed(0, element.id, element.shouldBeUsed);
       if (element.shouldBeUsed) {
-        inputPoints.append(element.point);
+        inputPoints.push_back(element.point);
       }
     }
 
@@ -99,17 +101,17 @@ bool BestFitCylinder::setUpResult(Cylinder& cylinder) {
       return false;
     }
 
-    foreach (const oi::Guarded<Point>& p, allUsablePoints) {
+    for (const oi::Guarded<Point>& p : allUsablePoints) {
       IdPoint point;
       point.id = p->getId();
       point.xyz = p->getPosition().getVectorH();
-      usablePoints.append(point);
+      usablePoints.push_back(point);
     }
-    foreach (const oi::Guarded<Point>& p, inputPoints) {
+    for (const oi::Guarded<Point>& p : inputPoints) {
       IdPoint point;
       point.id = p->getId();
       point.xyz = p->getPosition().getVectorH();
-      points.append(point);
+      points.push_back(point);
     }
   }
 
@@ -143,20 +145,21 @@ void BestFitCylinderAppxDirection::init() {
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   NeededElement param2;
   param2.description = "approximation direction.";
   param2.infinite = true;
   param2.typeOfElement = ElementTypes::eDirectionElement;
-  this->neededElements.append(param2);
+  this->neededElements.push_back(param2);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::eCylinderFeature);
+  this->applicableFor.push_back(FeatureTypes::eCylinderFeature);
 
   this->scalarInputParams.isValid = true;
-  this->scalarInputParams.stringParameter.insert("approximation",
-                                                 "direction");  // default
+  this->scalarInputParams.stringParameter.insert_or_assign(
+      "approximation",
+      "direction");  // default
 }
 
 /**
@@ -186,19 +189,19 @@ void BestFitCylinderAppxDummyPoint::init() {
   param1.infinite = true;
   param1.typeOfElement = ElementTypes::ePointElement;
   param1.roleName = "default";
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   NeededElement param3;
   param3.description = "Dummy points to indicate cylinder normal.";
   param3.infinite = true;
   param3.typeOfElement = ElementTypes::ePointElement;
   param3.roleName = "dummyPoint";
-  this->neededElements.append(param3);
+  this->neededElements.push_back(param3);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::eCylinderFeature);
+  this->applicableFor.push_back(FeatureTypes::eCylinderFeature);
 
   this->scalarInputParams.isValid = true;
-  this->scalarInputParams.stringParameter.insert("approximation",
-                                                 "first two dummy points");
+  this->scalarInputParams.stringParameter.insert_or_assign(
+      "approximation", "first two dummy points");
 }

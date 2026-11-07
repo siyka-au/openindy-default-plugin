@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <cmath>
+#include <vector>
 
 #include "chooselalib.h"
 #include "featurewrapper.h"
@@ -54,7 +55,7 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget() {
   pose.orientation.setAt(1, 1, 1.0);
   pose.orientation.setAt(2, 2, 1.0);
 
-  QList<OiVec> scene;
+  std::vector<OiVec> scene;
   auto point = [](double x, double y, double z) {
     OiVec v(3);
     v.setAt(0, x);
@@ -65,11 +66,10 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget() {
   // z = 0.01*x + 0.02*y : a real, non-axis-aligned plane, not a flat one
   // a fit could satisfy by accident
   auto onPlane = [](double x, double y) { return 0.01 * x + 0.02 * y; };
-  scene << point(8.0, -1.0, onPlane(8.0, -1.0))
-        << point(9.0, 1.0, onPlane(9.0, 1.0))
-        << point(9.0, -1.0, onPlane(9.0, -1.0))
-        << point(8.0, 1.0, onPlane(8.0, 1.0))
-        << point(8.5, 0.0, onPlane(8.5, 0.0));
+  scene = {
+      point(8.0, -1.0, onPlane(8.0, -1.0)), point(9.0, 1.0, onPlane(9.0, 1.0)),
+      point(9.0, -1.0, onPlane(9.0, -1.0)), point(8.0, 1.0, onPlane(8.0, 1.0)),
+      point(8.5, 0.0, onPlane(8.5, 0.0))};
 
   // PseudoTracker's real, deployed error terms - not invented for this test
   TrackerErrorTerms terms;
@@ -102,11 +102,11 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget() {
   function->init();
 
   int id = 1;
-  QList<oi::Guarded<Observation>> observations;
+  std::vector<oi::Guarded<Observation>> observations;
   for (const OiVec& truePoint : scene) {
     oi::Guarded<Observation> obs =
         simulateObservation(truePoint, pose, model, id);
-    observations.append(obs);
+    observations.push_back(obs);
     QVERIFY2(obs->getSigmaXYZ().getAt(0) > 0.0,
              "sigma must be populated, not the silent zero default");
 

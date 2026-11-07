@@ -1,9 +1,9 @@
 #ifndef P_BESTFITSPHERE_H
 #define P_BESTFITSPHERE_H
-
 #include <QObject>
 #include <QPointer>
 #include <QtMath>
+#include <vector>
 
 #include "fitfunction.h"
 #include "oimat.h"
@@ -35,9 +35,9 @@ class BestFitSphere : public FitFunction, public Producer<Sphere> {
 
   bool setUpResult(Sphere& sphere);
   bool approximate(Sphere& sphere,
-                   const QList<oi::Guarded<Point> >& inputPoints);
-  bool fit(Sphere& sphere, const QList<oi::Guarded<Point> >& inputPoints,
-           const QList<oi::Guarded<Point> >& allUsablePoints);
+                   const std::vector<oi::Guarded<Point> >& inputPoints);
+  bool fit(Sphere& sphere, const std::vector<oi::Guarded<Point> >& inputPoints,
+           const std::vector<oi::Guarded<Point> >& allUsablePoints);
 };
 
 #endif  // P_BESTFITSPHERE_H

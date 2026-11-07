@@ -1,11 +1,14 @@
 #include "configuredfunction.h"
 
+#include <vector>
+
 #include "cfvisitor.h"
 #include "treeutil.h"
 #include "types.h"
 
-ConfiguredFunction::ConfiguredFunction(ConfiguredFunctionConfig config,
-                                       QList<oi::Guarded<Function> > functions)
+ConfiguredFunction::ConfiguredFunction(
+    ConfiguredFunctionConfig config,
+    std::vector<oi::Guarded<Function> > functions)
     : SpecialFunction(), functions(functions), config(config) {}
 
 void ConfiguredFunction::init() {
@@ -25,7 +28,7 @@ std::expected<void, QString> ConfiguredFunction::execChecked(
     ListVisitor visitors;
 
     QPointer<NodeVisitor> debug = new PrintVisitor();
-    visitors.list.append(debug);
+    visitors.list.push_back(debug);
 
     CFContext ctx;  // contains references not copies !
     ctx.config = this->config;
@@ -37,7 +40,7 @@ std::expected<void, QString> ConfiguredFunction::execChecked(
       function->clear();  // remove inner data e.g. inputElements
     }
 
-    ctx.global_inputElements = this->global_inputElements.isEmpty()
+    ctx.global_inputElements = this->global_inputElements.empty()
                                    ? this->getInputElements()
                                    : this->global_inputElements;
     ctx.global_feature =
@@ -46,7 +49,7 @@ std::expected<void, QString> ConfiguredFunction::execChecked(
     QPointer<NodeVisitor> cf;
     cf = new CFVisitor(ctx);
 
-    visitors.list.append(cf);
+    visitors.list.push_back(cf);
 
     TreeUtil::traversal(this->config.parameter, visitors);
 
@@ -61,7 +64,7 @@ std::expected<void, QString> ConfiguredFunction::execChecked(
 QString ConfiguredFunction::prettyPrint() {
   QString s;
   s += "function: '" + this->getMetaData().name + "', featureFunctions: [ ";
-  foreach (oi::Guarded<Function> f, this->functions) {
+  for (oi::Guarded<Function> f : this->functions) {
     if (auto* configured = dynamic_cast<ConfiguredFunction*>(f.data())) {
       s += "'" + configured->prettyPrint() + "', ";
     } else {

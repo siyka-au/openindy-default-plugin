@@ -23,10 +23,10 @@ void PointFromPlaneOrigin::init() {
   param1.description = "Select the plane whose position defines the point.";
   param1.infinite = false;
   param1.typeOfElement = ElementTypes::ePlaneElement;
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set applicable for
-  this->applicableFor.append(FeatureTypes::ePointFeature);
+  this->applicableFor.push_back(FeatureTypes::ePointFeature);
 }
 
 /*!
@@ -55,7 +55,7 @@ bool PointFromPlaneOrigin::setUpResult(Point& point) {
     return false;
   }
 
-  const InputElement& element = this->inputElements[0].first();
+  const InputElement& element = this->inputElements[0].front();
 
   if (element.plane.isNull() || !element.plane->getIsSolved()) {
     this->setIsUsed(0, element.id, false);

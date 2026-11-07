@@ -17,13 +17,13 @@ void Helmert6Param::init() {
 
   // restrict to the no-scale path - Helmert7Param::exec() already calls
   // calc_6p() when this resolves to "no"
-  this->stringParameters.remove("calculate scale");
-  this->stringParameters.insert("calculate scale", "no");
+  this->stringParameters.erase("calculate scale");
+  this->stringParameters.emplace("calculate scale", "no");
 
   // drop scale-only parameters that no longer apply
-  this->stringParameters.remove("use temperature");
-  this->stringParameters.remove("use reference temperature");
-  this->stringParameters.remove("material");
-  this->doubleParameters.remove("reference");
-  this->doubleParameters.remove("actual");
+  this->stringParameters.erase("use temperature");
+  this->stringParameters.erase("use reference temperature");
+  this->stringParameters.erase("material");
+  this->doubleParameters.erase("reference");
+  this->doubleParameters.erase("actual");
 }

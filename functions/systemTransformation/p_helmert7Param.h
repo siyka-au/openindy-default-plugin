@@ -50,9 +50,9 @@ class Helmert7Param : public SystemTransformation, public Producer<TrafoParam> {
   OiVec p6_translation;
   OiVec p6_rotation;
 
-  QList<OiVec> extendVector(QList<OiVec> vec);
-  QList<OiVec> locSystem;
-  QList<OiVec> refSystem;
+  std::vector<OiVec> extendVector(std::vector<OiVec> vec);
+  std::vector<OiVec> locSystem;
+  std::vector<OiVec> refSystem;
 
   // general functions
   void getScaleType();
@@ -62,7 +62,7 @@ class Helmert7Param : public SystemTransformation, public Producer<TrafoParam> {
   bool calc_7p(TrafoParam& tp);
 
   vector<OiVec> calcCentroidCoord();
-  vector<OiVec> centroidReducedCoord(QList<OiVec> input, OiVec centroid);
+  vector<OiVec> centroidReducedCoord(std::vector<OiVec> input, OiVec centroid);
   vector<OiMat> modelMatrix(vector<OiVec> locC, vector<OiVec> refC);
   OiMat normalEquationMatrix(vector<OiMat> vecA);
   OiVec quaternion(OiMat n);

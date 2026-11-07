@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include "containers.h"
+
 /*!
  * \brief IntersectLineLine::init
  */
@@ -19,35 +21,38 @@ void IntersectLineLine::init() {
   param1.description = "Select a line to calculate the intersection.";
   param1.infinite = false;
   param1.typeOfElement = ElementTypes::eLineElement;
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   NeededElement param2;
   param2.description = "Select a line to calculate the intersection.";
   param2.infinite = false;
   param2.typeOfElement = ElementTypes::eLineElement;
-  this->neededElements.append(param2);
+  this->neededElements.push_back(param2);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::ePointFeature);
+  this->applicableFor.push_back(FeatureTypes::ePointFeature);
 
-  this->stringParameters.insert("intersection", "at first line");
-  this->stringParameters.insert("intersection", "at second line");
-  this->stringParameters.insert("intersection", "midpoint");
+  this->stringParameters.emplace("intersection", "at first line");
+  this->stringParameters.emplace("intersection", "at second line");
+  this->stringParameters.emplace("intersection", "midpoint");
 
   this->scalarInputParams.isValid = true;
-  this->scalarInputParams.stringParameter.insert("intersection",
-                                                 "midpoint");  // default
+  this->scalarInputParams.stringParameter.insert_or_assign(
+      "intersection",
+      "midpoint");  // default
 }
 
 IntersectionTypes IntersectLineLine::getIntersectionType() {
   if (this->scalarInputParams.stringParameter.contains("intersection")) {
-    if (this->scalarInputParams.stringParameter.value("intersection")
+    if (oi::value(this->scalarInputParams.stringParameter, "intersection")
             .compare("at first line") == 0) {
       return IntersectionTypes::eAtFirstLine;
-    } else if (this->scalarInputParams.stringParameter.value("intersection")
+    } else if (oi::value(this->scalarInputParams.stringParameter,
+                         "intersection")
                    .compare("at second line") == 0) {
       return IntersectionTypes::eAtSecondLine;
-    } else if (this->scalarInputParams.stringParameter.value("intersection")
+    } else if (oi::value(this->scalarInputParams.stringParameter,
+                         "intersection")
                    .compare("midpoint") == 0) {
       return IntersectionTypes::eMidPoint;
     }

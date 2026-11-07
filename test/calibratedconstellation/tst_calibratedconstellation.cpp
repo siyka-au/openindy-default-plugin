@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <cmath>
+#include <vector>
 
 #include "calibratedconstellation.h"
 #include "chooselalib.h"
@@ -107,13 +108,13 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
   // the same measured points equally well.
   CalibratedConstellation board(
       "7-point calibration board",
-      QList<LocalPoint>() << LocalPoint("A1", xyz(0.00, 0.00, 0.00), true)
-                          << LocalPoint("A2", xyz(0.20, 0.00, 0.00), true)
-                          << LocalPoint("A3", xyz(0.45, 0.00, 0.00), true)
-                          << LocalPoint("A4", xyz(0.00, 0.30, 0.00), true)
-                          << LocalPoint("A5", xyz(0.20, 0.30, 0.00), true)
-                          << LocalPoint("A6", xyz(0.45, 0.30, 0.00), true)
-                          << LocalPoint("FID", xyz(0.225, 0.15, 0.05), false),
+      std::vector<LocalPoint>{LocalPoint("A1", xyz(0.00, 0.00, 0.00), true),
+                              LocalPoint("A2", xyz(0.20, 0.00, 0.00), true),
+                              LocalPoint("A3", xyz(0.45, 0.00, 0.00), true),
+                              LocalPoint("A4", xyz(0.00, 0.30, 0.00), true),
+                              LocalPoint("A5", xyz(0.20, 0.30, 0.00), true),
+                              LocalPoint("A6", xyz(0.45, 0.30, 0.00), true),
+                              LocalPoint("FID", xyz(0.225, 0.15, 0.05), false)},
       "CAL-0001", std::chrono::year{2026} / 1 / 1);
 
   QCOMPARE(board.measuredPoints().size(), 6);
@@ -146,8 +147,8 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
 
   //--- observe every measured point, pairing its known local coordinate
   // with its noisy world-frame observation
-  QList<Point> localFramePoints;
-  QList<Point> observedWorldPoints;
+  std::vector<Point> localFramePoints;
+  std::vector<Point> observedWorldPoints;
 
   int id = 1;
   for (const LocalPoint& local : board.measuredPoints()) {
@@ -157,10 +158,10 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
         simulateObservation(trueWorld, station, model, id++);
 
     Point localPoint(false, Position(local.position()));
-    localFramePoints.append(localPoint);
+    localFramePoints.push_back(localPoint);
 
     Point observedPoint(false, Position(observation->getXYZ()));
-    observedWorldPoints.append(observedPoint);
+    observedWorldPoints.push_back(observedPoint);
   }
 
   //--- solve: known local coordinates as the start system, noisy world

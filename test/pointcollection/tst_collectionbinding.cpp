@@ -1,7 +1,9 @@
 #include <QtTest>
 #include <cmath>
+#include <vector>
 
 #include "chooselalib.h"
+#include "containers.h"
 #include "featurewrapper.h"
 #include "geometry/plane.h"
 #include "geometry/point.h"
@@ -145,7 +147,7 @@ void CollectionBindingTest::declaredShapeNeverGrowsWithPointCount() {
   // the resolved InputElement list legitimately grows one per point (it
   // always did, even for BestFitPlane's raw observations) - that is not
   // the friction PointCollection binding removed
-  QCOMPARE(function->getInputElements().value(0).size(), 500);
+  QCOMPARE(oi::value(function->getInputElements(), 0).size(), 500);
 
   // what must not have changed is the function's own declared shape
   QCOMPARE(function->getNeededElements().size(), 2);
@@ -200,14 +202,14 @@ void CollectionBindingTest::
   struct Nest {
     double x, y, z;
   };
-  const QList<Nest> nests = {
+  const std::vector<Nest> nests = {
       {0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {1.0, 1.0, 0.0}};
 
   int id = 1;
   int derivedId = 1000;
-  QList<oi::Guarded<Point> > derivedPoints;
+  std::vector<oi::Guarded<Point> > derivedPoints;
 
-  foreach (const Nest& nest, nests) {
+  for (const Nest& nest : nests) {
     // three raw shots of the same nest, each nudged slightly off the
     // true position - the average should recover it
     oi::Guarded<Function> averager = new AverageFromPoints();
@@ -226,15 +228,15 @@ void CollectionBindingTest::
 
     // D15a: the raw shots are individually visible/inspectable - they
     // are not consumed or hidden by averaging
-    QCOMPARE(averager->getInputElements().value(0).size(), 3);
+    QCOMPARE(oi::value(averager->getInputElements(), 0).size(), 3);
 
-    derivedPoints.append(derived);
+    derivedPoints.push_back(derived);
   }
 
   // the plane fits from the four derived points
   oi::Guarded<Function> plane1Function = new BestFitPlane();
   plane1Function->init();
-  foreach (const oi::Guarded<Point>& derived, derivedPoints) {
+  for (const oi::Guarded<Point>& derived : derivedPoints) {
     addInputPoint(plane1Function, derived);
   }
   oi::Guarded<Plane> planeFromAveraged = new Plane();
@@ -247,7 +249,7 @@ void CollectionBindingTest::
   oi::Guarded<Function> plane2Function = new BestFitPlane();
   plane2Function->init();
   int trueId = 5000;
-  foreach (const Nest& nest, nests) {
+  for (const Nest& nest : nests) {
     addInputPoint(plane2Function, makePoint(nest.x, nest.y, nest.z, trueId++));
   }
   oi::Guarded<Plane> planeFromTrue = new Plane();

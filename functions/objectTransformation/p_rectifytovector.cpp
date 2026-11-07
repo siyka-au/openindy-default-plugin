@@ -1,5 +1,7 @@
 #include "p_rectifytovector.h"
 
+#include "containers.h"
+
 /*!
  * \brief RectifyToVector::init
  */
@@ -19,14 +21,14 @@ void RectifyToVector::init() {
       "Select a direction used for the orientation of the target geometry.";
   param1.infinite = false;
   param1.typeOfElement = ElementTypes::eDirectionElement;
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   NeededElement param2;
   param2.description =
       "Select a station used for the orientation of the target geometry.";
   param2.infinite = false;
   param2.typeOfElement = ElementTypes::eStationElement;
-  this->neededElements.append(param2);
+  this->neededElements.push_back(param2);
 
   NeededElement param3;
   param3.description =
@@ -34,22 +36,22 @@ void RectifyToVector::init() {
       "geometry.";
   param3.infinite = false;
   param3.typeOfElement = ElementTypes::eCoordinateSystemElement;
-  this->neededElements.append(param3);
+  this->neededElements.push_back(param3);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::ePlaneFeature);
-  this->applicableFor.append(FeatureTypes::eCircleFeature);
+  this->applicableFor.push_back(FeatureTypes::ePlaneFeature);
+  this->applicableFor.push_back(FeatureTypes::eCircleFeature);
 
   // set string parameter
-  this->stringParameters.insert("rectify to station / coordinate system",
-                                "xAxis");
-  this->stringParameters.insert("rectify to station / coordinate system",
-                                "yAxis");
-  this->stringParameters.insert("rectify to station / coordinate system",
-                                "zAxis");
+  this->stringParameters.emplace("rectify to station / coordinate system",
+                                 "xAxis");
+  this->stringParameters.emplace("rectify to station / coordinate system",
+                                 "yAxis");
+  this->stringParameters.emplace("rectify to station / coordinate system",
+                                 "zAxis");
 
-  this->stringParameters.insert("sense", "negative");
-  this->stringParameters.insert("sense", "positive");
+  this->stringParameters.emplace("sense", "negative");
+  this->stringParameters.emplace("sense", "positive");
 }
 
 /*!
@@ -162,16 +164,16 @@ bool RectifyToVector::direction(OiVec& direction) {
 Axis RectifyToVector::axis() {
   if (this->scalarInputParams.stringParameter.contains(
           "rectify to station / coordinate system")) {
-    if (this->scalarInputParams.stringParameter
-            .value("rectify to station / coordinate system")
+    if (oi::value(this->scalarInputParams.stringParameter,
+                  "rectify to station / coordinate system")
             .compare("xAxis") == 0) {
       return Axis::eXAxis;
-    } else if (this->scalarInputParams.stringParameter
-                   .value("rectify to station / coordinate system")
+    } else if (oi::value(this->scalarInputParams.stringParameter,
+                         "rectify to station / coordinate system")
                    .compare("yAxis") == 0) {
       return Axis::eYAxis;
-    } else if (this->scalarInputParams.stringParameter
-                   .value("rectify to station / coordinate system")
+    } else if (oi::value(this->scalarInputParams.stringParameter,
+                         "rectify to station / coordinate system")
                    .compare("zAxis") == 0) {
       return Axis::eZAxis;
     }
@@ -193,8 +195,8 @@ bool RectifyToVector::setUpResult(Geometry& geometry) {
   // get the sense (positive or negative)
   double sense = 1.0;
   if (this->scalarInputParams.stringParameter.contains("sense")) {
-    if (this->scalarInputParams.stringParameter.value("sense").compare(
-            "negative") == 0) {
+    if (oi::value(this->scalarInputParams.stringParameter, "sense")
+            .compare("negative") == 0) {
       sense = -1.0;
     }
   }

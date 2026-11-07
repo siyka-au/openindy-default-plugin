@@ -1,5 +1,7 @@
 #ifndef CONFIGUREDFUNCTIONCONFIG_H
 #define CONFIGUREDFUNCTIONCONFIG_H
+#include <map>
+#include <vector>
 
 #include "constructfunction.h"
 #include "featurewrapper.h"
@@ -26,22 +28,22 @@ class ConfiguredFunctionConfig {
    * @brief getFunctionNames
    * @return all necessary funktions for this config
    */
-  QList<QString> getFunctionNames();
-  void collectFunctionNames(QList<QPointer<Node> >& parameter,
-                            QList<QString>& names);
-  QList<NeededElement> getNeededElements();
-  QList<QString> getNeededElementNames();
+  std::vector<QString> getFunctionNames();
+  void collectFunctionNames(std::vector<QPointer<Node> >& parameter,
+                            std::vector<QString>& names);
+  std::vector<NeededElement> getNeededElements();
+  std::vector<QString> getNeededElementNames();
 
  public:
   int version{};
   QString name;
   QString description;
-  QList<QPair<QString, NeededElement> > neededElements;
-  QList<FeatureTypes> applicableFor;
+  std::vector<QPair<QString, NeededElement> > neededElements;
+  std::vector<FeatureTypes> applicableFor;
 
   // versionn 1
-  QList<QString> functionNames;
-  QMultiMap<int, InputElementMapping> inputElementsMapping;
+  std::vector<QString> functionNames;
+  std::multimap<int, InputElementMapping> inputElementsMapping;
 
   // version 2
   QPointer<Node> parameter;

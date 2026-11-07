@@ -1,9 +1,9 @@
 #ifndef P_OIEXCHANGEASCII_H
 #define P_OIEXCHANGEASCII_H
-
 #include <QRegularExpression>
-#include <QVariantList>
 #include <exception>
+#include <map>
+#include <vector>
 
 #include "exchangesimpleascii.h"
 #include "oijob.h"
@@ -31,11 +31,11 @@ class OiExchangeAscii : public ExchangeSimpleAscii {
   // methods to get or set further information
   // #########################################
 
-  QList<ExchangeSimpleAscii::ColumnType> getDefaultColumnOrder(
+  std::vector<ExchangeSimpleAscii::ColumnType> getDefaultColumnOrder(
       const GeometryTypes& typeOfGeometry);
-  QMap<ExchangeSimpleAscii::ColumnType, QVariantList> getFilePreview(
-      const GeometryTypes& typeOfGeometry);
-  QList<ExchangeSimpleAscii::ColumnType> getPossibleColumns(
+  std::map<ExchangeSimpleAscii::ColumnType, std::vector<QVariant>>
+  getFilePreview(const GeometryTypes& typeOfGeometry);
+  std::vector<ExchangeSimpleAscii::ColumnType> getPossibleColumns(
       const GeometryTypes& typeOfGeometry);
 
  private:

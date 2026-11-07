@@ -1,10 +1,12 @@
 #include "cfcparameter.h"
 
+#include <vector>
+
 CFCParameter::CFCParameter(QString name, QString comment, QString feature,
-                           QList<QPointer<Node> > subnodes)
+                           std::vector<QPointer<Node> > subnodes)
     : name(name), comment(comment), feature(feature), subnodes(subnodes) {}
 
-QList<QPointer<Node> >& CFCParameter::getSubnodes() { return subnodes; }
+std::vector<QPointer<Node> >& CFCParameter::getSubnodes() { return subnodes; }
 
 QString CFCParameter::getName() { return name; }
 
@@ -14,9 +16,9 @@ QString CFCParameter::prettyPrint() {
   QString s;
   s += "{ name: '" + this->name + "', feature: '" + this->feature +
        "', comment: '" + this->comment + "'";
-  if (!this->subnodes.isEmpty()) {
+  if (!this->subnodes.empty()) {
     s += ", parameter: [ ";
-    foreach (QPointer<Node> p, this->subnodes) {
+    for (QPointer<Node> p : this->subnodes) {
       s += " " + p->prettyPrint();
     }
     s += " ], ";

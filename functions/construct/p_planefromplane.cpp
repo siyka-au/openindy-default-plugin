@@ -17,10 +17,10 @@ void PlaneFromPlane::init() {
   param1.description = "Select the plane to copy.";
   param1.infinite = false;
   param1.typeOfElement = ElementTypes::ePlaneElement;
-  this->neededElements.append(param1);
+  this->neededElements.push_back(param1);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::ePlaneFeature);
+  this->applicableFor.push_back(FeatureTypes::ePlaneFeature);
 }
 
 /*!

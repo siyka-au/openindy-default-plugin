@@ -23,11 +23,11 @@ void IntersectLinePlane::init() {
   param2.description = "Select a plane to calculate the intersection.";
   param2.infinite = false;
   param2.typeOfElement = ElementTypes::ePlaneElement;
-  this->neededElements.append(param1);
-  this->neededElements.append(param2);
+  this->neededElements.push_back(param1);
+  this->neededElements.push_back(param2);
 
   // set spplicable for
-  this->applicableFor.append(FeatureTypes::ePointFeature);
+  this->applicableFor.push_back(FeatureTypes::ePointFeature);
 }
 
 /*!
