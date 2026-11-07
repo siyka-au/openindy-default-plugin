@@ -1,6 +1,9 @@
 #include "p_oiexchangeascii.h"
 
+#include <iostream>
+#include <iterator>
 #include <map>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -37,6 +40,18 @@ void OiExchangeAscii::init() {
   this->supportedGeometries.push_back(GeometryTypes::ePlaneLevelGeometry);
 }
 
+namespace {
+// reads the whole stream from its start
+QString readText(std::iostream* stream) {
+  stream->clear();
+  stream->seekg(0);
+  std::string bytes((std::istreambuf_iterator<char>(*stream)),
+                    std::istreambuf_iterator<char>());
+  stream->clear();
+  return QString::fromUtf8(bytes.data(), static_cast<qsizetype>(bytes.size()));
+}
+}  // namespace
+
 /*!
  * \brief OiExchangeAscii::getDefaultColumnOrder
  * \param typeOfGeometry
@@ -47,20 +62,18 @@ OiExchangeAscii::getDefaultColumnOrder(const GeometryTypes& typeOfGeometry) {
   std::vector<ExchangeSimpleAscii::ColumnType> defaultColumnOrder;
 
   try {
-    // check if device exists
-    if (this->device.isNull()) {
+    // check if the stream exists
+    if (this->stream == nullptr) {
       return defaultColumnOrder;
     }
 
-    // if device is not opened yet, open it
-    if (!this->device->isOpen()) {
-      this->device->open(QIODevice::ReadOnly | QIODevice::Text);
-    }
+    // the whole text of the stream (the stream is read from the start)
+    QString text = readText(this->stream);
 
     // read the first twenty lines to get the maximum number of columns
     int numColumns = 0;
     int sampleSize = 20;
-    QTextStream in(this->device.data());
+    QTextStream in(&text);
     while (!in.atEnd() && sampleSize >= 0) {
       QString line = in.readLine();
 
@@ -79,9 +92,6 @@ OiExchangeAscii::getDefaultColumnOrder(const GeometryTypes& typeOfGeometry) {
         numColumns = columns.size();
       }
     }
-
-    // close the device
-    this->device->close();
 
     // depending on the geometry type and the number of columns fill the default
     // columns order
@@ -166,19 +176,17 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
   }
 
   try {
-    // check if device exists
-    if (this->device.isNull()) {
+    // check if the stream exists
+    if (this->stream == nullptr) {
       return filePreview;
     }
 
-    // if device is not opened yet, open it
-    if (!this->device->isOpen()) {
-      this->device->open(QIODevice::ReadOnly | QIODevice::Text);
-    }
+    // the whole text of the stream (the stream is read from the start)
+    QString text = readText(this->stream);
 
     // get the first twenty lines as preview
     int sampleSize = 20;
-    QTextStream in(this->device);
+    QTextStream in(&text);
     while (!in.atEnd() && sampleSize >= 0) {
       QString line = in.readLine();
 
@@ -190,23 +198,16 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
       for (int i = 0; std::cmp_less(i, defaultColumnOrder.size()); i++) {
         // add an empty entry if the current row has not enough columns
         if (std::cmp_less_equal(columns.size(), i)) {
-          std::vector<QVariant> rows =
-              oi::value(filePreview, defaultColumnOrder.at(i));
-          rows.push_back(QString());
+          filePreview[defaultColumnOrder.at(i)].push_back(QString());
           continue;
         }
 
         // get the rows that already exist and append the current one
-        std::vector<QVariant> rows =
-            oi::value(filePreview, defaultColumnOrder.at(i));
-        rows.push_back(columns.at(i));
+        filePreview[defaultColumnOrder.at(i)].push_back(columns.at(i));
       }
 
       sampleSize--;
     }
-
-    // close the device
-    this->device->close();
 
   } catch (const exception& e) {
     emit this->sendMessage(e.what(), MessageTypes::eErrorMessage);
@@ -271,24 +272,22 @@ void OiExchangeAscii::importOiData() {
     // set the number of error prone lines to 0
     int numErrors = 0;
 
-    // check if device exists
-    if (this->device.isNull()) {
+    // check if the stream exists
+    if (this->stream == nullptr) {
       emit this->importFinished(false);
       return;
     }
 
-    // if device is not opened yet, open it
-    if (!this->device->isOpen()) {
-      this->device->open(QIODevice::ReadOnly | QIODevice::Text);
-    }
+    // the whole text of the stream (the stream is read from the start)
+    QString text = readText(this->stream);
 
-    qint64 fileSize = this->device->size();
+    qint64 fileSize = text.size();
     qint64 readSize = 0;
     qint64 numPoints = 0;
 
     bool notSkipped = this->getSkipFirstLine();
     // read all lines
-    QTextStream in(this->device);
+    QTextStream in(&text);
     while (!in.atEnd()) {
       QString line = in.readLine();
       readSize += line.size();
@@ -527,9 +526,6 @@ void OiExchangeAscii::importOiData() {
       readSize += 2;
     }
 
-    // close the device
-    this->device->close();
-
     // emit import finished signal
     emit this->importFinished(true);
 
@@ -544,9 +540,9 @@ void OiExchangeAscii::importOiData() {
  */
 void OiExchangeAscii::exportOiData() {
   try {
-    if (!this->device.isNull()) {
-      this->device->open(QIODevice::WriteOnly);
-      QTextStream out(this->device);
+    if (this->stream != nullptr) {
+      QString outText;
+      QTextStream out(&outText);
 
       for (const oi::Guarded<FeatureWrapper>& fw :
            this->currentJob->getGeometriesList()) {
@@ -644,11 +640,14 @@ void OiExchangeAscii::exportOiData() {
           out << line;
         }
       }
-      this->device->close();
-      emit this->exportFinished(true);
+      out.flush();
+      *this->stream << outText.toStdString();
+      this->stream->flush();
+      emit this->exportFinished(this->stream->good());
 
     } else {
-      qDebug() << "export device is NULL";
+      emit this->sendMessage("export stream is not set",
+                             MessageTypes::eErrorMessage);
       emit this->exportFinished(false);
     }
 

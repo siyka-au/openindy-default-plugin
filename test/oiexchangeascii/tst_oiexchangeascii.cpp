@@ -1,6 +1,7 @@
 #include <QPointer>
 #include <QString>
 #include <QtTest>
+#include <sstream>
 #include <vector>
 
 #include "chooselalib.h"
@@ -51,8 +52,8 @@ P20	-749.56	2987.57	-453.59\r\n\
   columns.push_back(ExchangeSimpleAscii::eColumnZ);
   exchange->setUserDefinedColumns(columns);
 
-  QByteArray ba = data.toUtf8();
-  exchange->setDevice(QPointer<QIODevice>(new QBuffer(&ba)));
+  std::stringstream stream(data.toStdString());
+  exchange->setStream(&stream);
 
   exchange->setFeatures(
       std::vector<oi::Guarded<FeatureWrapper> >());  // only export
@@ -116,8 +117,8 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
   exchange->setSkipFirstLine(true);
   exchange->setDelimiter("whitespace [ ]");
 
-  QByteArray ba = data.toUtf8();
-  exchange->setDevice(QPointer<QIODevice>(new QBuffer(&ba)));
+  std::stringstream stream(data.toStdString());
+  exchange->setStream(&stream);
 
   // read column count from file / device
   exchange->setUserDefinedColumns(
