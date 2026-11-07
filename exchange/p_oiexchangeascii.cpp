@@ -317,7 +317,7 @@ std::vector<std::string> OiExchangeAscii::splitLine(
 /*!
  * \brief OiExchangeAscii::importOiData
  */
-void OiExchangeAscii::importOiData() {
+void OiExchangeAscii::importOiData(const OperationContext& ctx) {
   try {
     this->features.clear();
 
@@ -347,6 +347,7 @@ void OiExchangeAscii::importOiData() {
     // read all lines
     LineReader in(text);
     while (!in.atEnd()) {
+      ctx.throwIfCancelled();
       std::string line = in.readLine();
       readSize += line.size();
 
@@ -574,19 +575,22 @@ void OiExchangeAscii::importOiData() {
       }
 
       // update import progress
-      int progress = (int)(((float)readSize / (float)fileSize) * 100.0);
-      if (progress == 100) {
-        progress = 99;
-      }
       numPoints++;
-      this->updateProgress(progress,
-                           std::format("{} nominal(s) loaded", numPoints));
+      // never 100% before the import has finished
+      ctx.report(fileSize > 0
+                     ? std::min(0.99, static_cast<double>(readSize) /
+                                          static_cast<double>(fileSize))
+                     : 0.0,
+                 std::format("{} nominal(s) loaded", numPoints));
       readSize += 2;
     }
 
     // import finished signal
     this->importFinished(true);
 
+  } catch (const OperationCancelled&) {
+    this->sendMessage("Import cancelled", MessageTypes::eInformationMessage);
+    this->importFinished(false);
   } catch (const exception& e) {
     this->sendMessage(e.what(), MessageTypes::eErrorMessage,
                       MessageDestinations::eMessageBoxMessage);
@@ -596,7 +600,7 @@ void OiExchangeAscii::importOiData() {
 /*!
  * \brief OiExchangeAscii::exportOiData
  */
-void OiExchangeAscii::exportOiData() {
+void OiExchangeAscii::exportOiData(const OperationContext& /*ctx*/) {
   try {
     if (this->stream != nullptr) {
       std::string outText;

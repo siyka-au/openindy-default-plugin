@@ -535,7 +535,8 @@ double distributionTriangular(const double& x, const double& expectation,
  * \param d
  * \return
  */
-bool SimplePolarMeasurement::analyseSimulationData(UncertaintyData& d) {
+bool SimplePolarMeasurement::analyseSimulationData(
+    UncertaintyData& d, const OperationContext& /*ctx*/) {
   if (d.values.size() != 0) {
     double sumDD = 0.0;
 

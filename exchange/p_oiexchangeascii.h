@@ -23,8 +23,8 @@ class OiExchangeAscii : public ExchangeSimpleAscii {
   // import and export methods
   // #########################
 
-  void importOiData() override;
-  void exportOiData() override;
+  void importOiData(const OperationContext& ctx = {}) override;
+  void exportOiData(const OperationContext& ctx = {}) override;
 
   // #########################################
   // methods to get or set further information

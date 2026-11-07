@@ -34,7 +34,8 @@ class ConfiguredFunction : public SpecialFunction {
   // Function::canActAsProducer/canActAsTransform exempt any
   // SpecialFunction from the mixin check for the same reason.
   std::expected<void, std::string> execChecked(
-      const oi::Guarded<FeatureWrapper>& feature) override;
+      const oi::Guarded<FeatureWrapper>& feature,
+      const oi::OperationContext& operation = {}) override;
 
   std::string prettyPrint();
 

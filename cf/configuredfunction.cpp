@@ -24,7 +24,8 @@ void ConfiguredFunction::init() {
 }
 
 std::expected<void, std::string> ConfiguredFunction::execChecked(
-    const oi::Guarded<FeatureWrapper>& feature) {
+    const oi::Guarded<FeatureWrapper>& feature,
+    const oi::OperationContext& operation) {
   try {
     ListVisitor visitors;
 
@@ -33,6 +34,7 @@ std::expected<void, std::string> ConfiguredFunction::execChecked(
 
     CFContext ctx;  // contains references not copies !
     ctx.config = this->config;
+    ctx.operation = operation;  // the visitor polls it between functions
     ctx.baseFunction = this;
     ctx.baseFeature = feature;
     ctx.functions = this->functions;  // all necessary funktions

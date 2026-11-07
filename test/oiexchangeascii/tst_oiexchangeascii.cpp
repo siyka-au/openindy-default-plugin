@@ -20,6 +20,7 @@ class OiExchangeAsciiTest : public QObject {
  private Q_SLOTS:
   void testImportNominal();
   void testImportLevel();
+  void testImportReportsProgressAndCanBeCancelled();
 };
 
 OiExchangeAsciiTest::OiExchangeAsciiTest() {}
@@ -67,7 +68,7 @@ P20	-749.56	2987.57	-453.59\r\n\
   exchange->setUnit(DimensionType::eTemperature, UnitType::eUnitGrad);
 
   // import data
-  exchange->importOiData();
+  exchange->importOiData({});
 
   // test
   QVERIFY(exchange->getFeatures().size() == 6);
@@ -92,6 +93,66 @@ P20	-749.56	2987.57	-453.59\r\n\
            std::string("P20"));
 
   delete exchange;
+}
+
+namespace {
+struct RecordingProgress : oi::ProgressSink {
+  std::vector<oi::Progress> reports;
+  void onProgress(const oi::Progress& p) override { reports.push_back(p); }
+};
+struct FinishObserver : oi::ExchangeObserver {
+  int finished = -1;
+  void onImportFinished(bool success) override { finished = success ? 1 : 0; }
+};
+}  // namespace
+
+void OiExchangeAsciiTest::testImportReportsProgressAndCanBeCancelled() {
+  ChooseLALib::setLinearAlgebra(ChooseLALib::LinearAlgebraLibrary::Armadillo);
+  const std::string data = "P1 1 2 3\nP2 4 5 6\nP3 7 8 9\nP4 1 1 1\n";
+
+  auto run = [&](const oi::OperationContext& ctx, FinishObserver& observer) {
+    OiExchangeAscii exchange;
+    exchange.init();
+    exchange.setGeometryType(GeometryTypes::ePointGeometry);
+    exchange.setSkipFirstLine(false);
+    exchange.setDelimiter("whitespace [ ]");
+    exchange.setUserDefinedColumns(
+        {ExchangeSimpleAscii::eColumnFeatureName, ExchangeSimpleAscii::eColumnX,
+         ExchangeSimpleAscii::eColumnY, ExchangeSimpleAscii::eColumnZ});
+    std::stringstream stream(data);
+    exchange.setStream(&stream);
+    exchange.setNominalSystem(oi::Guarded<CoordinateSystem>(
+        new CoordinateSystem(oi::Guarded<Station>())));
+    exchange.setUnit(DimensionType::eMetric, UnitType::eUnitMilliMeter);
+    exchange.setUnit(DimensionType::eAngular, UnitType::eUnitDecimalDegree);
+    exchange.setUnit(DimensionType::eTemperature, UnitType::eUnitGrad);
+    exchange.setObserver(&observer);
+    exchange.importOiData(ctx);
+    return exchange.getFeatures().size();
+  };
+
+  RecordingProgress sink;
+  FinishObserver done;
+  QCOMPARE(run(oi::OperationContext(&sink), done), std::size_t{4});
+  QCOMPARE(done.finished, 1);
+  QCOMPARE(sink.reports.size(), std::size_t{4});
+  double last = 0.0;
+  for (const oi::Progress& p : sink.reports) {
+    QVERIFY(p.isDeterminate());
+    QVERIFY(p.fraction >= last);
+    QVERIFY(p.fraction < 1.0);  // 100% is the host's to show on completion
+    last = p.fraction;
+  }
+  QCOMPARE(sink.reports.back().message, std::string("4 nominal(s) loaded"));
+
+  std::stop_source stop;
+  stop.request_stop();
+  FinishObserver cancelled;
+  RecordingProgress quiet;
+  QCOMPARE(run(oi::OperationContext(&quiet, stop.get_token()), cancelled),
+           std::size_t{0});
+  QCOMPARE(cancelled.finished, 0);
+  QVERIFY(quiet.reports.empty());
 }
 
 void OiExchangeAsciiTest::testImportLevel() {
@@ -136,7 +197,7 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
   exchange->setUnit(DimensionType::eTemperature, UnitType::eUnitGrad);
 
   // import data
-  exchange->importOiData();
+  exchange->importOiData({});
 
   // test
   QVERIFY(exchange->getFeatures().size() == 2);

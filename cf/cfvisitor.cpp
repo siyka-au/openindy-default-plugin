@@ -123,6 +123,7 @@ void CFVisitor::post(QPointer<Node> n, int index, int level) {
     }
 
     debug(post, std::format("exec featureData: {}", fd.prettyPrint()), level);
+    ctx.operation.throwIfCancelled();
     if (!fd.function->exec(fd.feature)) {
       throw std::logic_error(
           std::format("execution failed for function: '{}'' with feature: '{}'",

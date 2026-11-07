@@ -16,6 +16,9 @@ class CFContext {
  public:
   CFContext();
 
+  // progress and cancellation of the exec this context belongs to
+  oi::OperationContext operation;
+
   /**
    * @brief getFunction
    * @param name

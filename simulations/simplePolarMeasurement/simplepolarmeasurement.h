@@ -35,7 +35,8 @@ class SimplePolarMeasurement : public SimulationModel {
 
   bool distort(const oi::Guarded<Reading>& r, const OiMat& objectRelation,
                const bool& newIterationStart) override;
-  bool analyseSimulationData(UncertaintyData& d) override;
+  bool analyseSimulationData(UncertaintyData& d,
+                             const OperationContext& ctx = {}) override;
   double getCorrelationCoefficient(const std::vector<double>& x,
                                    const std::vector<double>& y) override;
 
