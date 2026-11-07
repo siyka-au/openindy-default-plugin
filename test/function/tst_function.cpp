@@ -151,7 +151,7 @@ class FunctionTest : public QObject, public MessageSink {
                         MessageDestinations::eConsoleMessage);
 
  private:
-  oi::Guarded<Function> createFunction(std::string name);
+  std::unique_ptr<Function> createFunction(std::string name);
 
   void addInputObservations(std::string data, oi::Guarded<Function> function,
                             int id, int inputElementKey, bool shouldBeUsed);
@@ -551,7 +551,8 @@ oi::Guarded<Line> FunctionTest::createLine(double x, double y, double z,
 }
 
 void FunctionTest::testRegisterPoint() {
-  oi::Guarded<Function> function = new Register();
+  std::unique_ptr<Function> owned_function = std::make_unique<Register>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
 
   OiVec pointPos = OiVec(3);
@@ -573,11 +574,11 @@ void FunctionTest::testRegisterPoint() {
   QCOMPARE(xyz.getAt(2), 1137.5033860957583);
 
   delete point.data();
-  delete function.data();
 }
 
 void FunctionTest::testRegisterSphere() {
-  oi::Guarded<Function> function = new Register();
+  std::unique_ptr<Function> owned_function = std::make_unique<Register>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
 
   OiVec spherePos = OiVec(3);
@@ -600,11 +601,11 @@ void FunctionTest::testRegisterSphere() {
   QCOMPARE(xyz.getAt(2), 983.91537298026219);
 
   delete sphere.data();
-  delete function.data();
 }
 
 void FunctionTest::testRegisterCircle() {
-  oi::Guarded<Function> function = new Register();
+  std::unique_ptr<Function> owned_function = std::make_unique<Register>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
 
   oi::Guarded<Circle> circle = createCircle(
@@ -624,12 +625,13 @@ void FunctionTest::testRegisterCircle() {
   QCOMPARE(xyz.getAt(2), 992.62548819327355);
 
   delete circle.data();
-  delete function.data();
 }
 
 // OI-494
 void FunctionTest::testVRadial() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -701,8 +703,6 @@ void FunctionTest::testVRadial() {
       (-0.012), 0.001);
 
   COMPARE_DOUBLE(function->getStatistic().getFormError(), 0.067, 0.001);
-
-  delete function.data();
 }
 
 // testVRadial2 (OI-637) used to independently exercise the Points-based
@@ -712,7 +712,9 @@ void FunctionTest::testVRadial() {
 // so testVRadial above already covers the point-based path this used to
 // check separately - keeping both would just be the same test twice.
 void FunctionTest::testVRadial3() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -790,13 +792,13 @@ void FunctionTest::testVRadial3() {
       (140.563), 0.001);
 
   COMPARE_DOUBLE(function->getStatistic().getFormError(), 0.067, 0.001);
-
-  delete function.data();
 }
 
 // OI-566
 void FunctionTest::testBestFitCylinder1() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -832,13 +834,13 @@ void FunctionTest::testBestFitCylinder1() {
 
   COMPARE_DOUBLE(cylinder->getDirection().getVector().getAt(2), 1.0, 0.00001);
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 10438.54, 0.01);
-
-  delete function.data();
 }
 
 // OI-566
 void FunctionTest::testBestFitCylinder1_modifyX() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -874,13 +876,13 @@ void FunctionTest::testBestFitCylinder1_modifyX() {
 
   COMPARE_DOUBLE(cylinder->getDirection().getVector().getAt(2), 1.0, 0.00001);
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 10449.77, 0.01);
-
-  delete function.data();
 }
 
 // OI-566
 void FunctionTest::testBestFitCylinder1_modifyZ() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -916,13 +918,13 @@ void FunctionTest::testBestFitCylinder1_modifyZ() {
 
   COMPARE_DOUBLE(cylinder->getDirection().getVector().getAt(2), 1.0, 0.00001);
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 10438.54, 0.01);
-
-  delete function.data();
 }
 
 // OI-566
 void FunctionTest::testBestFitCylinder1_modifyY() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -958,13 +960,13 @@ void FunctionTest::testBestFitCylinder1_modifyY() {
 
   COMPARE_DOUBLE(cylinder->getDirection().getVector().getAt(2), 1.0, 0.00001);
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 10185.71, 0.01);
-
-  delete function.data();
 }
 
 // OI-298
 void FunctionTest::testBestFitCylinder2_trafo_guess_axis_3() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1001,13 +1003,13 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_3() {
 
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 19.16, 0.005);
   COMPARE_DOUBLE(cylinder->getStatistic().getStdev(), 0.03, 0.01);
-
-  delete function.data();
 }
 
 // OI-298
 void FunctionTest::testBestFitCylinder2_trafo_1st_2_pts() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1039,13 +1041,13 @@ void FunctionTest::testBestFitCylinder2_trafo_1st_2_pts() {
 
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 19.16, 0.005);
   COMPARE_DOUBLE(cylinder->getStatistic().getStdev(), 0.03, 0.01);
-
-  delete function.data();
 }
 
 // OI-298
 void FunctionTest::testBestFitCylinder2_trafo_guess_axis_2() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1082,13 +1084,13 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_2() {
 
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 19.16, 0.005);
   COMPARE_DOUBLE(cylinder->getStatistic().getStdev(), 0.03, 0.01);
-
-  delete function.data();
 }
 
 // OI-298
 void FunctionTest::testBestFitCylinder2_trafo_guess_axis_1() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1125,13 +1127,13 @@ void FunctionTest::testBestFitCylinder2_trafo_guess_axis_1() {
 
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 19.16, 0.005);
   COMPARE_DOUBLE(cylinder->getStatistic().getStdev(), 0.03, 0.01);
-
-  delete function.data();
 }
 
 // OI-298
 void FunctionTest::testBestFitCylinder2_guess_axis() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1168,13 +1170,13 @@ void FunctionTest::testBestFitCylinder2_guess_axis() {
 
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 19.16, 0.005);
   COMPARE_DOUBLE(cylinder->getStatistic().getStdev(), 0.03, 0.01);
-
-  delete function.data();
 }
 
 // OI-298 direction
 void FunctionTest::testBestFitCylinder2_1st_2_pts() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1206,13 +1208,13 @@ void FunctionTest::testBestFitCylinder2_1st_2_pts() {
 
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 19.16, 0.005);
   COMPARE_DOUBLE(cylinder->getStatistic().getStdev(), 0.03, 0.01);
-
-  delete function.data();
 }
 
 // OI-627
 void FunctionTest::testBestFitCylinderAproximationDirection1() {
-  oi::Guarded<Function> function = new BestFitCylinderAppxDirection();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinderAppxDirection>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1253,13 +1255,12 @@ void FunctionTest::testBestFitCylinderAproximationDirection1() {
 
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 19.16, 0.005);
   COMPARE_DOUBLE(cylinder->getStatistic().getStdev(), 0.03, 0.01);
-
-  delete function.data();
 }
 
 // OI-573
 void FunctionTest::testDisableAllObservationsButLastOne_no() {
-  oi::Guarded<Function> function = new BestFitPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1292,13 +1293,12 @@ void FunctionTest::testDisableAllObservationsButLastOne_no() {
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(0), 1.15, 0.01);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(1), 1.25, 0.01);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(2), 1.35, 0.01);
-
-  delete function.data();
 }
 
 // OI-573
 void FunctionTest::testDisableAllObservationsButLastOne_yes() {
-  oi::Guarded<Function> function = new BestFitPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1331,13 +1331,12 @@ void FunctionTest::testDisableAllObservationsButLastOne_yes() {
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(0), 1.3, 0.01);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(1), 1.4, 0.01);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(2), 1.5, 0.01);
-
-  delete function.data();
 }
 
 // OI-573
 void FunctionTest::testDisableAllObservationsButLastOne_2side_yes() {
-  oi::Guarded<Function> function = new BestFitPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1372,13 +1371,12 @@ void FunctionTest::testDisableAllObservationsButLastOne_2side_yes() {
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(0), 1.21, 0.01);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(1), 1.31, 0.01);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(2), 1.41, 0.01);
-
-  delete function.data();
 }
 
 // OI-577: old behavior
 void FunctionTest::testBestFitPlane() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1409,14 +1407,13 @@ void FunctionTest::testBestFitPlane() {
                  0.000001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(2), (0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 // OI-557 Test if Dummy Points affect the normal vector accordingly
 
 void FunctionTest::testBestFitPlane_DummyPoint_positive_up() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1448,12 +1445,11 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_up() {
                  0.000001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(2), (0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitPlane_DummyPoint_positive_down() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1485,12 +1481,11 @@ void FunctionTest::testBestFitPlane_DummyPoint_positive_down() {
                  0.000001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(2), (-0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitPlane_DummyPoint_negative_up() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1522,12 +1517,11 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_up() {
                  0.000001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(2), (0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitPlane_DummyPoint_negative_down() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1559,13 +1553,13 @@ void FunctionTest::testBestFitPlane_DummyPoint_negative_down() {
                  0.000001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(2), (-0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 // OI-577: old behavior
 void FunctionTest::testBestFitCircleInPlane_left() {
-  oi::Guarded<Function> function = new BestFitCircleInPlane();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCircleInPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1596,12 +1590,12 @@ void FunctionTest::testBestFitCircleInPlane_left() {
                  0.000001);
   COMPARE_DOUBLE(circle->getDirection().getVector().getAt(2), (0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitCircleInPlane_right() {
-  oi::Guarded<Function> function = new BestFitCircleInPlane();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCircleInPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1632,11 +1626,11 @@ void FunctionTest::testBestFitCircleInPlane_right() {
                  0.000001);
   COMPARE_DOUBLE(circle->getDirection().getVector().getAt(2), (-0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 void FunctionTest::testBestFitCircleInPlane_DummyPoint_positive_up() {
-  oi::Guarded<Function> function = new BestFitCircleInPlane();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCircleInPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1668,12 +1662,12 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_positive_up() {
                  0.000001);
   COMPARE_DOUBLE(circle->getDirection().getVector().getAt(2), (0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_up() {
-  oi::Guarded<Function> function = new BestFitCircleInPlane();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCircleInPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1705,12 +1699,12 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_up() {
                  0.000001);
   COMPARE_DOUBLE(circle->getDirection().getVector().getAt(2), (0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_down() {
-  oi::Guarded<Function> function = new BestFitCircleInPlane();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCircleInPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1742,12 +1736,12 @@ void FunctionTest::testBestFitCircleInPlane_DummyPoint_negative_down() {
                  0.000001);
   COMPARE_DOUBLE(circle->getDirection().getVector().getAt(2), (-0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitCylinder1__DummyPoint1() {
-  oi::Guarded<Function> function = new BestFitCylinderAppxDummyPoint();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinderAppxDummyPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1785,11 +1779,11 @@ void FunctionTest::testBestFitCylinder1__DummyPoint1() {
   COMPARE_DOUBLE(cylinder->getDirection().getVector().getAt(2),
                  (-0.0002907078214), 0.00001);
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 19.156, 0.01);
-
-  delete function.data();
 }
 void FunctionTest::testBestFitCylinder1__DummyPoint2() {
-  oi::Guarded<Function> function = new BestFitCylinderAppxDummyPoint();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinderAppxDummyPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1827,12 +1821,12 @@ void FunctionTest::testBestFitCylinder1__DummyPoint2() {
   COMPARE_DOUBLE(cylinder->getDirection().getVector().getAt(2),
                  (0.0002907078214), 0.00001);
   COMPARE_DOUBLE(cylinder->getRadius().getRadius(), 19.156, 0.01);
-
-  delete function.data();
 }
 
 void FunctionTest::testIntersectLineLine_parallel() {
-  oi::Guarded<Function> function = new IntersectLineLine();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<IntersectLineLine>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1847,11 +1841,11 @@ void FunctionTest::testIntersectLineLine_parallel() {
 
   bool res = function->exec(pointFeature);
   QVERIFY2(!res, "exec");
-
-  delete function.data();
 }
 void FunctionTest::testIntersectLineLine_intersect1_atfirstline() {
-  oi::Guarded<Function> function = new IntersectLineLine();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<IntersectLineLine>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1877,12 +1871,12 @@ void FunctionTest::testIntersectLineLine_intersect1_atfirstline() {
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(0), 2, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(1), 2, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(2), 2, 0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testIntersectLineLine_intersect1_atsecondline() {
-  oi::Guarded<Function> function = new IntersectLineLine();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<IntersectLineLine>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1908,12 +1902,12 @@ void FunctionTest::testIntersectLineLine_intersect1_atsecondline() {
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(0), 2, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(1), 2, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(2), 2, 0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testIntersectLineLine_intersect1_midpoint() {
-  oi::Guarded<Function> function = new IntersectLineLine();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<IntersectLineLine>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1939,12 +1933,12 @@ void FunctionTest::testIntersectLineLine_intersect1_midpoint() {
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(0), 2, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(1), 2, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(2), 2, 0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testIntersectLineLine_intersect2_atfirstline() {
-  oi::Guarded<Function> function = new IntersectLineLine();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<IntersectLineLine>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -1970,12 +1964,12 @@ void FunctionTest::testIntersectLineLine_intersect2_atfirstline() {
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(0), 1.5, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(1), 1.5, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(2), 1.5, 0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testIntersectLineLine_intersect2_atsecondline() {
-  oi::Guarded<Function> function = new IntersectLineLine();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<IntersectLineLine>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2002,12 +1996,12 @@ void FunctionTest::testIntersectLineLine_intersect2_atsecondline() {
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(0), 2., 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(1), 1.5, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(2), 1., 0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testIntersectLineLine_intersect2_midpoint() {
-  oi::Guarded<Function> function = new IntersectLineLine();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<IntersectLineLine>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2033,13 +2027,12 @@ void FunctionTest::testIntersectLineLine_intersect2_midpoint() {
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(0), 1.75, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(1), 1.5, 0.0001);
   COMPARE_DOUBLE(point->getPosition().getVector().getAt(2), 1.25, 0.0001);
-
-  delete function.data();
 }
 
 // OI-42
 void FunctionTest::testRectifyToPoint_Plane_negative() {
-  oi::Guarded<Function> function = new RectifyToPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<RectifyToPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2063,12 +2056,11 @@ void FunctionTest::testRectifyToPoint_Plane_negative() {
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(2), (1.0), 0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testRectifyToPoint_Plane_positive() {
-  oi::Guarded<Function> function = new RectifyToPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<RectifyToPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2092,12 +2084,11 @@ void FunctionTest::testRectifyToPoint_Plane_positive() {
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(2), (-1.0), 0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testRectifyToPoint_Plane_Station() {
-  oi::Guarded<Function> function = new RectifyToPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<RectifyToPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2121,13 +2112,12 @@ void FunctionTest::testRectifyToPoint_Plane_Station() {
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(2), (-1.0), 0.0001);
-
-  delete function.data();
 }
 
 // OI-42
 void FunctionTest::testRectifyToPoint_Circle_negative() {
-  oi::Guarded<Function> function = new RectifyToPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<RectifyToPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2151,13 +2141,12 @@ void FunctionTest::testRectifyToPoint_Circle_negative() {
   COMPARE_DOUBLE(geometry->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(geometry->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(geometry->getDirection().getVector().getAt(2), (1.0), 0.0001);
-
-  delete function.data();
 }
 
 // OI-42
 void FunctionTest::testRectifyToPoint_Line_negative() {
-  oi::Guarded<Function> function = new RectifyToPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<RectifyToPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2181,13 +2170,12 @@ void FunctionTest::testRectifyToPoint_Line_negative() {
   COMPARE_DOUBLE(geometry->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(geometry->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(geometry->getDirection().getVector().getAt(2), (1.0), 0.0001);
-
-  delete function.data();
 }
 
 // OI-42
 void FunctionTest::testRectifyToPoint_Cylinder_negative() {
-  oi::Guarded<Function> function = new RectifyToPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<RectifyToPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2211,13 +2199,13 @@ void FunctionTest::testRectifyToPoint_Cylinder_negative() {
   COMPARE_DOUBLE(geometry->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(geometry->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(geometry->getDirection().getVector().getAt(2), (1.0), 0.0001);
-
-  delete function.data();
 }
 
 // OI-42
 void FunctionTest::testRectifyToVector_PlaneToPlane_negative() {
-  oi::Guarded<Function> function = new RectifyToVector();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<RectifyToVector>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2241,11 +2229,11 @@ void FunctionTest::testRectifyToVector_PlaneToPlane_negative() {
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(plane->getDirection().getVector().getAt(2), (-1.0), 0.0001);
-
-  delete function.data();
 }
 void FunctionTest::testRectifyToVector_PlaneToStation() {
-  oi::Guarded<Function> function = new RectifyToVector();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<RectifyToVector>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2269,12 +2257,12 @@ void FunctionTest::testRectifyToVector_PlaneToStation() {
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(2), (-1.0), 0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testRectifyToVector_CircleToStation() {
-  oi::Guarded<Function> function = new RectifyToVector();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<RectifyToVector>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2298,12 +2286,12 @@ void FunctionTest::testRectifyToVector_CircleToStation() {
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(2), (-1.0), 0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testRectifyToVector_LineToStation() {
-  oi::Guarded<Function> function = new RectifyToVector();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<RectifyToVector>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2327,12 +2315,12 @@ void FunctionTest::testRectifyToVector_LineToStation() {
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(2), (-1.0), 0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testRectifyToVector_CylinderToStation() {
-  oi::Guarded<Function> function = new RectifyToVector();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<RectifyToVector>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2356,13 +2344,13 @@ void FunctionTest::testRectifyToVector_CylinderToStation() {
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(2), (-1.0), 0.0001);
-
-  delete function.data();
 }
 
 // OI-527
 void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_zAxis() {
-  oi::Guarded<Function> function = new RectifyToVector();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<RectifyToVector>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2387,13 +2375,13 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_zAxis() {
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(0), 0.0, 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(1), 0.0, 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(2), (-1.0), 0.0001);
-
-  delete function.data();
 }
 
 // OI-527
 void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_xAxis() {
-  oi::Guarded<Function> function = new RectifyToVector();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<RectifyToVector>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2437,13 +2425,13 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_xAxis() {
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(0), (-1.0), 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(1), (0.0), 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(2), (0.0), 0.0001);
-
-  delete function.data();
 }
 
 // OI-527
 void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_yAxis() {
-  oi::Guarded<Function> function = new RectifyToVector();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<RectifyToVector>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2487,13 +2475,13 @@ void FunctionTest::testRectifyToVector_PlaneToCoodinateSystem_yAxis() {
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(0), (0.0), 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(1), (-1.0), 0.0001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(2), (0.0), 0.0001);
-
-  delete function.data();
 }
 
 // OI-636
 void FunctionTest::testCircleInPlaneFromPoints() {
-  oi::Guarded<Function> function = new BestFitCircleInPlane();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCircleInPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2524,13 +2512,12 @@ void FunctionTest::testCircleInPlaneFromPoints() {
                  0.000001);
   COMPARE_DOUBLE(circle->getDirection().getVector().getAt(2), (0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 // OI-508
 void FunctionTest::testBestFitPoint_residuals() {
-  oi::Guarded<Function> function = new BestFitPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2568,13 +2555,12 @@ void FunctionTest::testBestFitPoint_residuals() {
       oi::value(function->getStatistic().getDisplayResidual(1002).corrections,
                 "v", -1),
       (1.639), 0.001);
-
-  delete function.data();
 }
 
 // clock wise
 void FunctionTest::testBestFitPlane_right() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2608,7 +2594,8 @@ void FunctionTest::testBestFitPlane_right() {
 }
 
 void FunctionTest::testBestFitPlane_residuals() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2663,12 +2650,11 @@ void FunctionTest::testBestFitPlane_residuals() {
       oi::value(function->getStatistic().getDisplayResidual(3000).corrections,
                 "v", -1),
       (101.6470), 0.001);  // shouldInUse == false
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitLine_residuals() {
-  oi::Guarded<Function> function = new BestFitLine();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitLine>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2723,12 +2709,12 @@ void FunctionTest::testBestFitLine_residuals() {
       oi::value(function->getStatistic().getDisplayResidual(3000).corrections,
                 "v", -1),
       (141.4227), 0.001);  // shouldInUse == false
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitCircleInPlane_residuals() {
-  oi::Guarded<Function> function = new BestFitCircleInPlane();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCircleInPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2794,14 +2780,15 @@ void FunctionTest::testBestFitCircleInPlane_residuals() {
       oi::value(function->getStatistic().getDisplayResidual(3002).corrections,
                 "vr", -1),
       (-141.4171), 0.001);  // shouldInUse == false
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitCircleInPlane_residuals2() {
   QSKIP("");
 
-  oi::Guarded<Function> function = new BestFitCircleInPlane();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCircleInPlane>();
+
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -2897,12 +2884,11 @@ void FunctionTest::testBestFitCircleInPlane_residuals2() {
       oi::value(function->getStatistic().getDisplayResidual(3002).corrections,
                 "vr", -1),
       (-141.4171), 0.001);  // shouldInUse == false
-
-  delete function.data();
 }
 
 void FunctionTest::testBestFitSphere_residuals() {
-  oi::Guarded<Function> function = new BestFitSphere();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitSphere>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -3096,12 +3082,12 @@ void FunctionTest::testBestFitSphere_residuals() {
       oi::value(function->getStatistic().getDisplayResidual(3001).corrections,
                 "vr", -1),
       (-0.140637), 0.00001);  // shouldInUse == false
-
-  delete function.data();
 }
 
 void FunctionTest::testPointFromPoints_point() {
-  oi::Guarded<Function> function = new PointFromPoints();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<PointFromPoints>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -3121,8 +3107,6 @@ void FunctionTest::testPointFromPoints_point() {
                  0.0001);
   COMPARE_DOUBLE(feature->getPosition().getVector().getAt(2), (3000.3180),
                  0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::
@@ -3131,7 +3115,9 @@ void FunctionTest::
   // measurement/element input involved, and stays user-owned/editable
   //(D19) - unlike a fit's output.
 
-  oi::Guarded<Function> function = new NominalPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<NominalPoint>();
+
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -3144,7 +3130,7 @@ void FunctionTest::
 
   oi::Guarded<Point> feature = new Point();
   oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
-  feature->addFunction(function);
+  feature->addFunction(std::move(owned_function));
 
   bool res = function->exec(wrapper);
   QVERIFY2(res, "exec");
@@ -3162,7 +3148,8 @@ void FunctionTest::
 }
 
 void FunctionTest::testNominalPoint_declaresNoNeededElements() {
-  oi::Guarded<Function> function = new NominalPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<NominalPoint>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
 
   QVERIFY2(
@@ -3170,12 +3157,12 @@ void FunctionTest::testNominalPoint_declaresNoNeededElements() {
       "a nominal function takes scalar parameters only - this absence is what "
       "Geometry::getOwnerDescription reads to know the result is not owned by "
       "a fit");
-
-  delete function.data();
 }
 
 void FunctionTest::testPointFromPoints_circle() {
-  oi::Guarded<Function> function = new PointFromPoints();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<PointFromPoints>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -3198,23 +3185,26 @@ void FunctionTest::testPointFromPoints_circle() {
                  0.0001);
   COMPARE_DOUBLE(feature->getPosition().getVector().getAt(2), (3000.3180),
                  0.0001);
-
-  delete function.data();
 }
 
 void FunctionTest::testPointFromPoints_Register() {
   oi::Guarded<Point> feature = new Point();
   oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
-  oi::Guarded<Function> function1 = new PointFromPoints();
+  std::unique_ptr<Function> owned_function1 =
+      std::make_unique<PointFromPoints>();
+
+  oi::Guarded<Function> function1(owned_function1.get());
   function1->init();
   function1->setMessageSink(this);
-  feature->addFunction(function1);
+  feature->addFunction(std::move(owned_function1));
 
-  oi::Guarded<Function> function2 = new Register();
+  std::unique_ptr<Function> owned_function2 = std::make_unique<Register>();
+
+  oi::Guarded<Function> function2(owned_function2.get());
   function2->init();
   function2->setMessageSink(this);
-  feature->addFunction(function2);
+  feature->addFunction(std::move(owned_function2));
 
   QVERIFY2(
       feature->getDisplayFunctions().compare("PointFromPoints, Register") == 0,
@@ -3253,17 +3243,18 @@ void FunctionTest::testPointFromPoints_Register() {
                  0.0001);
 }
 
-oi::Guarded<Function> FunctionTest::createFunction(std::string functionName) {
-  oi::Guarded<Function> function;
+std::unique_ptr<Function> FunctionTest::createFunction(
+    std::string functionName) {
+  std::unique_ptr<Function> function;
   OiTemplatePlugin plugin;
 
   function = plugin.createFunction(functionName);
 
-  if (function.isNull()) {
+  if (!function) {
     function = plugin.createFunction(functionName);
   }
 
-  Q_ASSERT_X(!function.isNull(), "createFunction",
+  Q_ASSERT_X(function != nullptr, "createFunction",
              std::format("no function found: {}", functionName).c_str());
 
   function->init();
@@ -3276,7 +3267,10 @@ void FunctionTest::testPointFromPoints_RegisterV2() {
   oi::Guarded<Point> feature = new Point();
   oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
-  oi::Guarded<Function> function = createFunction("RegisterPositionToPlane");
+  std::unique_ptr<Function> owned_function =
+      createFunction("RegisterPositionToPlane");
+
+  oi::Guarded<Function> function(owned_function.get());
   QVERIFY2(!function.isNull(), "function is null");
 
   // colum delim: " "
@@ -3288,7 +3282,7 @@ void FunctionTest::testPointFromPoints_RegisterV2() {
   addInputPlane(0., 0., 0., 0.10080018, -0.09785417, 0.99008277, function, 2001,
                 1);
 
-  feature->addFunction(function);
+  feature->addFunction(std::move(owned_function));
   QVERIFY2(
       feature->getDisplayFunctions().compare("RegisterPositionToPlane") == 0,
       "getDisplayFunctions");
@@ -3323,14 +3317,17 @@ void FunctionTest::testDistance_PointFromPoints_RegisterV2() {
   feature->setFeatureName("ScalarEntityDistance");
   oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
-  oi::Guarded<Function> function = createFunction("DistanceFromPlane");
+  std::unique_ptr<Function> owned_function =
+      createFunction("DistanceFromPlane");
+
+  oi::Guarded<Function> function(owned_function.get());
   QVERIFY2(!function.isNull(), "function is null");
 
   addInputPoint(1000.6609, 2000.3247, 3000.3180, function, 2000, 0);
   addInputPlane(1374.9964, 1624.9982, 1024.7504, 0.100818, -0.097854, 0.990081,
                 function, 2001, 1);
 
-  feature->addFunction(function);
+  feature->addFunction(std::move(owned_function));
   QVERIFY2(feature->getDisplayFunctions().compare("DistanceFromPlane") == 0,
            "getDisplayFunctions");
 
@@ -3354,7 +3351,9 @@ void FunctionTest::testXDistance_PointFromPoints_RegisterV2() {
   feature->setFeatureName("ScalarEntityDistance");
   oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
-  oi::Guarded<Function> function = createFunction("XDistance");
+  std::unique_ptr<Function> owned_function = createFunction("XDistance");
+
+  oi::Guarded<Function> function(owned_function.get());
   QVERIFY2(!function.isNull(), "function is null");
 
   // colum delim: " "
@@ -3364,7 +3363,7 @@ void FunctionTest::testXDistance_PointFromPoints_RegisterV2() {
   addInputPlane(1100.0, 1200.0, 1300.0, 0.001, -0.001, 0.999, function, 2001,
                 1);
 
-  feature->addFunction(function);
+  feature->addFunction(std::move(owned_function));
   QVERIFY2(feature->getDisplayFunctions().compare("XDistance") == 0,
            "getDisplayFunctions");
 
@@ -3385,7 +3384,9 @@ void FunctionTest::testYDistance_PointFromPoints_RegisterV2() {
   feature->setFeatureName("ScalarEntityDistance");
   oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
-  oi::Guarded<Function> function = createFunction("YDistance");
+  std::unique_ptr<Function> owned_function = createFunction("YDistance");
+
+  oi::Guarded<Function> function(owned_function.get());
   QVERIFY2(!function.isNull(), "function is null");
 
   // colum delim: " "
@@ -3395,7 +3396,7 @@ void FunctionTest::testYDistance_PointFromPoints_RegisterV2() {
   addInputPlane(1100.0, 1200.0, 1300.0, 0.001, -0.001, 0.999, function, 2001,
                 1);
 
-  feature->addFunction(function);
+  feature->addFunction(std::move(owned_function));
   QVERIFY2(feature->getDisplayFunctions().compare("YDistance") == 0,
            "getDisplayFunctions");
 
@@ -3416,7 +3417,9 @@ void FunctionTest::testZDistance_PointFromPoints_RegisterV2() {
   feature->setFeatureName("ScalarEntityDistance");
   oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
-  oi::Guarded<Function> function = createFunction("ZDistance");
+  std::unique_ptr<Function> owned_function = createFunction("ZDistance");
+
+  oi::Guarded<Function> function(owned_function.get());
   QVERIFY2(!function.isNull(), "function is null");
 
   // colum delim: " "
@@ -3426,7 +3429,7 @@ void FunctionTest::testZDistance_PointFromPoints_RegisterV2() {
   addInputPlane(1100.0, 1200.0, 1300.0, 0.001, -0.001, 0.999, function, 2001,
                 1);
 
-  feature->addFunction(function);
+  feature->addFunction(std::move(owned_function));
   QVERIFY2(feature->getDisplayFunctions().compare("ZDistance") == 0,
            "getDisplayFunctions");
 
@@ -3470,7 +3473,10 @@ void FunctionTest::testDistanceBetweenTwoPointsV2() {
   feature->setFeatureName("ScalarEntityDistance");
   oi::Guarded<oi::FeatureWrapper> wrapper = feature->getFeatureWrapper();
 
-  oi::Guarded<Function> function = createFunction("DistanceBetweenTwoPoints");
+  std::unique_ptr<Function> owned_function =
+      createFunction("DistanceBetweenTwoPoints");
+
+  oi::Guarded<Function> function(owned_function.get());
   QVERIFY2(!function.isNull(), "function is null");
 
   addInputPoint(1000.6609, 2000.3247, 3000.3180, function, 2000, 0);
@@ -3480,13 +3486,13 @@ void FunctionTest::testDistanceBetweenTwoPointsV2() {
   QVERIFY2(res, "exec");
 
   COMPARE_DOUBLE(feature->getDistance(), (5.000), 0.0001);
-
-  delete function.data();
 }
 
 // OI-805
 void FunctionTest::testCircleInPlaneFromPoints_with_DummyPoint() {
-  oi::Guarded<Function> function = new BestFitCircleInPlane();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCircleInPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -3519,12 +3525,11 @@ void FunctionTest::testCircleInPlaneFromPoints_with_DummyPoint() {
                  0.000001);
   COMPARE_DOUBLE(circle->getDirection().getVector().getAt(2), (-0.9999975),
                  0.000001);
-
-  delete function.data();
 }
 
 void FunctionTest::testLineFromPoints() {
-  oi::Guarded<Function> function = new BestFitLine();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitLine>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -3557,13 +3562,13 @@ void FunctionTest::testLineFromPoints() {
                  0.000001);
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(2), (0.000002),
                  0.000001);
-
-  delete function.data();
 }
 
 // OI-1003
 void FunctionTest::testNotSolved_guessAxis() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -3593,13 +3598,13 @@ void FunctionTest::testNotSolved_guessAxis() {
   QVERIFY2(!res, "exec");
 
   DEBUG_CYLINDER(cylinder);
-
-  delete function.data();
 }
 
 // OI-1003
 void FunctionTest::testNotSolved_firstTwoPoints() {
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setMessageSink(this);
 
@@ -3629,8 +3634,6 @@ void FunctionTest::testNotSolved_firstTwoPoints() {
   QVERIFY2(!res, "exec");
 
   DEBUG_CYLINDER(cylinder);
-
-  delete function.data();
 }
 
 QTEST_APPLESS_MAIN(FunctionTest)

@@ -96,7 +96,8 @@ void CollectionBindingTest::initTestCase() {
 }
 
 void CollectionBindingTest::pointsAddedAfterInitialResolutionArePickedUp() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
 
   // three points: enough to solve, all on z = 0
@@ -128,7 +129,8 @@ void CollectionBindingTest::pointsAddedAfterInitialResolutionArePickedUp() {
 }
 
 void CollectionBindingTest::declaredShapeNeverGrowsWithPointCount() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
 
   // D12: BestFitPlane declares two roles - "default" (the fitted points)
@@ -153,7 +155,8 @@ void CollectionBindingTest::declaredShapeNeverGrowsWithPointCount() {
 }
 
 void CollectionBindingTest::tooFewPointsFailsCleanly() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
 
   addInputPoint(function, makePoint(0.0, 0.0, 0.0, 1));
@@ -166,7 +169,8 @@ void CollectionBindingTest::tooFewPointsFailsCleanly() {
 }
 
 void CollectionBindingTest::collinearPointsAreRejectedByTheFitNotTheCount() {
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
 
   // three points satisfies the declared minimum, and they still cannot
@@ -209,7 +213,9 @@ void CollectionBindingTest::
   for (const Nest& nest : nests) {
     // three raw shots of the same nest, each nudged slightly off the
     // true position - the average should recover it
-    oi::Guarded<Function> averager = new AverageFromPoints();
+    std::unique_ptr<Function> owned_averager =
+        std::make_unique<AverageFromPoints>();
+    oi::Guarded<Function> averager(owned_averager.get());
     averager->init();
     addInputPoint(averager, makePoint(nest.x - 0.01, nest.y, nest.z, id++));
     addInputPoint(averager, makePoint(nest.x + 0.01, nest.y, nest.z, id++));
@@ -231,7 +237,9 @@ void CollectionBindingTest::
   }
 
   // the plane fits from the four derived points
-  oi::Guarded<Function> plane1Function = new BestFitPlane();
+  std::unique_ptr<Function> owned_plane1Function =
+      std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> plane1Function(owned_plane1Function.get());
   plane1Function->init();
   for (const oi::Guarded<Point>& derived : derivedPoints) {
     addInputPoint(plane1Function, derived);
@@ -243,7 +251,9 @@ void CollectionBindingTest::
            "plane should solve from four averaged points");
 
   // and identically from the four true, un-repeated positions
-  oi::Guarded<Function> plane2Function = new BestFitPlane();
+  std::unique_ptr<Function> owned_plane2Function =
+      std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> plane2Function(owned_plane2Function.get());
   plane2Function->init();
   int trueId = 5000;
   for (const Nest& nest : nests) {

@@ -103,10 +103,13 @@ oi::Guarded<OiJob> OwnedPlaneAccessorsTest::makeJobWithPlane(
   plane->setFeatureName("Plane1");
   job->addFeature(std::move(own_plane));
 
-  oi::Guarded<SetPlaneFunction> planeFn = new SetPlaneFunction();
+  std::unique_ptr<SetPlaneFunction> owned_planeFn =
+      std::make_unique<SetPlaneFunction>();
+
+  oi::Guarded<SetPlaneFunction> planeFn(owned_planeFn.get());
   planeFn->position = position;
   planeFn->direction = normal;
-  plane->addFunction(planeFn);
+  plane->addFunction(std::move(owned_planeFn));
   plane->recalc();
 
   outPlaneWrapper = planeWrapper;
@@ -127,9 +130,13 @@ void OwnedPlaneAccessorsTest::
   line->setFeatureName("Plane1.NormalLine");
   job->addFeature(std::move(own_line));
 
-  oi::Guarded<LineFromPlaneNormal> function = new LineFromPlaneNormal();
+  std::unique_ptr<LineFromPlaneNormal> owned_function =
+      std::make_unique<LineFromPlaneNormal>();
+
+  oi::Guarded<LineFromPlaneNormal> function(owned_function.get());
   function->init();
-  QVERIFY(job->addOwnedSubGeometry(planeWrapper, lineWrapper, function, 0));
+  QVERIFY(job->addOwnedSubGeometry(planeWrapper, lineWrapper,
+                                   std::move(owned_function), 0));
 
   // simulate the DAG walk (no FeatureUpdater in a plugin-level test)
   line->recalc();
@@ -156,9 +163,13 @@ void OwnedPlaneAccessorsTest::
   point->setFeatureName("Plane1.PointOnPlane");
   job->addFeature(std::move(own_point));
 
-  oi::Guarded<PointFromPlaneOrigin> function = new PointFromPlaneOrigin();
+  std::unique_ptr<PointFromPlaneOrigin> owned_function =
+      std::make_unique<PointFromPlaneOrigin>();
+
+  oi::Guarded<PointFromPlaneOrigin> function(owned_function.get());
   function->init();
-  QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper, function, 0));
+  QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper,
+                                   std::move(owned_function), 0));
 
   point->recalc();
 
@@ -181,18 +192,24 @@ void OwnedPlaneAccessorsTest::movingThePlaneRegeneratesItsOwnedAccessors() {
   oi::Guarded<oi::FeatureWrapper> lineWrapper = line->getFeatureWrapper();
   line->setFeatureName("Plane1.NormalLine");
   job->addFeature(std::move(own_line));
-  oi::Guarded<LineFromPlaneNormal> lineFn = new LineFromPlaneNormal();
+  std::unique_ptr<LineFromPlaneNormal> owned_lineFn =
+      std::make_unique<LineFromPlaneNormal>();
+  oi::Guarded<LineFromPlaneNormal> lineFn(owned_lineFn.get());
   lineFn->init();
-  QVERIFY(job->addOwnedSubGeometry(planeWrapper, lineWrapper, lineFn, 0));
+  QVERIFY(job->addOwnedSubGeometry(planeWrapper, lineWrapper,
+                                   std::move(owned_lineFn), 0));
 
   auto own_point = std::make_unique<oi::Point>();
   oi::Guarded<oi::Point> point = own_point.get();
   oi::Guarded<oi::FeatureWrapper> pointWrapper = point->getFeatureWrapper();
   point->setFeatureName("Plane1.PointOnPlane");
   job->addFeature(std::move(own_point));
-  oi::Guarded<PointFromPlaneOrigin> pointFn = new PointFromPlaneOrigin();
+  std::unique_ptr<PointFromPlaneOrigin> owned_pointFn =
+      std::make_unique<PointFromPlaneOrigin>();
+  oi::Guarded<PointFromPlaneOrigin> pointFn(owned_pointFn.get());
   pointFn->init();
-  QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper, pointFn, 0));
+  QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper,
+                                   std::move(owned_pointFn), 0));
 
   line->recalc();
   line->setIsUpdated(true);
@@ -231,9 +248,12 @@ void OwnedPlaneAccessorsTest::editingAGeneratedAccessorIsRejected() {
   oi::Guarded<oi::FeatureWrapper> pointWrapper = point->getFeatureWrapper();
   point->setFeatureName("Plane1.PointOnPlane");
   job->addFeature(std::move(own_point));
-  oi::Guarded<PointFromPlaneOrigin> function = new PointFromPlaneOrigin();
+  std::unique_ptr<PointFromPlaneOrigin> owned_function =
+      std::make_unique<PointFromPlaneOrigin>();
+  oi::Guarded<PointFromPlaneOrigin> function(owned_function.get());
   function->init();
-  QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper, function, 0));
+  QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper,
+                                   std::move(owned_function), 0));
 
   point->recalc();
   QCOMPARE(point->getPosition().getVector().getAt(0), 1.0);
@@ -258,18 +278,24 @@ void OwnedPlaneAccessorsTest::deletingThePlaneDeletesItsOwnedAccessors() {
   oi::Guarded<oi::FeatureWrapper> lineWrapper = line->getFeatureWrapper();
   line->setFeatureName("Plane1.NormalLine");
   job->addFeature(std::move(own_line));
-  oi::Guarded<LineFromPlaneNormal> lineFn = new LineFromPlaneNormal();
+  std::unique_ptr<LineFromPlaneNormal> owned_lineFn =
+      std::make_unique<LineFromPlaneNormal>();
+  oi::Guarded<LineFromPlaneNormal> lineFn(owned_lineFn.get());
   lineFn->init();
-  QVERIFY(job->addOwnedSubGeometry(planeWrapper, lineWrapper, lineFn, 0));
+  QVERIFY(job->addOwnedSubGeometry(planeWrapper, lineWrapper,
+                                   std::move(owned_lineFn), 0));
 
   auto own_point = std::make_unique<oi::Point>();
   oi::Guarded<oi::Point> point = own_point.get();
   oi::Guarded<oi::FeatureWrapper> pointWrapper = point->getFeatureWrapper();
   point->setFeatureName("Plane1.PointOnPlane");
   job->addFeature(std::move(own_point));
-  oi::Guarded<PointFromPlaneOrigin> pointFn = new PointFromPlaneOrigin();
+  std::unique_ptr<PointFromPlaneOrigin> owned_pointFn =
+      std::make_unique<PointFromPlaneOrigin>();
+  oi::Guarded<PointFromPlaneOrigin> pointFn(owned_pointFn.get());
   pointFn->init();
-  QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper, pointFn, 0));
+  QVERIFY(job->addOwnedSubGeometry(planeWrapper, pointWrapper,
+                                   std::move(owned_pointFn), 0));
 
   const int lineId = line->getId();
   const int pointId = point->getId();

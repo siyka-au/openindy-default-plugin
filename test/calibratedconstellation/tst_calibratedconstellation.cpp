@@ -154,7 +154,7 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
   for (const LocalPoint& local : board.measuredPoints()) {
     const OiVec trueWorld =
         toWorld(local.position(), trueBoardRotation, trueBoardTranslation);
-    oi::Guarded<Observation> observation =
+    const std::unique_ptr<Observation> observation =
         simulateObservation(trueWorld, station, model, id++);
 
     Point localPoint(false, Position(local.position()));
@@ -168,7 +168,9 @@ void CalibratedConstellationTest::solvedPoseRecoversBoardAndDerivedPoint() {
   // observations as the destination system - exactly the "known points in
   // one frame + observed counterparts in another -> rigid transform"
   // problem Helmert6Param already solves
-  oi::Guarded<Helmert6Param> solver = new Helmert6Param();
+  std::unique_ptr<Helmert6Param> owned_solver =
+      std::make_unique<Helmert6Param>();
+  oi::Guarded<Helmert6Param> solver(owned_solver.get());
   solver->init();
 
   ScalarInputParams params;

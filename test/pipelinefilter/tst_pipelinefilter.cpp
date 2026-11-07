@@ -18,13 +18,13 @@ using namespace oi::math;
 
 namespace {
 
-oi::Guarded<Reading> makeCartesianReading(double x, double y, double z) {
+std::unique_ptr<Reading> makeCartesianReading(double x, double y, double z) {
   ReadingCartesian r;
   r.isValid = true;
   r.xyz.setAt(0, x);
   r.xyz.setAt(1, y);
   r.xyz.setAt(2, z);
-  return new Reading(r);
+  return std::make_unique<Reading>(r);
 }
 
 }  // namespace
@@ -91,12 +91,12 @@ oi::Guarded<OiJob> PipelineFilterTest::makeJobWithActiveStation(
 // does not have, exactly as that test's own comment explains.
 oi::Guarded<Point> PipelineFilterTest::measureOnePoint(
     const oi::Guarded<OiJob>& job, int targetId, double x, double y, double z) {
-  const std::vector<oi::Guarded<FeatureWrapper> > before =
+  const std::vector<oi::Guarded<FeatureWrapper>> before =
       job->getFeaturesList();
 
-  std::vector<oi::Guarded<Reading> > readings;
+  std::vector<std::unique_ptr<Reading>> readings;
   readings.push_back(makeCartesianReading(x, y, z));
-  job->addMeasurementResults(targetId, readings);
+  job->addMeasurementResults(targetId, std::move(readings));
 
   oi::Guarded<Point> measured;
   for (const oi::Guarded<FeatureWrapper>& fw : job->getFeaturesList()) {
@@ -207,9 +207,11 @@ void PipelineFilterTest::
     planeFeature->getFeature()->setFeatureName("wall-nofilter");
     job->addFeature(std::move(own_plane));
 
-    oi::Guarded<Function> function = new BestFitPlane();
+    std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+
+    oi::Guarded<Function> function(owned_function.get());
     function->init();
-    plane->addFunction(function);
+    plane->addFunction(std::move(owned_function));
 
     const int targetId = planeFeature->getFeature()->getId();
     for (const Pt& p : pts) {
@@ -242,14 +244,16 @@ void PipelineFilterTest::
     planeFeature->getFeature()->setFeatureName("wall-filtered");
     job->addFeature(std::move(own_plane));
 
-    oi::Guarded<Function> function = new BestFitPlane();
+    std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+
+    oi::Guarded<Function> function(owned_function.get());
     function->init();
     function->setPipeline(0, std::vector<PipelineStage>{
                                  PipelineStage::residualOutlierRejection(3.0)});
-    plane->addFunction(function);
+    plane->addFunction(std::move(owned_function));
 
     const int targetId = planeFeature->getFeature()->getId();
-    std::vector<oi::Guarded<Point> > measured;
+    std::vector<oi::Guarded<Point>> measured;
     for (const Pt& p : pts) {
       oi::Guarded<Point> m =
           this->measureOnePoint(job, targetId, p.x, p.y, p.z);
@@ -317,11 +321,13 @@ void PipelineFilterTest::addingANewOutlierLaterReTriggersTheFilterAndTheFit() {
   planeFeature->getFeature()->setFeatureName("wall-retrigger");
   job->addFeature(std::move(own_plane));
 
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setPipeline(0, std::vector<PipelineStage>{
                                PipelineStage::residualOutlierRejection(3.0)});
-  plane->addFunction(function);
+  plane->addFunction(std::move(owned_function));
 
   const int targetId = planeFeature->getFeature()->getId();
 
@@ -387,22 +393,24 @@ void PipelineFilterTest::
   pointFeature->getFeature()->setFeatureName("target-01");
   job->addFeature(std::move(own_point));
 
-  oi::Guarded<Function> function = new BestFitPoint();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPoint>();
+
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   function->setPipeline(0, std::vector<PipelineStage>{
                                PipelineStage::residualOutlierRejection(3.0)});
-  point->addFunction(function);
+  point->addFunction(std::move(owned_function));
 
   // 20 good readings clustered tightly around (10, 20, 30), plus one
   // grossly mis-aimed reading. eObservationElement, position 0 - the
   // same NeededElement::pipeline mechanism, no plugin-side code touched
   // to make BestFitPoint honour it.
-  std::vector<oi::Guarded<Observation> > observations;
+  std::vector<oi::Guarded<Observation>> observations;
   auto addReading = [&](double x, double y, double z) {
-    oi::Guarded<Reading> reading = makeCartesianReading(x, y, z);
-    oi::Guarded<Observation> observation = new Observation();
-    reading->setObservation(observation);
-    station->getCoordinateSystem()->addObservation(observation);
+    auto created = std::make_unique<Observation>();
+    const oi::Guarded<Observation> observation(created.get());
+    created->adoptReading(makeCartesianReading(x, y, z));
+    QVERIFY(station->getCoordinateSystem()->addObservation(std::move(created)));
     OiVec xyz(4);
     xyz.setAt(0, x);
     xyz.setAt(1, y);

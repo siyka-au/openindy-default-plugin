@@ -2,6 +2,7 @@
 #define CONFIGUREDFUNCTION_H
 #include <QObject>
 #include <map>
+#include <memory>
 #include <vector>
 
 #include "configuredfunctionconfig.h"
@@ -20,7 +21,7 @@ class ConfiguredFunction : public SpecialFunction {
 
  public:
   ConfiguredFunction(ConfiguredFunctionConfig config,
-                     std::vector<oi::Guarded<Function> > functions);
+                     std::vector<std::unique_ptr<Function>> functions);
   void init() override;
 
   // Stage 7d/D21: overrides execChecked(), not exec(), because
@@ -40,13 +41,14 @@ class ConfiguredFunction : public SpecialFunction {
   std::string prettyPrint();
 
  public:
-  std::map<int, std::vector<InputElement> > global_inputElements;
+  std::map<int, std::vector<InputElement>> global_inputElements;
   oi::Guarded<FeatureWrapper> global_feature;
 
  private:
   ConfiguredFunctionConfig config;
-  // all necessary funktions
-  std::vector<oi::Guarded<Function> > functions;
+  // all necessary funktions: owned here, viewed through `functions`
+  std::vector<std::unique_ptr<Function>> ownedFunctions;
+  std::vector<oi::Guarded<Function>> functions;
 };
 
 #endif  // CONFIGUREDFUNCTION_H

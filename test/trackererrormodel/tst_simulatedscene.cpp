@@ -98,15 +98,15 @@ void SimulatedSceneTest::trackerObservedPlaneConvergesWithinErrorBudget() {
   // position and populated sigma the tracker error model produced, so
   // this test still exercises the same error budget as before, just
   // through the Point that would actually own that observation.
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
 
   int id = 1;
-  std::vector<oi::Guarded<Observation>> observations;
+  std::vector<std::unique_ptr<Observation>> observations;
   for (const OiVec& truePoint : scene) {
-    oi::Guarded<Observation> obs =
-        simulateObservation(truePoint, pose, model, id);
-    observations.push_back(obs);
+    observations.push_back(simulateObservation(truePoint, pose, model, id));
+    const std::unique_ptr<Observation>& obs = observations.back();
     QVERIFY2(obs->getSigmaXYZ().getAt(0) > 0.0,
              "sigma must be populated, not the silent zero default");
 

@@ -9,8 +9,12 @@
 
 ConfiguredFunction::ConfiguredFunction(
     ConfiguredFunctionConfig config,
-    std::vector<oi::Guarded<Function> > functions)
-    : SpecialFunction(), functions(functions), config(config) {}
+    std::vector<std::unique_ptr<Function>> functions)
+    : SpecialFunction(), config(config), ownedFunctions(std::move(functions)) {
+  for (const std::unique_ptr<Function>& f : this->ownedFunctions) {
+    this->functions.push_back(oi::Guarded<Function>(f.get()));
+  }
+}
 
 void ConfiguredFunction::init() {
   this->metaData.name = this->config.name;
@@ -29,8 +33,8 @@ std::expected<void, std::string> ConfiguredFunction::execChecked(
   try {
     ListVisitor visitors;
 
-    QPointer<NodeVisitor> debug = new PrintVisitor();
-    visitors.list.push_back(debug);
+    const auto debug = std::make_unique<PrintVisitor>();
+    visitors.list.push_back(debug.get());
 
     CFContext ctx;  // contains references not copies !
     ctx.config = this->config;
@@ -49,10 +53,8 @@ std::expected<void, std::string> ConfiguredFunction::execChecked(
     ctx.global_feature =
         this->global_feature.isNull() ? feature : this->global_feature;
 
-    QPointer<NodeVisitor> cf;
-    cf = new CFVisitor(std::move(ctx));
-
-    visitors.list.push_back(cf);
+    const auto cf = std::make_unique<CFVisitor>(std::move(ctx));
+    visitors.list.push_back(cf.get());
 
     TreeUtil::traversal(this->config.parameter, visitors);
 

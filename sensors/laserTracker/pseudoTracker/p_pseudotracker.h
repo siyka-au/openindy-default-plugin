@@ -43,7 +43,7 @@ class PseudoTracker : public LaserTracker {
   bool disconnectSensor() override;
 
   //! laser tracker measures a point and returns an observation
-  std::vector<oi::Guarded<Reading> > measure(
+  std::vector<std::unique_ptr<Reading>> measure(
       const MeasurementConfig& mConfig) override;
 
   //! stream
@@ -86,15 +86,15 @@ class PseudoTracker : public LaserTracker {
   bool compensation() override;
 
  private:
-  std::vector<oi::Guarded<Reading> > measurePolar(
+  std::vector<std::unique_ptr<Reading>> measurePolar(
       const MeasurementConfig& mConfig);
-  std::vector<oi::Guarded<Reading> > measureDistance(
+  std::vector<std::unique_ptr<Reading>> measureDistance(
       const MeasurementConfig& mConfig);
-  std::vector<oi::Guarded<Reading> > measureDirection(
+  std::vector<std::unique_ptr<Reading>> measureDirection(
       const MeasurementConfig& mConfig);
-  std::vector<oi::Guarded<Reading> > measureCartesian(
+  std::vector<std::unique_ptr<Reading>> measureCartesian(
       const MeasurementConfig& mConfig);
-  std::vector<oi::Guarded<Reading> > measureLevel(
+  std::vector<std::unique_ptr<Reading>> measureLevel(
       const MeasurementConfig& mConfig);
 
   //! the true (noise-free) aim as a noisy polar draw, using this

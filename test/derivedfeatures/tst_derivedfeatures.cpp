@@ -84,7 +84,10 @@ void DerivedFeaturesTest::lineTakesPlaneNormalAndPosition() {
   oi::Guarded<FeatureWrapper> planeFeature =
       makePlane(pos(1.0, 2.0, 3.0), dir(0.0, 0.0, 1.0));
 
-  oi::Guarded<Function> function = new LineFromPlaneNormal();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<LineFromPlaneNormal>();
+
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   bindPlane(function, planeFeature);
 
@@ -102,7 +105,10 @@ void DerivedFeaturesTest::pointTakesPlaneOrigin() {
   oi::Guarded<FeatureWrapper> planeFeature =
       makePlane(pos(4.0, 5.0, 6.0), dir(0.0, 1.0, 0.0));
 
-  oi::Guarded<Function> function = new PointFromPlaneOrigin();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<PointFromPlaneOrigin>();
+
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   bindPlane(function, planeFeature);
 
@@ -120,11 +126,17 @@ void DerivedFeaturesTest::derivedFeaturesFollowTheirSourcePlane() {
   oi::Guarded<FeatureWrapper> planeFeature =
       makePlane(pos(0.0, 0.0, 0.0), dir(0.0, 0.0, 1.0));
 
-  oi::Guarded<Function> lineFunction = new LineFromPlaneNormal();
+  std::unique_ptr<Function> owned_lineFunction =
+      std::make_unique<LineFromPlaneNormal>();
+
+  oi::Guarded<Function> lineFunction(owned_lineFunction.get());
   lineFunction->init();
   bindPlane(lineFunction, planeFeature);
 
-  oi::Guarded<Function> pointFunction = new PointFromPlaneOrigin();
+  std::unique_ptr<Function> owned_pointFunction =
+      std::make_unique<PointFromPlaneOrigin>();
+
+  oi::Guarded<Function> pointFunction(owned_pointFunction.get());
   pointFunction->init();
   bindPlane(pointFunction, planeFeature);
 
@@ -160,7 +172,10 @@ void DerivedFeaturesTest::unsolvedPlaneYieldsNoDerivedFeature() {
   plane->setIsSolved(false);
   oi::Guarded<oi::FeatureWrapper> planeFeature = plane->getFeatureWrapper();
 
-  oi::Guarded<Function> function = new LineFromPlaneNormal();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<LineFromPlaneNormal>();
+
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   bindPlane(function, planeFeature);
 

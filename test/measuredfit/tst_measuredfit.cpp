@@ -19,13 +19,13 @@ using namespace oi::math;
 
 namespace {
 
-oi::Guarded<Reading> makeCartesianReading(double x, double y, double z) {
+std::unique_ptr<Reading> makeCartesianReading(double x, double y, double z) {
   ReadingCartesian r;
   r.isValid = true;
   r.xyz.setAt(0, x);
   r.xyz.setAt(1, y);
   r.xyz.setAt(2, z);
-  return new Reading(r);
+  return std::make_unique<Reading>(r);
 }
 
 }  // namespace
@@ -96,12 +96,12 @@ oi::Guarded<OiJob> MeasuredFitTest::makeJobWithActiveStation(
  */
 oi::Guarded<Point> MeasuredFitTest::measureOnePoint(
     const oi::Guarded<OiJob>& job, int targetId, double x, double y, double z) {
-  const std::vector<oi::Guarded<FeatureWrapper> > before =
+  const std::vector<oi::Guarded<FeatureWrapper>> before =
       job->getFeaturesList();
 
-  std::vector<oi::Guarded<Reading> > readings;
+  std::vector<std::unique_ptr<Reading>> readings;
   readings.push_back(makeCartesianReading(x, y, z));
-  job->addMeasurementResults(targetId, readings);
+  job->addMeasurementResults(targetId, std::move(readings));
 
   oi::Guarded<Point> measured;
   for (const oi::Guarded<FeatureWrapper>& fw : job->getFeaturesList()) {
@@ -141,9 +141,11 @@ void MeasuredFitTest::measuringIntoAPlaneProducesASolvedPlaneEndToEnd() {
   planeFeature->getFeature()->setFeatureName("wall-01");
   job->addFeature(std::move(own_plane));
 
-  oi::Guarded<Function> function = new BestFitPlane();
+  std::unique_ptr<Function> owned_function = std::make_unique<BestFitPlane>();
+
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
-  plane->addFunction(function);
+  plane->addFunction(std::move(owned_function));
 
   QVERIFY2(oi::value(function->getInputElements(), 0).empty(),
            "nothing tagged yet");
@@ -216,13 +218,15 @@ void MeasuredFitTest::measuringIntoACylinderProducesASolvedCylinderEndToEnd() {
   // a minimum of 5, exercised here with the same real-world dataset
   // testVRadial (tst_function.cpp) already proves converges to
   // radius ~19.16
-  oi::Guarded<Function> function = new BestFitCylinder();
+  std::unique_ptr<Function> owned_function =
+      std::make_unique<BestFitCylinder>();
+  oi::Guarded<Function> function(owned_function.get());
   function->init();
   ScalarInputParams scalarInputParams;
   scalarInputParams.stringParameter.insert_or_assign("approximation",
                                                      "guess axis");
   function->setScalarInputParams(scalarInputParams);
-  cylinder->addFunction(function);
+  cylinder->addFunction(std::move(owned_function));
 
   QVERIFY2(oi::value(function->getInputElements(), 0).empty(),
            "nothing tagged yet");

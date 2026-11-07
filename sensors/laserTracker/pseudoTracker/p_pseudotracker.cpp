@@ -8,6 +8,16 @@
 #include "containers.h"
 #include "stringutil.h"
 
+namespace {
+// the readings of one acquisition are moved, not copied
+void moveAppend(std::vector<std::unique_ptr<Reading>>& into,
+                std::vector<std::unique_ptr<Reading>> from) {
+  for (std::unique_ptr<Reading>& reading : from) {
+    into.push_back(std::move(reading));
+  }
+}
+}  // namespace
+
 /*!
  * \brief PseudoTracker::init
  */
@@ -304,9 +314,9 @@ bool PseudoTracker::compensation() {
  * \param mConfig
  * \return
  */
-std::vector<oi::Guarded<Reading> > PseudoTracker::measure(
+std::vector<std::unique_ptr<Reading>> PseudoTracker::measure(
     const MeasurementConfig& mConfig) {
-  std::vector<oi::Guarded<Reading> > readings;
+  std::vector<std::unique_ptr<Reading>> readings;
 
   if (!this->returnReading) {
     return readings;
@@ -331,23 +341,23 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measure(
     for (int face = 0; face < faceCount; face++) {
       switch (getReadingType(mConfig)) {
         case ReadingTypes::ePolarReading: {
-          oi::appendAll(readings, measurePolar(mConfig));
+          moveAppend(readings, measurePolar(mConfig));
           break;
         }
         case ReadingTypes::eDistanceReading: {
-          oi::appendAll(readings, measureDistance(mConfig));
+          moveAppend(readings, measureDistance(mConfig));
           break;
         }
         case ReadingTypes::eDirectionReading: {
-          oi::appendAll(readings, measureDirection(mConfig));
+          moveAppend(readings, measureDirection(mConfig));
           break;
         }
         case ReadingTypes::eCartesianReading: {
-          oi::appendAll(readings, measureCartesian(mConfig));
+          moveAppend(readings, measureCartesian(mConfig));
           break;
         }
         case ReadingTypes::eLevelReading: {
-          oi::appendAll(readings, measureLevel(mConfig));
+          moveAppend(readings, measureLevel(mConfig));
           break;
         }
       }
@@ -365,14 +375,9 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measure(
   this->isScanning = false;
 
   if (readings.size() > 0) {
-    // delete old last reading
-    if (!this->lastReading.second.isNull()) {
-      delete this->lastReading.second;
-    }
-
-    this->lastReading.first = readings.back()->getTypeOfReading();
-    oi::Guarded<Reading> r = new Reading(*readings.back().data());
-    this->lastReading.second = r;
+    // remember a copy of the last reading (frees the previous one)
+    this->setLastReading(readings.back()->getTypeOfReading(),
+                         std::make_unique<Reading>(*readings.back()));
   }
 
   return readings;
@@ -393,13 +398,13 @@ oi::ValueMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
 
   oi::ValueMap m;
 
-  oi::Guarded<Reading> r(nullptr);
+  std::unique_ptr<Reading> r;
 
   switch (streamFormat) {
     case ReadingTypes::ePolarReading: {
       const ReadingPolar rPolar = this->simulateAim();
 
-      r = new Reading(rPolar);
+      r = std::make_unique<Reading>(rPolar);
 
       m.insert_or_assign("azimuth", rPolar.azimuth);
       m.insert_or_assign("zenith", rPolar.zenith);
@@ -410,7 +415,7 @@ oi::ValueMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
     case ReadingTypes::eCartesianReading: {
       const ReadingPolar rPolar = this->simulateAim();
 
-      r = new Reading(rPolar);
+      r = std::make_unique<Reading>(rPolar);
 
       m.insert_or_assign("x", r->getCartesianReading().xyz.getAt(0));
       m.insert_or_assign("y", r->getCartesianReading().xyz.getAt(1));
@@ -423,7 +428,7 @@ oi::ValueMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
       rDistance.distance = this->myDistance;
       rDistance.isValid = true;
 
-      r = new Reading(rDistance);
+      r = std::make_unique<Reading>(rDistance);
 
       m.insert_or_assign("distance", r->getDistanceReading().distance);
 
@@ -435,7 +440,7 @@ oi::ValueMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
       rDirection.zenith = this->myZenith;
       rDirection.isValid = true;
 
-      r = new Reading(rDirection);
+      r = std::make_unique<Reading>(rDirection);
 
       m.insert_or_assign("azimuth", r->getDirectionReading().azimuth);
       m.insert_or_assign("zenith", r->getDirectionReading().zenith);
@@ -455,18 +460,14 @@ oi::ValueMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
       break;
   }
 
-  // delete old last reading
-  if (!this->lastReading.second.isNull()) {
-    delete this->lastReading.second;
-  }
-
   // check reading
-  if (r.isNull()) {
+  if (!r) {
+    this->setLastReading(this->lastReading.first, nullptr);  // forget the old
     return m;
   }
 
-  this->lastReading.first = r->getTypeOfReading();
-  this->lastReading.second = r;
+  const ReadingTypes type = r->getTypeOfReading();
+  this->setLastReading(type, std::move(r));
 
   QThread::msleep(300);
 
@@ -517,13 +518,13 @@ bool PseudoTracker::getIsBusy() { return false; }
  * \param mConfig
  * \return
  */
-std::vector<oi::Guarded<Reading> > PseudoTracker::measurePolar(
+std::vector<std::unique_ptr<Reading>> PseudoTracker::measurePolar(
     const MeasurementConfig& mConfig) {
-  std::vector<oi::Guarded<Reading> > readings;
+  std::vector<std::unique_ptr<Reading>> readings;
 
   const ReadingPolar rPolar = this->simulateAim();
 
-  oi::Guarded<Reading> p = new Reading(rPolar);
+  auto p = std::make_unique<Reading>(rPolar);
 
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
@@ -539,7 +540,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measurePolar(
 
   QThread::msleep(this->measureTime);
 
-  readings.push_back(p);
+  readings.push_back(std::move(p));
 
   return readings;
 }
@@ -549,11 +550,11 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measurePolar(
  * \param mConfig
  * \return
  */
-std::vector<oi::Guarded<Reading> > PseudoTracker::measureDistance(
+std::vector<std::unique_ptr<Reading>> PseudoTracker::measureDistance(
     const MeasurementConfig& mConfig) {
   Q_UNUSED(mConfig)
 
-  std::vector<oi::Guarded<Reading> > readings;
+  std::vector<std::unique_ptr<Reading>> readings;
 
   // share the same modelled polar draw as every other reading type instead
   // of an independent, unmodelled noise stub - distance-only readings
@@ -566,7 +567,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureDistance(
   rDistance.sigmaDistance = rPolar.sigmaDistance;
   rDistance.isValid = true;
 
-  oi::Guarded<Reading> p = new Reading(rDistance);
+  auto p = std::make_unique<Reading>(rDistance);
 
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
@@ -575,7 +576,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureDistance(
 
   QThread::msleep(1000);
 
-  readings.push_back(p);
+  readings.push_back(std::move(p));
 
   return readings;
 }
@@ -585,11 +586,11 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureDistance(
  * \param mConfig
  * \return
  */
-std::vector<oi::Guarded<Reading> > PseudoTracker::measureDirection(
+std::vector<std::unique_ptr<Reading>> PseudoTracker::measureDirection(
     const MeasurementConfig& mConfig) {
   Q_UNUSED(mConfig)
 
-  std::vector<oi::Guarded<Reading> > readings;
+  std::vector<std::unique_ptr<Reading>> readings;
 
   const ReadingPolar rPolar = this->simulateAim();
 
@@ -601,7 +602,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureDirection(
   rDirection.sigmaZenith = rPolar.sigmaZenith;
   rDirection.isValid = true;
 
-  oi::Guarded<Reading> p = new Reading(rDirection);
+  auto p = std::make_unique<Reading>(rDirection);
 
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
@@ -610,7 +611,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureDirection(
 
   QThread::msleep(1000);
 
-  readings.push_back(p);
+  readings.push_back(std::move(p));
 
   return readings;
 }
@@ -620,9 +621,9 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureDirection(
  * \param mConfig
  * \return
  */
-std::vector<oi::Guarded<Reading> > PseudoTracker::measureCartesian(
+std::vector<std::unique_ptr<Reading>> PseudoTracker::measureCartesian(
     const MeasurementConfig& mConfig) {
-  std::vector<oi::Guarded<Reading> > readings;
+  std::vector<std::unique_ptr<Reading>> readings;
 
   // build from a noisy polar draw and let Reading's own polar->cartesian
   // propagation (Reading::errorPropagationPolarToCartesian, a proper
@@ -631,7 +632,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureCartesian(
   const Reading polarReading(this->simulateAim());
   const ReadingCartesian rCartesian = polarReading.getCartesianReading();
 
-  oi::Guarded<Reading> p = new Reading(rCartesian);
+  auto p = std::make_unique<Reading>(rCartesian);
 
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
@@ -647,7 +648,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureCartesian(
 
   QThread::msleep(this->measureTime);
 
-  readings.push_back(p);
+  readings.push_back(std::move(p));
 
   return readings;
 }
@@ -694,9 +695,9 @@ bool PseudoTracker::search() {
   return true;
 }
 
-std::vector<oi::Guarded<Reading> > PseudoTracker::measureLevel(
+std::vector<std::unique_ptr<Reading>> PseudoTracker::measureLevel(
     const MeasurementConfig& mConfig) {
-  std::vector<oi::Guarded<Reading> > readings;
+  std::vector<std::unique_ptr<Reading>> readings;
 
   ReadingLevel rLevel;
   rLevel.i = ((double)rand() / RAND_MAX) / 1000.;
@@ -708,7 +709,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureLevel(
   rLevel.sigmaK = defaultAccuracy.sigmaK;
   rLevel.isValid = true;
 
-  oi::Guarded<Reading> p = new Reading(rLevel);
+  auto p = std::make_unique<Reading>(rLevel);
 
   p->setSensorFace(
       (SensorFaces)(side - 1));  // SensorFaces defined side between 0 and 1 but
@@ -717,7 +718,7 @@ std::vector<oi::Guarded<Reading> > PseudoTracker::measureLevel(
 
   QThread::msleep(1000);
 
-  readings.push_back(p);
+  readings.push_back(std::move(p));
 
   return readings;
 }

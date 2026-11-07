@@ -62,7 +62,7 @@ inline ReadingPolar trueObservationOf(const OiVec& sceneXyz,
 // true polar observation, then reuse Reading's own polar->cartesian
 // propagation (the same Jacobian PseudoTracker now relies on) to get xyz and
 // sigmaXyz consistently, rather than a third hand-rolled conversion
-inline oi::Guarded<Observation> simulateObservation(
+inline std::unique_ptr<Observation> simulateObservation(
     const OiVec& sceneXyz, const StationPose& pose,
     const TrackerErrorModel& model, int id) {
   const ReadingPolar trueReading = trueObservationOf(sceneXyz, pose);
@@ -86,7 +86,7 @@ inline oi::Guarded<Observation> simulateObservation(
   worldXyz.setAt(2, worldRelative.getAt(2) + pose.position.getAt(2));
   worldXyz.setAt(3, 1.0);
 
-  oi::Guarded<Observation> observation = new Observation(worldXyz, id, true);
+  auto observation = std::make_unique<Observation>(worldXyz, id, true);
   observation->setIsSolved(true);
 
   // orientation is a pure rotation, so sigma magnitudes carry across

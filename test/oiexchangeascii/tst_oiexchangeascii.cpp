@@ -38,7 +38,8 @@ P20	-749.56	2987.57	-453.59\r\n\
 ");
 
   // DataExchanger::importData line 115 ...
-  OiExchangeAscii* exchange = new OiExchangeAscii();
+  const auto ownedExchange = std::make_unique<OiExchangeAscii>();
+  OiExchangeAscii* exchange = ownedExchange.get();
   exchange->init();
 
   // setup
@@ -91,8 +92,6 @@ P20	-749.56	2987.57	-453.59\r\n\
            std::string("P19"));
   QCOMPARE(exchange->getFeatures().at(5)->getPoint()->getFeatureName(),
            std::string("P20"));
-
-  delete exchange;
 }
 
 namespace {
@@ -170,7 +169,8 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
 ");
 
   // DataExchanger::importData line 115 ...
-  OiExchangeAscii* exchange = new OiExchangeAscii();
+  const auto ownedExchange = std::make_unique<OiExchangeAscii>();
+  OiExchangeAscii* exchange = ownedExchange.get();
   exchange->init();
 
   // setup
@@ -217,8 +217,6 @@ Level_2  0.0 0.0 0.0 0.001023 -0.001945 0.999989\r\n\
 
   QCOMPARE(exchange->getFeatures().at(1)->getPlane()->getFeatureName(),
            std::string("Level_2"));
-
-  delete exchange;
 }
 
 QTEST_APPLESS_MAIN(OiExchangeAsciiTest)

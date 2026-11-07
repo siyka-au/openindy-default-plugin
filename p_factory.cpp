@@ -2,6 +2,7 @@
 
 #include <QtCore>
 #include <format>
+#include <memory>
 #include <vector>
 
 #include "metaInfo.h"
@@ -15,10 +16,9 @@ OiTemplatePlugin::OiTemplatePlugin() {}
  * Returns a list with all sensors
  * \return
  */
-std::vector<oi::Guarded<Sensor> > OiTemplatePlugin::createSensors() {
-  std::vector<oi::Guarded<Sensor> > resultSet;
-  oi::Guarded<Sensor> pTracker = new PseudoTracker();
-  resultSet.push_back(pTracker);
+std::vector<std::unique_ptr<Sensor>> OiTemplatePlugin::createSensors() {
+  std::vector<std::unique_ptr<Sensor>> resultSet;
+  resultSet.push_back(std::make_unique<PseudoTracker>());
   return resultSet;
 }
 
@@ -27,44 +27,44 @@ std::vector<oi::Guarded<Sensor> > OiTemplatePlugin::createSensors() {
  * Returns a list with all functions
  * \return
  */
-std::vector<oi::Guarded<Function> > OiTemplatePlugin::createFunctions() {
-  std::vector<oi::Guarded<Function> > resultSet;
+std::vector<std::unique_ptr<Function>> OiTemplatePlugin::createFunctions() {
+  std::vector<std::unique_ptr<Function>> resultSet;
 
-  resultSet.push_back(new NominalPoint());
+  resultSet.push_back(std::make_unique<NominalPoint>());
 
-  resultSet.push_back(new BestFitPoint());
-  resultSet.push_back(new BestFitLine());
-  resultSet.push_back(new BestFitPlane());
-  resultSet.push_back(new BestFitCircle());
-  resultSet.push_back(new PointFromPoints());
-  resultSet.push_back(new PlaneFromPlane());
-  resultSet.push_back(new LineFromPlaneNormal());
-  resultSet.push_back(new PointFromPlaneOrigin());
-  resultSet.push_back(new AverageFromPoints());
-  resultSet.push_back(new PointBetweenTwoPoints());
-  resultSet.push_back(new IntersectLineLine());
-  resultSet.push_back(new IntersectLinePlane());
-  resultSet.push_back(new IntersectPlanePlane());
-  resultSet.push_back(new ChangeRadius());
-  resultSet.push_back(new TranslateByValue());
-  resultSet.push_back(new Register());
-  resultSet.push_back(new BestFitSphere());
-  resultSet.push_back(new BestFitCircleInPlane());
-  resultSet.push_back(new RectifyToPoint());
-  resultSet.push_back(new RectifyToVector());
-  resultSet.push_back(new Shift());
-  resultSet.push_back(new BestFitCylinder());
-  resultSet.push_back(new BestFitCylinderAppxDirection());
-  resultSet.push_back(new BestFitCylinderAppxDummyPoint());
-  resultSet.push_back(new Helmert7Param());
-  resultSet.push_back(new Helmert6Param());
+  resultSet.push_back(std::make_unique<BestFitPoint>());
+  resultSet.push_back(std::make_unique<BestFitLine>());
+  resultSet.push_back(std::make_unique<BestFitPlane>());
+  resultSet.push_back(std::make_unique<BestFitCircle>());
+  resultSet.push_back(std::make_unique<PointFromPoints>());
+  resultSet.push_back(std::make_unique<PlaneFromPlane>());
+  resultSet.push_back(std::make_unique<LineFromPlaneNormal>());
+  resultSet.push_back(std::make_unique<PointFromPlaneOrigin>());
+  resultSet.push_back(std::make_unique<AverageFromPoints>());
+  resultSet.push_back(std::make_unique<PointBetweenTwoPoints>());
+  resultSet.push_back(std::make_unique<IntersectLineLine>());
+  resultSet.push_back(std::make_unique<IntersectLinePlane>());
+  resultSet.push_back(std::make_unique<IntersectPlanePlane>());
+  resultSet.push_back(std::make_unique<ChangeRadius>());
+  resultSet.push_back(std::make_unique<TranslateByValue>());
+  resultSet.push_back(std::make_unique<Register>());
+  resultSet.push_back(std::make_unique<BestFitSphere>());
+  resultSet.push_back(std::make_unique<BestFitCircleInPlane>());
+  resultSet.push_back(std::make_unique<RectifyToPoint>());
+  resultSet.push_back(std::make_unique<RectifyToVector>());
+  resultSet.push_back(std::make_unique<Shift>());
+  resultSet.push_back(std::make_unique<BestFitCylinder>());
+  resultSet.push_back(std::make_unique<BestFitCylinderAppxDirection>());
+  resultSet.push_back(std::make_unique<BestFitCylinderAppxDummyPoint>());
+  resultSet.push_back(std::make_unique<Helmert7Param>());
+  resultSet.push_back(std::make_unique<Helmert6Param>());
 
   FunctionConfigParser parser;
   for (ConfiguredFunctionConfig config : parser.readConfigFromJson()) {
-    std::vector<oi::Guarded<Function> > functions;
     if (config.version == 2) {
-      resultSet.push_back(new ConfiguredFunction(
-          config, functions));  // this instance contains only function name!
+      // this instance contains only function name!
+      resultSet.push_back(std::make_unique<ConfiguredFunction>(
+          config, std::vector<std::unique_ptr<Function>>()));
     }
   }
 
@@ -76,9 +76,9 @@ std::vector<oi::Guarded<Function> > OiTemplatePlugin::createFunctions() {
  * Returns a list with all network adjustments
  * \return
  */
-std::vector<oi::Guarded<BundleAdjustment> >
+std::vector<std::unique_ptr<BundleAdjustment>>
 OiTemplatePlugin::createBundleAdjustments() {
-  std::vector<oi::Guarded<BundleAdjustment> > resultSet;
+  std::vector<std::unique_ptr<BundleAdjustment>> resultSet;
   return resultSet;
 }
 
@@ -87,10 +87,10 @@ OiTemplatePlugin::createBundleAdjustments() {
  * Returns a list with all simulations
  * \return
  */
-std::vector<oi::Guarded<SimulationModel> >
+std::vector<std::unique_ptr<SimulationModel>>
 OiTemplatePlugin::createSimulations() {
-  std::vector<oi::Guarded<SimulationModel> > resultSet;
-  resultSet.push_back(new SimplePolarMeasurement());
+  std::vector<std::unique_ptr<SimulationModel>> resultSet;
+  resultSet.push_back(std::make_unique<SimplePolarMeasurement>());
   return resultSet;
 }
 
@@ -98,10 +98,10 @@ OiTemplatePlugin::createSimulations() {
  * \brief OiTemplatePlugin::createSimpleAsciiExchanges
  * \return
  */
-std::vector<oi::Guarded<ExchangeSimpleAscii> >
+std::vector<std::unique_ptr<ExchangeSimpleAscii>>
 OiTemplatePlugin::createSimpleAsciiExchanges() {
-  std::vector<oi::Guarded<ExchangeSimpleAscii> > resultSet;
-  resultSet.push_back(new OiExchangeAscii());
+  std::vector<std::unique_ptr<ExchangeSimpleAscii>> resultSet;
+  resultSet.push_back(std::make_unique<OiExchangeAscii>());
   return resultSet;
 }
 
@@ -109,9 +109,9 @@ OiTemplatePlugin::createSimpleAsciiExchanges() {
  * \brief OiTemplatePlugin::createDefinedFormatExchanges
  * \return
  */
-std::vector<oi::Guarded<ExchangeDefinedFormat> >
+std::vector<std::unique_ptr<ExchangeDefinedFormat>>
 OiTemplatePlugin::createDefinedFormatExchanges() {
-  std::vector<oi::Guarded<ExchangeDefinedFormat> > resultSet;
+  std::vector<std::unique_ptr<ExchangeDefinedFormat>> resultSet;
   return resultSet;
 }
 
@@ -121,10 +121,11 @@ OiTemplatePlugin::createDefinedFormatExchanges() {
  * \param name
  * \return
  */
-oi::Guarded<Sensor> OiTemplatePlugin::createSensor(const std::string& name) {
-  oi::Guarded<Sensor> result(nullptr);
+std::unique_ptr<Sensor> OiTemplatePlugin::createSensor(
+    const std::string& name) {
+  std::unique_ptr<Sensor> result;
   if (name.compare("PseudoTracker") == 0) {
-    result = new PseudoTracker();
+    result = std::make_unique<PseudoTracker>();
   }
   return result;
 }
@@ -135,105 +136,109 @@ oi::Guarded<Sensor> OiTemplatePlugin::createSensor(const std::string& name) {
  * \param name
  * \return
  */
-oi::Guarded<Function> OiTemplatePlugin::createFunction(
+std::unique_ptr<Function> OiTemplatePlugin::createFunction(
     const std::string& name) {
-  oi::Guarded<Function> result(nullptr);
+  std::unique_ptr<Function> result;
   if (name.compare("NominalPoint") == 0) {
-    result = new NominalPoint();
+    result = std::make_unique<NominalPoint>();
   } else if (name.compare("BestFitPoint") == 0) {
-    result = new BestFitPoint();
+    result = std::make_unique<BestFitPoint>();
   } else if (name.compare("BestFitLine") == 0) {
-    result = new BestFitLine();
+    result = std::make_unique<BestFitLine>();
   } else if (name.compare("BestFitPlane") == 0) {
-    result = new BestFitPlane();
+    result = std::make_unique<BestFitPlane>();
   } else if (name.compare("PointFromPoints") == 0) {
-    result = new PointFromPoints();
+    result = std::make_unique<PointFromPoints>();
   } else if (name.compare("PlaneFromPlane") == 0) {
-    result = new PlaneFromPlane();
+    result = std::make_unique<PlaneFromPlane>();
   } else if (name.compare("LineFromPlaneNormal") == 0) {
-    result = new LineFromPlaneNormal();
+    result = std::make_unique<LineFromPlaneNormal>();
   } else if (name.compare("PointFromPlaneOrigin") == 0) {
-    result = new PointFromPlaneOrigin();
+    result = std::make_unique<PointFromPlaneOrigin>();
   } else if (name.compare("AverageFromPoints") == 0) {
-    result = new AverageFromPoints();
+    result = std::make_unique<AverageFromPoints>();
   } else if (name.compare("PointBetweenTwoPoints") == 0) {
-    result = new PointBetweenTwoPoints();
+    result = std::make_unique<PointBetweenTwoPoints>();
   } else if (name.compare("IntersectLineLine") == 0) {
-    result = new IntersectLineLine();
+    result = std::make_unique<IntersectLineLine>();
   } else if (name.compare("IntersectLinePlane") == 0) {
-    result = new IntersectLinePlane();
+    result = std::make_unique<IntersectLinePlane>();
   } else if (name.compare("IntersectPlanePlane") == 0) {
-    result = new IntersectPlanePlane();
+    result = std::make_unique<IntersectPlanePlane>();
   } else if (name.compare("ChangeRadius") == 0) {
-    result = new ChangeRadius();
+    result = std::make_unique<ChangeRadius>();
   } else if (name.compare("TranslateByValue") == 0) {
-    result = new TranslateByValue();
+    result = std::make_unique<TranslateByValue>();
   } else if (name.compare("Register") == 0) {
-    result = new Register();
+    result = std::make_unique<Register>();
   } else if (name.compare("HelmertTransformation") == 0) {
-    result = new Helmert7Param();
+    result = std::make_unique<Helmert7Param>();
   } else if (name.compare("Helmert6Param") == 0) {
-    result = new Helmert6Param();
+    result = std::make_unique<Helmert6Param>();
   } else if (name.compare("BestFitCircle") == 0) {
-    result = new BestFitCircle();
+    result = std::make_unique<BestFitCircle>();
   } else if (name.compare("BestFitCircleInPlane") == 0) {
-    result = new BestFitCircleInPlane();
+    result = std::make_unique<BestFitCircleInPlane>();
   } else if (name.compare("BestFitSphere") == 0) {
-    result = new BestFitSphere();
+    result = std::make_unique<BestFitSphere>();
   } else if (name.compare("RectifyToPoint") == 0) {
-    result = new RectifyToPoint();
+    result = std::make_unique<RectifyToPoint>();
   } else if (name.compare("Shift") == 0) {
-    result = new Shift();
+    result = std::make_unique<Shift>();
   } else if (name.compare("RectifyToVector") == 0) {
-    return new RectifyToVector();
+    return std::make_unique<RectifyToVector>();
   } else if (name.compare("BestFitCylinder") == 0) {
-    return new BestFitCylinder();
+    return std::make_unique<BestFitCylinder>();
   } else if (name.compare("BestFitCylinderAppxDirection") == 0) {
-    return new BestFitCylinderAppxDirection();
+    return std::make_unique<BestFitCylinderAppxDirection>();
   } else if (name.compare("BestFitCylinderAppxDummyPoint") == 0) {
-    return new BestFitCylinderAppxDummyPoint();
+    return std::make_unique<BestFitCylinderAppxDummyPoint>();
   } else {
     return createFunctionFromConfig(name);
   }
   return result;
 }
 
-oi::Guarded<Function> OiTemplatePlugin::createFunctionFromConfig(
+std::unique_ptr<Function> OiTemplatePlugin::createFunctionFromConfig(
     const std::string& functionName) {
   // internal functions
   if (functionName.compare("DistanceBetweenTwoPoints") == 0) {
-    return new DistanceBetweenTwoPoints();
+    return std::make_unique<DistanceBetweenTwoPoints>();
   } else if (functionName.compare("XYFilter") == 0) {
-    return new XYZFilter("XYFilter", true, true, false);  // keep Z
+    return std::make_unique<XYZFilter>("XYFilter", true, true,
+                                       false);  // keep Z
   } else if (functionName.compare("XZFilter") == 0) {
-    return new XYZFilter("XZFilter", true, false, true);  // keep Y
+    return std::make_unique<XYZFilter>("XZFilter", true, false,
+                                       true);  // keep Y
   } else if (functionName.compare("YZFilter") == 0) {
-    return new XYZFilter("YZFilter", false, true, true);  // keep X
+    return std::make_unique<XYZFilter>("YZFilter", false, true,
+                                       true);  // keep X
   }
 
-  oi::Guarded<Function> function(nullptr);
+  std::unique_ptr<Function> function;
 
   FunctionConfigParser parser;
   for (ConfiguredFunctionConfig config : parser.readConfigFromJson()) {
     if (config.name.compare(functionName) == 0) {
-      std::vector<oi::Guarded<Function> > functions;
+      std::vector<std::unique_ptr<Function>> functions;
       for (std::string name : config.getFunctionNames()) {
-        oi::Guarded<Function> f = createFunction(name);
-        if (f.isNull()) {
+        std::unique_ptr<Function> f = createFunction(name);
+        if (!f) {
           throw logic_error(std::format("no function found: {}", name));
         }
         f->init();
-        functions.push_back(f);
+        functions.push_back(std::move(f));
       }
 
       if (config.version == 2) {
-        function = new ConfiguredFunction(config, functions);
+        function =
+            std::make_unique<ConfiguredFunction>(config, std::move(functions));
         function->init();
         break;
       }
     }
 
-    if (!function.isNull()) {
+    if (function) {
       return function;
     }
   }
@@ -247,9 +252,9 @@ oi::Guarded<Function> OiTemplatePlugin::createFunctionFromConfig(
  * \param name
  * \return
  */
-oi::Guarded<BundleAdjustment> OiTemplatePlugin::createBundleAdjustment(
+std::unique_ptr<BundleAdjustment> OiTemplatePlugin::createBundleAdjustment(
     const std::string& name) {
-  oi::Guarded<BundleAdjustment> result(nullptr);
+  std::unique_ptr<BundleAdjustment> result;
   return result;
 }
 
@@ -259,12 +264,12 @@ oi::Guarded<BundleAdjustment> OiTemplatePlugin::createBundleAdjustment(
  * \param name
  * \return
  */
-oi::Guarded<SimulationModel> OiTemplatePlugin::createSimulation(
+std::unique_ptr<SimulationModel> OiTemplatePlugin::createSimulation(
     const std::string& name) {
-  oi::Guarded<SimulationModel> result(nullptr);
+  std::unique_ptr<SimulationModel> result;
 
   if (name.compare("SimplePolarMeasurement") == 0) {
-    result = new SimplePolarMeasurement();
+    result = std::make_unique<SimplePolarMeasurement>();
   }
 
   return result;
@@ -275,12 +280,12 @@ oi::Guarded<SimulationModel> OiTemplatePlugin::createSimulation(
  * \param name
  * \return
  */
-oi::Guarded<ExchangeSimpleAscii> OiTemplatePlugin::createSimpleAsciiExchange(
-    const std::string& name) {
-  oi::Guarded<ExchangeSimpleAscii> result(nullptr);
+std::unique_ptr<ExchangeSimpleAscii>
+OiTemplatePlugin::createSimpleAsciiExchange(const std::string& name) {
+  std::unique_ptr<ExchangeSimpleAscii> result;
 
   if (name.compare("OiExchangeAscii") == 0) {
-    result = new OiExchangeAscii();
+    result = std::make_unique<OiExchangeAscii>();
   }
 
   return result;
@@ -291,9 +296,9 @@ oi::Guarded<ExchangeSimpleAscii> OiTemplatePlugin::createSimpleAsciiExchange(
  * \param name
  * \return
  */
-oi::Guarded<ExchangeDefinedFormat>
+std::unique_ptr<ExchangeDefinedFormat>
 OiTemplatePlugin::createDefinedFormatExchange(const std::string& name) {
-  oi::Guarded<ExchangeDefinedFormat> result(nullptr);
+  std::unique_ptr<ExchangeDefinedFormat> result;
   return result;
 }
 

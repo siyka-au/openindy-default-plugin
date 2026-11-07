@@ -59,7 +59,8 @@ void LoadPluginTest::testLoadPlugin() {
       loaded.plugin.metadataJson().find("\"isOiPlugin\"") != std::string::npos,
       "plugin metadata missing");
 
-  std::vector<oi::Guarded<Function> > functions = oiPlugin->createFunctions();
+  std::vector<std::unique_ptr<Function>> functions =
+      oiPlugin->createFunctions();
   QVERIFY2(functions.size() > 0, "no functions found");
 }
 void LoadPluginTest::testPseudoTracker_eCartesianReading() {
@@ -72,7 +73,8 @@ void LoadPluginTest::testPseudoTracker_eCartesianReading() {
 
   Plugin* oiPlugin = loaded.plugin.get();
 
-  oi::Guarded<Sensor> sensor = oiPlugin->createSensor("PseudoTracker");
+  std::unique_ptr<Sensor> sensor = oiPlugin->createSensor("PseudoTracker");
+  QVERIFY2(sensor != nullptr, "no sensor");
 
   sensor->init();
 
@@ -83,7 +85,7 @@ void LoadPluginTest::testPseudoTracker_eCartesianReading() {
   sp.insert_or_assign("reading type", "cartesian");
   sc.setStringParameter(sp);
   sensor->setSensorConfiguration(sc);
-  std::vector<oi::Guarded<Reading> > readings = sensor->measure(config);
+  std::vector<std::unique_ptr<Reading>> readings = sensor->measure(config);
   QVERIFY2(readings.size() > 0, "no readings");
 }
 
