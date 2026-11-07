@@ -251,6 +251,14 @@ target_include_directories(tst_loadplugin PRIVATE test/include)
 target_link_libraries(tst_loadplugin PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 target_compile_definitions(tst_loadplugin PRIVATE
     PLUGIN_PATH="$<TARGET_FILE:OpenIndyDefaultPlugin>")
+# core's Qt-free oi-cli runs a plane fit through this plugin, saves and reloads
+# the protobuf
+if(TARGET oi-cli)
+    add_test(NAME oi_cli_default_plugin
+        COMMAND oi-cli --selftest --plugin $<TARGET_FILE:OpenIndyDefaultPlugin>)
+    set_tests_properties(oi_cli_default_plugin PROPERTIES SKIP_RETURN_CODE 77)
+    add_dependencies(oi-cli OpenIndyDefaultPlugin)
+endif()
 add_test(NAME loadplugin COMMAND tst_loadplugin)
 add_dependencies(tst_loadplugin OpenIndyDefaultPlugin)
 
