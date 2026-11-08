@@ -6,6 +6,11 @@
 #include <utility>
 #include <vector>
 
+namespace {
+constexpr double kLineFittedParameters =
+    2.0;  // degrees of freedom removed by the line fit
+}  // namespace
+
 void BestFitLine::init() {
   // set plugin meta data
   this->metaData.name = "BestFitLine";
@@ -158,8 +163,8 @@ bool BestFitLine::setUpResult(Line& line) {
 
   // set statistic
   this->statistic.setIsValid(true);
-  this->statistic.setStdev(
-      std::sqrt(vtv / (static_cast<double>(inputPoints.size()) - 2.0)));
+  this->statistic.setStdev(std::sqrt(
+      vtv / (static_cast<double>(inputPoints.size()) - kLineFittedParameters)));
   line.setStatistic(this->statistic);
 
   return true;

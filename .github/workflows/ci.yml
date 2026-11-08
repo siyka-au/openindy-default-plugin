@@ -80,3 +80,72 @@ jobs:
         run: |
           git ls-files | grep -E '\.(cpp|h|hpp|cc)$' | grep -vE '^(lib|third_party|3rdparty|build)/' \
             | xargs uvx clang-format==$CLANG_TOOLS_VERSION --dry-run -Werror --style=file
+
+  # The checks below have zero findings in this repository and fail the job; every other
+  # check of .clang-tidy is reported in an uploaded log without failing it. Only this
+  # repository's own files are linted (HeaderFilterRegex in .clang-tidy anchors on the
+  # checkout directory name, so core, math, Qt and Conan headers are skipped).
+  clang-tidy:
+    runs-on: ubuntu-24.04
+    env:
+      GATED_CHECKS: >-
+        cppcoreguidelines-pro-bounds-pointer-arithmetic,cppcoreguidelines-macro-usage,
+        cppcoreguidelines-macro-to-enum,modernize-macro-to-enum,
+        cppcoreguidelines-avoid-non-const-global-variables,
+        cppcoreguidelines-avoid-magic-numbers,
+        cppcoreguidelines-non-private-member-variables-in-classes,
+        cppcoreguidelines-owning-memory
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: openindy-default-plugin }
+      - uses: actions/checkout@v4
+        with:
+          repository: siyka-au/openindy-core
+          path: openindy-core
+          token: ${{ secrets.SIBLING_REPO_TOKEN || github.token }}
+      - uses: actions/checkout@v4
+        with:
+          repository: siyka-au/openindy-math
+          path: openindy-math
+          token: ${{ secrets.SIBLING_REPO_TOKEN || github.token }}
+      - uses: astral-sh/setup-uv@v6
+      - name: System packages
+        run: >
+          sudo apt-get update && sudo apt-get install -y ninja-build g++-14
+          libarmadillo-dev libblas-dev liblapack-dev libgl1-mesa-dev libxkbcommon-dev libegl1
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          cache: true
+      - uses: actions/cache@v4
+        with:
+          path: ~/.conan2/p
+          key: conan-gcc14-${{ hashFiles('openindy-core/conanfile.txt', 'openindy-core/conan/profiles/*') }}
+      - name: Conan packages
+        working-directory: openindy-core
+        run: uvx conan install . -pr:a conan/profiles/linux-gcc -s:a compiler.version=14 --build=missing -of build/conan
+      - name: Configure (compile_commands.json) and build generated files
+        working-directory: openindy-default-plugin
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+                -DCMAKE_TOOLCHAIN_FILE=../openindy-core/build/conan/conan_toolchain.cmake
+          cmake --build build -j$(nproc)
+      # No --checks here: the command line would override test/.clang-tidy. The full set
+      # runs, but only the gated checks are errors; the log is uploaded either way.
+      - name: Run clang-tidy (gated checks fail, the rest is informational)
+        working-directory: openindy-default-plugin
+        run: |
+          checks=$(echo "$GATED_CHECKS" | tr -d ' \n')
+          status=0
+          git ls-files '*.cpp' | grep -v '^build/' | xargs -P$(nproc) -n4 \
+            uvx --from clang-tidy==$CLANG_TOOLS_VERSION clang-tidy -p build --quiet \
+              --warnings-as-errors="$checks" > clang-tidy-full.log 2>&1 || status=$?
+          echo "warnings: $(grep -c 'warning:' clang-tidy-full.log || true)"
+          echo "gated errors: $(grep -c 'error:.*\[cppcoreguidelines' clang-tidy-full.log || true)"
+          exit $status
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: clang-tidy-full
+          path: openindy-default-plugin/clang-tidy-full.log
+          if-no-files-found: ignore

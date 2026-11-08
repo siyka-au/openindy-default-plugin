@@ -53,8 +53,12 @@ struct TrackerErrorTerms {
  */
 class TrackerErrorModel {
  public:
-  explicit TrackerErrorModel(const TrackerErrorTerms& oneSigmaTerms,
-                             int sigmaEstimationSamples = 256);
+  //! resamples used to estimate the per-axis sigma when the caller gives none
+  static constexpr int kDefaultSigmaEstimationSamples = 256;
+
+  explicit TrackerErrorModel(
+      const TrackerErrorTerms& oneSigmaTerms,
+      int sigmaEstimationSamples = kDefaultSigmaEstimationSamples);
 
   //! one noisy draw from a true polar observation, with sigmaAzimuth/
   //! sigmaZenith/sigmaDistance set from the model's own resampled scatter

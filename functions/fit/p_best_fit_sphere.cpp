@@ -4,6 +4,17 @@
 #include <utility>
 #include <vector>
 
+namespace {
+constexpr double kQuarter = 0.25;
+constexpr double kHalf = 0.5;
+constexpr double kConvergenceLimit =
+    0.000001;  // squared correction below which the iteration stops
+constexpr int kMaxIterations =
+    101;  // the loop gives up at this iteration count
+constexpr int kSphereFittedParameters =
+    12;  // see the degrees-of-freedom check below
+}  // namespace
+
 /*!
  * \brief BestFitSphere::init
  */
@@ -162,12 +173,12 @@ bool BestFitSphere::approximate(
   double zm = 0.0;
 
   r = std::sqrt(
-      std::abs(0.25 * (a.getAt(0) * a.getAt(0) + a.getAt(1) * a.getAt(1) +
-                       a.getAt(2) * a.getAt(2)) -
+      std::abs(kQuarter * (a.getAt(0) * a.getAt(0) + a.getAt(1) * a.getAt(1) +
+                           a.getAt(2) * a.getAt(2)) -
                a.getAt(3)));
-  xm = -0.5 * a.getAt(0) + centroid.getAt(0);
-  ym = -0.5 * a.getAt(1) + centroid.getAt(1);
-  zm = -0.5 * a.getAt(2) + centroid.getAt(2);
+  xm = -kHalf * a.getAt(0) + centroid.getAt(0);
+  ym = -kHalf * a.getAt(1) + centroid.getAt(1);
+  zm = -kHalf * a.getAt(2) + centroid.getAt(2);
 
   // set approximate result
   Position position;
@@ -280,12 +291,12 @@ bool BestFitSphere::fit(
 
     OiVec::dot(xdxd, xd, xd);
 
-    if (!((xdxd > 0.000001) && (numIterations < 101))) {
+    if (!((xdxd > kConvergenceLimit) && (numIterations < kMaxIterations))) {
       break;
     }
   }
 
-  if (numIterations >= 101) {
+  if (numIterations >= kMaxIterations) {
     this->sendMessage("No solution found during 100 iterations",
                       MessageTypes::eWarningMessage);
     return false;
@@ -307,12 +318,12 @@ bool BestFitSphere::fit(
 
   // calculate standard deviation
   double stdv = 0.0;
-  if (verb.getSize() > 12) {
+  if (verb.getSize() > kSphereFittedParameters) {
     double sum_vv = 0.0;
     for (int i = 0; i < verb.getSize(); i++) {
       sum_vv += verb.getAt(i) * verb.getAt(i);
     }
-    stdv = std::sqrt(sum_vv / (verb.getSize() - 12));
+    stdv = std::sqrt(sum_vv / (verb.getSize() - kSphereFittedParameters));
   } else {
     stdv = 0.0;
   }

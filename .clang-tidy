@@ -1,6 +1,6 @@
 ---
-# C++ Core Guidelines are the style rule set. Checks disabled below are
-# deliberate, with the reason given.
+# C++ Core Guidelines are the style rule set; every check of the set is enabled.
+# (test/.clang-tidy switches off the few that are noise in test code.)
 Checks: >
   -*,
   cppcoreguidelines-*,
@@ -11,9 +11,7 @@ Checks: >
   modernize-use-using,
   modernize-make-unique,
   modernize-make-shared,
-  misc-throw-by-value-catch-by-reference,
-  -cppcoreguidelines-avoid-magic-numbers
-# magic-numbers: being worked through file by file.
+  misc-throw-by-value-catch-by-reference
 WarningsAsErrors: ''
 # Only this repo's own sources are reported (not core, Qt or Conan headers); CI checks the
 # repos out under their repo names, so the anchor holds there too.

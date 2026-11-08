@@ -9,6 +9,41 @@
 #include "string_util.h"
 
 namespace {
+constexpr double kDefaultLambda = 0.000403;  // default one-sigma [mm]
+constexpr double kDefaultMu = 0.000005;   // default one-sigma [dimensionless]
+constexpr double kDefaultEx = 0.0000122;  // default one-sigma [mm]
+constexpr double kDefaultBy = 0.0000654;  // default one-sigma [mm]
+constexpr double kDefaultBz = 0.0000974;  // default one-sigma [mm]
+constexpr double kDefaultAlpha = 0.128;   // default one-sigma [arc sec]
+constexpr double kDefaultGamma = 0.079;   // default one-sigma [arc sec]
+constexpr double kDefaultAa1 = 0.064;     // default one-sigma [arc sec]
+constexpr double kDefaultBa1 = 0.080;     // default one-sigma [arc sec]
+constexpr double kDefaultAa2 = 0.073;     // default one-sigma [arc sec]
+constexpr double kDefaultBa2 = 0.090;     // default one-sigma [arc sec]
+constexpr double kDefaultAe0 = 0.223;     // default one-sigma [arc sec]
+constexpr double kDefaultAe1 = 0.152;     // default one-sigma [arc sec]
+constexpr double kDefaultBe1 = 0.183;     // default one-sigma [arc sec]
+constexpr double kDefaultAe2 = 0.214;     // default one-sigma [arc sec]
+constexpr double kDefaultBe2 = 0.179;     // default one-sigma [arc sec]
+constexpr double kAngleSigma = 0.000001570;  // [rad]
+constexpr double kDistanceSigma = 0.000025;  // [mm]
+constexpr double kXyzSigma = 0.000025;       // [mm]
+constexpr double kTempSigma = 0.5;           // [celsius]
+constexpr double kStartAzimuth = 0.00001;    // [rad]
+constexpr double kStartZenith = 0.00001;     // [rad]
+constexpr double kStartDistance = 0.000001;  // [mm]
+constexpr unsigned long kSimulatedActionMs =
+    1000;  // simulated duration of a sensor action
+constexpr unsigned long kSimulatedMoveMs = 5000;
+constexpr unsigned long kSimulatedShortActionMs = 300;
+constexpr double kMillisPerSecond = 1000.0;
+constexpr int kDefaultIntervalMs = 1000;
+constexpr double kHalf = 0.5;
+constexpr double kNoiseScale =
+    1000.0;  // random level i/j is within 1/kNoiseScale
+}  // namespace
+
+namespace {
 // the readings of one acquisition are moved, not copied
 void moveAppend(std::vector<std::unique_ptr<Reading>>& into,
                 std::vector<std::unique_ptr<Reading>> from) {
@@ -117,22 +152,22 @@ void PseudoTracker::init() {
   this->supportedConnectionTypes.push_back(ConnectionKind::serial());
 
   // set double parameter
-  this->doubleParameters.insert_or_assign("lambda [mm]", 0.000403);
-  this->doubleParameters.insert_or_assign("mu", 0.000005);
-  this->doubleParameters.insert_or_assign("ex [mm]", 0.0000122);
-  this->doubleParameters.insert_or_assign("by [mm]", 0.0000654);
-  this->doubleParameters.insert_or_assign("bz [mm]", 0.0000974);
-  this->doubleParameters.insert_or_assign("alpha [arc sec]", 0.128);
-  this->doubleParameters.insert_or_assign("gamma [arc sec]", 0.079);
-  this->doubleParameters.insert_or_assign("Aa1 [arc sec]", 0.064);
-  this->doubleParameters.insert_or_assign("Ba1 [arc sec]", 0.080);
-  this->doubleParameters.insert_or_assign("Aa2 [arc sec]", 0.073);
-  this->doubleParameters.insert_or_assign("Ba2 [arc sec]", 0.090);
-  this->doubleParameters.insert_or_assign("Ae0 [arc sec]", 0.223);
-  this->doubleParameters.insert_or_assign("Ae1 [arc sec]", 0.152);
-  this->doubleParameters.insert_or_assign("Be1 [arc sec]", 0.183);
-  this->doubleParameters.insert_or_assign("Ae2 [arc sec]", 0.214);
-  this->doubleParameters.insert_or_assign("Be2 [arc sec]", 0.179);
+  this->doubleParameters.insert_or_assign("lambda [mm]", kDefaultLambda);
+  this->doubleParameters.insert_or_assign("mu", kDefaultMu);
+  this->doubleParameters.insert_or_assign("ex [mm]", kDefaultEx);
+  this->doubleParameters.insert_or_assign("by [mm]", kDefaultBy);
+  this->doubleParameters.insert_or_assign("bz [mm]", kDefaultBz);
+  this->doubleParameters.insert_or_assign("alpha [arc sec]", kDefaultAlpha);
+  this->doubleParameters.insert_or_assign("gamma [arc sec]", kDefaultGamma);
+  this->doubleParameters.insert_or_assign("Aa1 [arc sec]", kDefaultAa1);
+  this->doubleParameters.insert_or_assign("Ba1 [arc sec]", kDefaultBa1);
+  this->doubleParameters.insert_or_assign("Aa2 [arc sec]", kDefaultAa2);
+  this->doubleParameters.insert_or_assign("Ba2 [arc sec]", kDefaultBa2);
+  this->doubleParameters.insert_or_assign("Ae0 [arc sec]", kDefaultAe0);
+  this->doubleParameters.insert_or_assign("Ae1 [arc sec]", kDefaultAe1);
+  this->doubleParameters.insert_or_assign("Be1 [arc sec]", kDefaultBe1);
+  this->doubleParameters.insert_or_assign("Ae2 [arc sec]", kDefaultAe2);
+  this->doubleParameters.insert_or_assign("Be2 [arc sec]", kDefaultBe2);
 
   // set string parameter
   this->stringParameters.emplace("active probe", "0.5''");
@@ -149,21 +184,21 @@ void PseudoTracker::init() {
                                   // responds with an incorrect measurement
 
   // set default accuracy
-  this->defaultAccuracy.sigmaAzimuth = 0.000001570;
-  this->defaultAccuracy.sigmaZenith = 0.000001570;
-  this->defaultAccuracy.sigmaDistance = 0.000025;
-  this->defaultAccuracy.sigmaXyz.setAt(0, 0.000025);
-  this->defaultAccuracy.sigmaXyz.setAt(1, 0.000025);
-  this->defaultAccuracy.sigmaXyz.setAt(2, 0.000025);
-  this->defaultAccuracy.sigmaTemp = 0.5;
-  this->defaultAccuracy.sigmaI = 0.000001570;
-  this->defaultAccuracy.sigmaJ = 0.000001570;
-  this->defaultAccuracy.sigmaK = 0.000001570;
+  this->defaultAccuracy.sigmaAzimuth = kAngleSigma;
+  this->defaultAccuracy.sigmaZenith = kAngleSigma;
+  this->defaultAccuracy.sigmaDistance = kDistanceSigma;
+  this->defaultAccuracy.sigmaXyz.setAt(0, kXyzSigma);
+  this->defaultAccuracy.sigmaXyz.setAt(1, kXyzSigma);
+  this->defaultAccuracy.sigmaXyz.setAt(2, kXyzSigma);
+  this->defaultAccuracy.sigmaTemp = kTempSigma;
+  this->defaultAccuracy.sigmaI = kAngleSigma;
+  this->defaultAccuracy.sigmaJ = kAngleSigma;
+  this->defaultAccuracy.sigmaK = kAngleSigma;
 
   // general tracker inits
-  this->myAzimuth = 0.00001;
-  this->myZenith = 0.00001;
-  this->myDistance = 0.000001;
+  this->myAzimuth = kStartAzimuth;
+  this->myZenith = kStartZenith;
+  this->myDistance = kStartDistance;
   this->myMotor = false;
   this->myInit = false;
   this->myCompIt = false;
@@ -210,7 +245,7 @@ bool PseudoTracker::abortAction() { return false; }
  */
 bool PseudoTracker::connectSensor() {
   this->isConnected = true;
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
   return true;
 }
 
@@ -220,7 +255,7 @@ bool PseudoTracker::connectSensor() {
  */
 bool PseudoTracker::disconnectSensor() {
   this->isConnected = false;
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
   return true;
 }
 
@@ -230,7 +265,7 @@ bool PseudoTracker::disconnectSensor() {
  */
 bool PseudoTracker::initialize() {
   this->myInit = true;
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
   return true;
 }
 
@@ -247,7 +282,7 @@ bool PseudoTracker::move(const double& azimuth, const double& zenith,
   this->myAzimuth = azimuth;
   this->myZenith = zenith;
   this->myDistance = distance;
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
   return true;
 }
 
@@ -261,8 +296,8 @@ bool PseudoTracker::move(const double& azimuth, const double& zenith,
 bool PseudoTracker::move(const double& x, const double& y, const double& z) {
   this->myAzimuth = qAtan2(y, x);
   this->myDistance = std::sqrt(x * x + y * y + z * z);
-  this->myZenith = this->myDistance == 0. ? M_PI / 2. : acos(z / myDistance);
-  QThread::msleep(1000);
+  this->myZenith = this->myDistance == 0. ? M_PI * kHalf : acos(z / myDistance);
+  QThread::msleep(kSimulatedActionMs);
   return true;
 }
 
@@ -271,7 +306,7 @@ bool PseudoTracker::move(const double& x, const double& y, const double& z) {
  * \return
  */
 bool PseudoTracker::home() {
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
   return true;
 }
 
@@ -281,7 +316,7 @@ bool PseudoTracker::home() {
  */
 bool PseudoTracker::changeMotorState() {
   this->myMotor = !this->myMotor;
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
   return true;
 }
 
@@ -295,7 +330,7 @@ bool PseudoTracker::toggleSightOrientation() {
   } else {
     this->side = 1;
   }
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
   return true;
 }
 
@@ -304,7 +339,7 @@ bool PseudoTracker::toggleSightOrientation() {
  * \return
  */
 bool PseudoTracker::compensation() {
-  QThread::msleep(5000);
+  QThread::msleep(kSimulatedMoveMs);
   this->myCompIt = true;
   return true;
 }
@@ -333,8 +368,8 @@ std::vector<std::unique_ptr<Reading>> PseudoTracker::measure(
   this->measureTime =
       mConfig.getMeasurementType() ==
               MeasurementTypes::eScanTimeDependent_MeasurementType
-          ? static_cast<int>(mConfig.getTimeInterval() * 1000)
-          : 1000;
+          ? static_cast<int>(mConfig.getTimeInterval() * kMillisPerSecond)
+          : kDefaultIntervalMs;
   this->isScanning = meaurementTypeScan;
 
   while (true) {
@@ -469,7 +504,7 @@ oi::ValueMap PseudoTracker::readingStream(const ReadingTypes& streamFormat) {
   const ReadingTypes type = r->getTypeOfReading();
   this->setLastReading(type, std::move(r));
 
-  QThread::msleep(300);
+  QThread::msleep(kSimulatedShortActionMs);
 
   return m;
 }
@@ -502,7 +537,7 @@ std::map<std::string, std::string> PseudoTracker::getSensorStatus() {
   stats.insert_or_assign("myInit", oi::number(myInit));
   stats.insert_or_assign("myCompIt", oi::number(myCompIt));
 
-  QThread::msleep(300);
+  QThread::msleep(kSimulatedShortActionMs);
 
   return stats;
 }
@@ -574,7 +609,7 @@ std::vector<std::unique_ptr<Reading>> PseudoTracker::measureDistance(
                                  // this class between 1 and 2
   p->setMeasuredAt(std::chrono::system_clock::now());
 
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
 
   readings.push_back(std::move(p));
 
@@ -609,7 +644,7 @@ std::vector<std::unique_ptr<Reading>> PseudoTracker::measureDirection(
                                  // this class between 1 and 2
   p->setMeasuredAt(std::chrono::system_clock::now());
 
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
 
   readings.push_back(std::move(p));
 
@@ -691,7 +726,7 @@ ReadingPolar PseudoTracker::simulateAim() const {
 bool PseudoTracker::search() {
   this->sensorMessage("search", MessageTypes::eInformationMessage,
                       MessageDestinations::eConsoleMessage);
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
   return true;
 }
 
@@ -700,8 +735,8 @@ std::vector<std::unique_ptr<Reading>> PseudoTracker::measureLevel(
   std::vector<std::unique_ptr<Reading>> readings;
 
   ReadingLevel rLevel;
-  rLevel.i = ((double)rand() / RAND_MAX) / 1000.;
-  rLevel.j = ((double)rand() / RAND_MAX) / 1000.;
+  rLevel.i = ((double)rand() / RAND_MAX) / kNoiseScale;
+  rLevel.j = ((double)rand() / RAND_MAX) / kNoiseScale;
   rLevel.k = sqrt(1. - pow(rLevel.i, 2) - pow(rLevel.j, 2));
 
   rLevel.sigmaI = defaultAccuracy.sigmaI;
@@ -716,7 +751,7 @@ std::vector<std::unique_ptr<Reading>> PseudoTracker::measureLevel(
                                  // this class between 1 and 2
   p->setMeasuredAt(std::chrono::system_clock::now());
 
-  QThread::msleep(1000);
+  QThread::msleep(kSimulatedActionMs);
 
   readings.push_back(std::move(p));
 

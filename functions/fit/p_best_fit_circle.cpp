@@ -6,6 +6,19 @@
 #include <format>
 #include <vector>
 
+namespace {
+constexpr int kMaxIterations = 50;
+constexpr double kInitialMaxAbsDu = 1.0E308;
+constexpr double kConvergenceLimit = 1.0E-8;
+constexpr int kUnknowns =
+    8;  // circle unknowns plus the offset of the helper plane
+constexpr int kUnknownPlaneOffset = 7;  // column of the helper plane offset
+constexpr int kConstrainedSize = 10;    // kUnknowns plus the two constraints
+constexpr int kFittedParameters =
+    6;  // degrees of freedom removed by the circle fit
+constexpr double kSquareDerivative = 2.0;  // d(x^2)/dx
+}  // namespace
+
 /*!
  * \brief BestFitCircle::init
  */
@@ -118,27 +131,27 @@ bool BestFitCircle::setUpResult(Circle& circle) {
 
   OiVec plane = this->getApproximatedPlane(obsCount, x, y, z, xc, yc, zc);
 
-  int maxItr = 50;
-  double maxAbsDu = 1.0E308;
+  int maxItr = kMaxIterations;
+  double maxAbsDu = kInitialMaxAbsDu;
   double nx = plane.getAt(0);
   double ny = plane.getAt(1);
   double nz = plane.getAt(2);
   double d = plane.getAt(3);
 
   OiVec v(3 * obsCount);
-  OiMat Qxx(8, 8);
+  OiMat Qxx(kUnknowns, kUnknowns);
 
-  OiMat A(2 * obsCount, 8);
+  OiMat A(2 * obsCount, kUnknowns);
   OiMat B(2 * obsCount, 3 * obsCount);
   OiVec w(2 * obsCount);
   OiMat Pww(2 * obsCount, 2 * obsCount);
-  OiMat NGL(8, 8);
-  OiVec ngl(8);
-  OiMat NGLR(10, 10);
-  OiMat QxxR(10, 10);
-  OiVec nglr(10);
-  OiVec du(8);
-  OiVec duk(10);
+  OiMat NGL(kUnknowns, kUnknowns);
+  OiVec ngl(kUnknowns);
+  OiMat NGLR(kConstrainedSize, kConstrainedSize);
+  OiMat QxxR(kConstrainedSize, kConstrainedSize);
+  OiVec nglr(kConstrainedSize);
+  OiVec du(kUnknowns);
+  OiVec duk(kConstrainedSize);
 
   int iterations = 0;
   while (true) {
@@ -148,18 +161,18 @@ bool BestFitCircle::setUpResult(Circle& circle) {
       double zP = z[i] - v.getAt(3 * i + 2);
 
       // Kugelparameter
-      A.setAt(i, Circle::unknownCenterX, -2.0 * (xP - xc));
-      A.setAt(i, Circle::unknownCenterY, -2.0 * (yP - yc));
-      A.setAt(i, Circle::unknownCenterZ, -2.0 * (zP - zc));
-      A.setAt(i, Circle::unknownRadius, -2.0 * rc);
+      A.setAt(i, Circle::unknownCenterX, -kSquareDerivative * (xP - xc));
+      A.setAt(i, Circle::unknownCenterY, -kSquareDerivative * (yP - yc));
+      A.setAt(i, Circle::unknownCenterZ, -kSquareDerivative * (zP - zc));
+      A.setAt(i, Circle::unknownRadius, -kSquareDerivative * rc);
       // A.setAt(i, Circle::unknownNormalI, 0.0);
       // A.setAt(i, Circle::unknownNormalJ, 0.0);
       // A.setAt(i, Circle::unknownNormalK, 0.0);
       // A.setAt(i, 7, 0.0);
 
-      B.setAt(i, i * 3, 2.0 * (xP - xc));
-      B.setAt(i, i * 3 + 1, 2.0 * (yP - yc));
-      B.setAt(i, i * 3 + 2, 2.0 * (zP - zc));
+      B.setAt(i, i * 3, kSquareDerivative * (xP - xc));
+      B.setAt(i, i * 3 + 1, kSquareDerivative * (yP - yc));
+      B.setAt(i, i * 3 + 2, kSquareDerivative * (zP - zc));
 
       w.setAt(i, rc * rc - ((xP - xc) * (xP - xc) + (yP - yc) * (yP - yc) +
                             (zP - zc) * (zP - zc)));
@@ -172,7 +185,7 @@ bool BestFitCircle::setUpResult(Circle& circle) {
       A.setAt(obsCount + i, Circle::unknownNormalI, xP);
       A.setAt(obsCount + i, Circle::unknownNormalJ, yP);
       A.setAt(obsCount + i, Circle::unknownNormalK, zP);
-      A.setAt(obsCount + i, 7, -1.0);
+      A.setAt(obsCount + i, kUnknownPlaneOffset, -1.0);
 
       B.setAt(obsCount + i, i * 3, nx);
       B.setAt(obsCount + i, i * 3 + 1, ny);
@@ -199,12 +212,15 @@ bool BestFitCircle::setUpResult(Circle& circle) {
     NGLR.setAt(NGL.getRowCount(), Circle::unknownNormalI, xc);
     NGLR.setAt(NGL.getRowCount(), Circle::unknownNormalJ, yc);
     NGLR.setAt(NGL.getRowCount(), Circle::unknownNormalK, zc);
-    NGLR.setAt(NGL.getRowCount(), 7, -1.0);
+    NGLR.setAt(NGL.getRowCount(), kUnknownPlaneOffset, -1.0);
     nglr.setAt(NGL.getRowCount(), d - (nx * xc + ny * yc + nz * zc));
 
-    NGLR.setAt(NGL.getRowCount() + 1, Circle::unknownNormalI, 2.0 * nx);
-    NGLR.setAt(NGL.getRowCount() + 1, Circle::unknownNormalJ, 2.0 * ny);
-    NGLR.setAt(NGL.getRowCount() + 1, Circle::unknownNormalK, 2.0 * nz);
+    NGLR.setAt(NGL.getRowCount() + 1, Circle::unknownNormalI,
+               kSquareDerivative * nx);
+    NGLR.setAt(NGL.getRowCount() + 1, Circle::unknownNormalJ,
+               kSquareDerivative * ny);
+    NGLR.setAt(NGL.getRowCount() + 1, Circle::unknownNormalK,
+               kSquareDerivative * nz);
     nglr.setAt(NGL.getRowCount() + 1, 1.0 - (nx * nx + ny * ny + nz * nz));
 
     NGLR.setAt(Circle::unknownCenterX, NGL.getRowCount(), nx);
@@ -213,11 +229,14 @@ bool BestFitCircle::setUpResult(Circle& circle) {
     NGLR.setAt(Circle::unknownNormalI, NGL.getRowCount(), xc);
     NGLR.setAt(Circle::unknownNormalJ, NGL.getRowCount(), yc);
     NGLR.setAt(Circle::unknownNormalK, NGL.getRowCount(), zc);
-    NGLR.setAt(7, NGL.getRowCount(), -1.0);
+    NGLR.setAt(kUnknownPlaneOffset, NGL.getRowCount(), -1.0);
 
-    NGLR.setAt(Circle::unknownNormalI, NGL.getRowCount() + 1, 2.0 * nx);
-    NGLR.setAt(Circle::unknownNormalJ, NGL.getRowCount() + 1, 2.0 * ny);
-    NGLR.setAt(Circle::unknownNormalK, NGL.getRowCount() + 1, 2.0 * nz);
+    NGLR.setAt(Circle::unknownNormalI, NGL.getRowCount() + 1,
+               kSquareDerivative * nx);
+    NGLR.setAt(Circle::unknownNormalJ, NGL.getRowCount() + 1,
+               kSquareDerivative * ny);
+    NGLR.setAt(Circle::unknownNormalK, NGL.getRowCount() + 1,
+               kSquareDerivative * nz);
 
     QxxR = NGLR.inv();
     duk = QxxR * nglr;
@@ -230,7 +249,7 @@ bool BestFitCircle::setUpResult(Circle& circle) {
     nx += duk.getAt(Circle::unknownNormalI);
     ny += duk.getAt(Circle::unknownNormalJ);
     nz += duk.getAt(Circle::unknownNormalK);
-    d += duk.getAt(7);
+    d += duk.getAt(kUnknownPlaneOffset);
 
     maxAbsDu = duk.getAt(0);
     for (int i = 0; i < du.getSize(); i++) {
@@ -243,7 +262,7 @@ bool BestFitCircle::setUpResult(Circle& circle) {
 
     v = B.t() * Pww * (A * du - w);
 
-    if (iterations < maxItr && maxAbsDu < 1.0E-8) {
+    if (iterations < maxItr && maxAbsDu < kConvergenceLimit) {
       qDebug() << "DEBUG: Found Solution!";
       break;
     } else if (iterations > maxItr) {
@@ -258,8 +277,9 @@ bool BestFitCircle::setUpResult(Circle& circle) {
   myStats.setS0APriori(1.0);
   double vv = NAN;
   OiVec::dot(vv, v, v);
-  myStats.setS0APosteriori((obsCount - 6) > 0 ? sqrt(vv / (obsCount - 6.0))
-                                              : 1.0);
+  myStats.setS0APosteriori((obsCount - kFittedParameters) > 0
+                               ? sqrt(vv / (obsCount - kFittedParameters))
+                               : 1.0);
 
   Position circlePosition;
   OiVec xyz(3);

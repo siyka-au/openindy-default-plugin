@@ -4,6 +4,10 @@
 
 #include "containers.h"
 
+namespace {
+constexpr double kMillimetresPerMetre = 1000.0;
+}  // namespace
+
 /*!
  * \brief ChangeRadius::init
  */
@@ -76,10 +80,10 @@ bool ChangeRadius::setUpResult(Sphere& sphere) {
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
     offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   } else {
     offset = oi::value(this->doubleParameters, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   }
 
   // add offset to radius of the sphere
@@ -103,10 +107,10 @@ bool ChangeRadius::setUpResult(Circle& circle) {
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
     offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   } else {
     offset = oi::value(this->doubleParameters, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   }
 
   // add offset to radius of the circle
@@ -131,10 +135,10 @@ bool ChangeRadius::setUpResult(Cylinder& cylinder) {
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
     offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   } else {
     offset = oi::value(this->doubleParameters, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   }
 
   // add offset to radius of the cylinder

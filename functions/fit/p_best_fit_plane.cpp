@@ -3,6 +3,11 @@
 #include <format>
 #include <vector>
 
+namespace {
+constexpr double kPlaneFittedParameters =
+    3.0;  // degrees of freedom removed by the plane fit
+}  // namespace
+
 /*!
  * \brief BestFitPlane::init
  */
@@ -171,7 +176,8 @@ bool BestFitPlane::setUpResult(Plane& plane) {
   // set statistic
   this->statistic.setIsValid(true);
   this->statistic.setStdev(
-      std::sqrt(eVal / (static_cast<double>(usedPositions.size()) - 3.0)));
+      std::sqrt(eVal / (static_cast<double>(usedPositions.size()) -
+                        kPlaneFittedParameters)));
   plane.setStatistic(this->statistic);
 
   return true;

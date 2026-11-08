@@ -6,6 +6,12 @@
 
 #include "containers.h"
 
+namespace {
+constexpr double kParallelDotLimit =
+    0.999;  // |cos| above which two lines count as parallel
+constexpr double kHalf = 0.5;
+}  // namespace
+
 /*!
  * \brief IntersectLineLine::init
  */
@@ -137,7 +143,7 @@ bool IntersectLineLine::setUpResult(Point& point) {
       break;
 
     case IntersectionTypes::eMidPoint:
-      s = (fline1 + fline2) / 2.;
+      s = (fline1 + fline2) * kHalf;
       break;
 
     case IntersectionTypes::eAtFirstLine:  // fall though
@@ -171,5 +177,5 @@ bool IntersectLineLine::isParallel(const oi::Guarded<Line>& line1,
   double dot = 0.0;
   OiVec::dot(dot, line1->getDirection().getVector(),
              line2->getDirection().getVector());
-  return dot > 0.999;
+  return dot > kParallelDotLimit;
 }

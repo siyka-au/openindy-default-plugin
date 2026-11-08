@@ -2,6 +2,10 @@
 
 #include <format>
 
+namespace {
+constexpr double kHalf = 0.5;  // midpoint weight
+}  // namespace
+
 /*!
  * \brief PointBetweenTwoPoints::init
  */
@@ -74,7 +78,7 @@ bool PointBetweenTwoPoints::setUpResult(Point& point) {
   // calculate midpoint
   OiVec center =
       (point1->getPosition().getVector() + point2->getPosition().getVector()) *
-      0.5;
+      kHalf;
 
   // set result
   Position position;
@@ -85,7 +89,7 @@ bool PointBetweenTwoPoints::setUpResult(Point& point) {
   this->statistic.setIsValid(true);
   this->statistic.setStdev(
       (point1->getStatistic().getStdev() + point2->getStatistic().getStdev()) *
-      0.5);
+      kHalf);
   point.setStatistic(this->statistic);
 
   return true;

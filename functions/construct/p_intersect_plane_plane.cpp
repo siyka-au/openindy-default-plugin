@@ -4,6 +4,11 @@
 
 #include <format>
 
+namespace {
+constexpr double kParallelDotLimit =
+    0.99990;  // |dot(n1, n2)| above which two planes count as parallel
+}  // namespace
+
 /*!
  * \brief IntersectPlanePlane::init
  */
@@ -126,7 +131,7 @@ bool IntersectPlanePlane::isIntersection(const oi::Guarded<Plane>& plane1,
   double dot = 0.0;
   OiVec::dot(dot, plane1->getDirection().getVector(),
              plane2->getDirection().getVector());
-  if (dot > -0.99990 && dot < 0.99990) {
+  if (dot > -kParallelDotLimit && dot < kParallelDotLimit) {
     return true;
   }
   return false;

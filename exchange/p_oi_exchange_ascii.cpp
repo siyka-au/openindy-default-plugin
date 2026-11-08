@@ -15,6 +15,14 @@
 #include "containers.h"
 #include "string_util.h"
 
+namespace {
+constexpr int kSampleSize = 20;  // lines sampled to detect the column layout
+constexpr int kColumnsXyz = 5;   // id x y z + one more
+constexpr int kColumnsXyzSigma = 6;
+constexpr int kColumnsFull = 7;
+constexpr double kMaxSampleFraction = 0.99;
+}  // namespace
+
 struct ColumnData {
   std::string featureName;
   std::string comment;
@@ -109,7 +117,7 @@ OiExchangeAscii::getDefaultColumnOrder(const GeometryTypes& typeOfGeometry) {
 
     // read the first twenty lines to get the maximum number of columns
     int numColumns = 0;
-    int sampleSize = 20;
+    int sampleSize = kSampleSize;
     LineReader in(text);
     while (!in.atEnd() && sampleSize >= 0) {
       std::string line = in.readLine();
@@ -134,7 +142,7 @@ OiExchangeAscii::getDefaultColumnOrder(const GeometryTypes& typeOfGeometry) {
     switch (typeOfGeometry) {
       case GeometryTypes::ePlaneGeometry:
       case GeometryTypes::ePlaneLevelGeometry:
-        if (numColumns == 7) {
+        if (numColumns == kColumnsFull) {
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnFeatureName);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
@@ -159,27 +167,27 @@ OiExchangeAscii::getDefaultColumnOrder(const GeometryTypes& typeOfGeometry) {
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
-        } else if (numColumns == 5) {
+        } else if (numColumns == kColumnsXyz) {
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnFeatureName);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnGroupName);
-        } else if (numColumns == 6) {
-          defaultColumnOrder.push_back(OiExchangeAscii::eColumnFeatureName);
-          defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
-          defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
-          defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
-          defaultColumnOrder.push_back(OiExchangeAscii::eColumnGroupName);
-          defaultColumnOrder.push_back(OiExchangeAscii::eColumnComment);
-        } else if (numColumns > 6) {
+        } else if (numColumns == kColumnsXyzSigma) {
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnFeatureName);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnGroupName);
           defaultColumnOrder.push_back(OiExchangeAscii::eColumnComment);
-          for (int i = 6; i < numColumns; i++) {
+        } else if (numColumns > kColumnsXyzSigma) {
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnFeatureName);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnX);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnY);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnZ);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnGroupName);
+          defaultColumnOrder.push_back(OiExchangeAscii::eColumnComment);
+          for (int i = kColumnsXyzSigma; i < numColumns; i++) {
             defaultColumnOrder.push_back(OiExchangeAscii::eColumnIgnore);
           }
         }
@@ -221,7 +229,7 @@ OiExchangeAscii::getFilePreview(const GeometryTypes& typeOfGeometry) {
     std::string text = readText(this->stream);
 
     // get the first twenty lines as preview
-    int sampleSize = 20;
+    int sampleSize = kSampleSize;
     LineReader in(text);
     while (!in.atEnd() && sampleSize >= 0) {
       std::string line = in.readLine();
@@ -575,10 +583,10 @@ void OiExchangeAscii::importOiData(const OperationContext& ctx) {
       // update import progress
       numPoints++;
       // never 100% before the import has finished
-      ctx.report(fileSize > 0
-                     ? std::min(0.99, static_cast<double>(readSize) /
-                                          static_cast<double>(fileSize))
-                     : 0.0,
+      ctx.report(fileSize > 0 ? std::min(kMaxSampleFraction,
+                                         static_cast<double>(readSize) /
+                                             static_cast<double>(fileSize))
+                              : 0.0,
                  std::format("{} nominal(s) loaded", numPoints));
       readSize += 2;
     }

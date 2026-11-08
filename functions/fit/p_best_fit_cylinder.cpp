@@ -3,6 +3,10 @@
 #include <format>
 #include <vector>
 
+namespace {
+constexpr std::size_t kMinPoints = 5;  // a cylinder has five degrees of freedom
+}  // namespace
+
 /*!
  * \brief BestFitCylinder::init
  */
@@ -92,7 +96,7 @@ bool BestFitCylinder::setUpResult(Cylinder& cylinder) {
     // five is the geometric minimum (2 DOF axis direction + 2 DOF
     // point-on-axis + 1 DOF radius) - a hint, not a gate: the real
     // validation is whether the fit below actually converges.
-    if (inputPoints.size() < 5) {
+    if (inputPoints.size() < kMinPoints) {
       this->sendMessage(
           std::format("Not enough valid points to fit the cylinder {}",
                       cylinder.getFeatureName()),

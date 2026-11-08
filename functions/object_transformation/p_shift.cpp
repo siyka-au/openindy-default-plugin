@@ -4,6 +4,10 @@
 
 #include "containers.h"
 
+namespace {
+constexpr double kMillimetresPerMetre = 1000.0;
+}  // namespace
+
 /*!
  * \brief Shift::init
  */
@@ -60,10 +64,10 @@ bool Shift::setUpResult(Plane& plane) {
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
     offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   } else {
     offset = oi::value(this->doubleParameters, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   }
 
   // get normalized vector
@@ -92,10 +96,10 @@ bool Shift::setUpResult(Circle& circle) {
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
     offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   } else {
     offset = oi::value(this->doubleParameters, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   }
 
   // get normalized vector

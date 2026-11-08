@@ -6,6 +6,82 @@
 
 #include "containers.h"
 
+namespace {
+// Edlen refractive-index formula (updated Edlen equation) coefficients
+constexpr double kEdlenA1 = 13.928169;  // used negated
+constexpr double kEdlenA2 = 34.7078238;
+constexpr double kKelvinOffset = 273.15;
+constexpr double kWaterTriplePoint = 273.16;  // [K]
+constexpr int kEdlenExponent1 = 15;
+constexpr double kEdlenExponent2 = 1.25;
+constexpr double kSaturationPressureAtTriplePoint = 611.657;  // [pascal]
+constexpr double kPercentPerUnit = 100.0;
+constexpr double kEdlenA = 8342.54;
+constexpr double kEdlenB = 2406147;
+constexpr double kEdlenC = 15998;
+constexpr double kEdlenD = 96095.43;
+constexpr double kEdlenE = 0.601;
+constexpr double kEdlenF = 0.00972;
+constexpr double kEdlenG = 0.003661;
+constexpr double kEdlenB2 = 130;
+constexpr double kEdlenC2 = 38.9;
+constexpr int kEdlenScale = 8;       // 10^-8 scaling of the group index terms
+constexpr int kEdlenTermPower = 10;  // 10^-10 scaling of the humidity term
+constexpr double kEdlenT0 = 292.75;
+constexpr double kEdlenH0 = 3.7345;
+constexpr double kEdlenH1 = 0.0401;
+constexpr double kSensorLambdaSigma = 0.000403;
+constexpr double kSensorMuSigma = 0.000005;
+constexpr double kSensorExSigma = 0.0000122;
+constexpr double kSensorBySigma = 0.0000654;
+constexpr double kSensorBzSigma = 0.0000974;
+constexpr double kSensorAlphaSigma = 0.128;
+constexpr double kSensorGammaSigma = 0.079;
+constexpr double kSensorAa1Sigma = 0.064;
+constexpr double kSensorBa1Sigma = 0.080;
+constexpr double kSensorAa2Sigma = 0.073;
+constexpr double kSensorBa2Sigma = 0.090;
+constexpr double kSensorAe0Sigma = 0.223;
+constexpr double kSensorAe1Sigma = 0.152;
+constexpr double kSensorBe1Sigma = 0.183;
+constexpr double kSensorAe2Sigma = 0.214;
+constexpr double kSensorBe2Sigma = 0.214;
+constexpr double kThermalExpansionValue = 11.8;   // [1/K]
+constexpr double kMaterialTemperatureValue = 20;  // [celsius]
+constexpr double kTemperatureValue = 20.0;        // [celsius]
+constexpr double kTemperatureUncertainty = 0.5;
+constexpr double kVerticalTemperatureGradientValue = 0.4;
+constexpr double kVerticalTemperatureGradientUncertainty = 0.1;
+constexpr double kHorizontalTemperatureGradientValue = 0.1;
+constexpr double kHorizontalTemperatureGradientUncertainty = 0.1;
+constexpr double kPressureValue = 101325.0;  // [pascal]
+constexpr double kPressureUncertainty = 10.0;
+constexpr double kVerticalPressureGradientValue = -0.8;
+constexpr double kVerticalPressureGradientUncertainty = 0.1;
+constexpr double kHumidityValue = 50.0;  // [percent]
+constexpr double kHumanDeltaAzimuthUncertainty = 0.0001;
+constexpr double kHumanDeltaZenithUncertainty = 0.0001;
+constexpr double kHumanDeltaDistanceUncertainty = 0.0001;
+constexpr double kDefaultWavelength = 0.633;  // [micrometer], helium-neon laser
+constexpr double kErfA1 = 0.254829592;        // Abramowitz-Stegun 7.1.26
+constexpr double kErfA2 = -0.284496736;       // Abramowitz-Stegun 7.1.26
+constexpr double kErfA3 = 1.421413741;        // Abramowitz-Stegun 7.1.26
+constexpr double kErfA4 = -1.453152027;       // Abramowitz-Stegun 7.1.26
+constexpr double kErfA5 = 1.061405429;        // Abramowitz-Stegun 7.1.26
+constexpr double kErfP = 0.3275911;           // Abramowitz-Stegun 7.1.26
+constexpr double kHalf = 0.5;
+constexpr double kTwo = 2.0;
+constexpr double kMicrometresPerMillimetre =
+    1000.0;  // unit conversion for the sensor sigmas [um -> mm]
+constexpr double kArcsecPerHalfTurn = 648000.0;  // 180 * 3600
+constexpr double kMilliPerUnit = 1000.0;
+constexpr double kDegreesPerHalfTurn = 180.0;
+constexpr double kPartsPerMillion = 1000000.0;
+constexpr double kChi2Limit95 =
+    16.919;  // chi-square quantile, 95 percent, 9 degrees of freedom
+constexpr double kHistogramClasses = 10.0;
+}  // namespace
+
 /*!
  * \brief SimplePolarMeasurement::init
  */
@@ -33,7 +109,7 @@ void SimplePolarMeasurement::init() {
 
   lambda.name = "lambda";
   lambda.value = 0.0;
-  lambda.uncertainty = 0.000403;
+  lambda.uncertainty = kSensorLambdaSigma;
   lambda.distribution = this->distributions.at(0);
   lambda.distributions = this->distributions;
   lambda.errorUnit = "[mm]";
@@ -47,7 +123,7 @@ void SimplePolarMeasurement::init() {
 
   mu.name = "mu";
   mu.value = 0.0;
-  mu.uncertainty = 0.000005;
+  mu.uncertainty = kSensorMuSigma;
   mu.distribution = this->distributions.at(0);
   mu.distributions = this->distributions;
   mu.errorUnit = "[-]";
@@ -61,7 +137,7 @@ void SimplePolarMeasurement::init() {
 
   ex.name = "ex";
   ex.value = 0.0;
-  ex.uncertainty = 0.0000122;
+  ex.uncertainty = kSensorExSigma;
   ex.distribution = this->distributions.at(0);
   ex.distributions = this->distributions;
   ex.errorUnit = "[mm]";
@@ -75,7 +151,7 @@ void SimplePolarMeasurement::init() {
 
   by.name = "by";
   by.value = 0.0;
-  by.uncertainty = 0.0000654;
+  by.uncertainty = kSensorBySigma;
   by.distribution = this->distributions.at(0);
   by.distributions = this->distributions;
   by.errorUnit = "[mm]";
@@ -89,7 +165,7 @@ void SimplePolarMeasurement::init() {
 
   bz.name = "bz";
   bz.value = 0.0;
-  bz.uncertainty = 0.0000974;
+  bz.uncertainty = kSensorBzSigma;
   bz.distribution = this->distributions.at(0);
   bz.distributions = this->distributions;
   bz.errorUnit = "[mm]";
@@ -103,7 +179,7 @@ void SimplePolarMeasurement::init() {
 
   alpha.name = "alpha";
   alpha.value = 0.0;
-  alpha.uncertainty = 0.128;
+  alpha.uncertainty = kSensorAlphaSigma;
   alpha.distribution = this->distributions.at(0);
   alpha.distributions = this->distributions;
   alpha.errorUnit = "[arcsec]";
@@ -117,7 +193,7 @@ void SimplePolarMeasurement::init() {
 
   gamma.name = "gamma";
   gamma.value = 0.0;
-  gamma.uncertainty = 0.079;
+  gamma.uncertainty = kSensorGammaSigma;
   gamma.distribution = this->distributions.at(0);
   gamma.distributions = this->distributions;
   gamma.errorUnit = "[arcsec]";
@@ -131,7 +207,7 @@ void SimplePolarMeasurement::init() {
 
   Aa1.name = "Aa1";
   Aa1.value = 0.0;
-  Aa1.uncertainty = 0.064;
+  Aa1.uncertainty = kSensorAa1Sigma;
   Aa1.distribution = this->distributions.at(0);
   Aa1.distributions = this->distributions;
   Aa1.errorUnit = "[arcsec]";
@@ -145,7 +221,7 @@ void SimplePolarMeasurement::init() {
 
   Ba1.name = "Aa1";
   Ba1.value = 0.0;
-  Ba1.uncertainty = 0.080;
+  Ba1.uncertainty = kSensorBa1Sigma;
   Ba1.distribution = this->distributions.at(0);
   Ba1.distributions = this->distributions;
   Ba1.errorUnit = "[arcsec]";
@@ -159,7 +235,7 @@ void SimplePolarMeasurement::init() {
 
   Aa2.name = "Aa2";
   Aa2.value = 0.0;
-  Aa2.uncertainty = 0.073;
+  Aa2.uncertainty = kSensorAa2Sigma;
   Aa2.distribution = this->distributions.at(0);
   Aa2.distributions = this->distributions;
   Aa2.errorUnit = "[arcsec]";
@@ -173,7 +249,7 @@ void SimplePolarMeasurement::init() {
 
   Ba2.name = "Ba2";
   Ba2.value = 0.0;
-  Ba2.uncertainty = 0.090;
+  Ba2.uncertainty = kSensorBa2Sigma;
   Ba2.distribution = this->distributions.at(0);
   Ba2.distributions = this->distributions;
   Ba2.errorUnit = "[arcsec]";
@@ -187,7 +263,7 @@ void SimplePolarMeasurement::init() {
 
   Ae0.name = "Ae0";
   Ae0.value = 0.0;
-  Ae0.uncertainty = 0.223;
+  Ae0.uncertainty = kSensorAe0Sigma;
   Ae0.distribution = this->distributions.at(0);
   Ae0.distributions = this->distributions;
   Ae0.errorUnit = "[arcsec]";
@@ -201,7 +277,7 @@ void SimplePolarMeasurement::init() {
 
   Ae1.name = "Ae1";
   Ae1.value = 0.0;
-  Ae1.uncertainty = 0.152;
+  Ae1.uncertainty = kSensorAe1Sigma;
   Ae1.distribution = this->distributions.at(0);
   Ae1.distributions = this->distributions;
   Ae1.errorUnit = "[arcsec]";
@@ -215,7 +291,7 @@ void SimplePolarMeasurement::init() {
 
   Be1.name = "Be1";
   Be1.value = 0.0;
-  Be1.uncertainty = 0.183;
+  Be1.uncertainty = kSensorBe1Sigma;
   Be1.distribution = this->distributions.at(0);
   Be1.distributions = this->distributions;
   Be1.errorUnit = "[arcsec]";
@@ -229,7 +305,7 @@ void SimplePolarMeasurement::init() {
 
   Ae2.name = "Ae2";
   Ae2.value = 0.0;
-  Ae2.uncertainty = 0.214;
+  Ae2.uncertainty = kSensorAe2Sigma;
   Ae2.distribution = this->distributions.at(0);
   Ae2.distributions = this->distributions;
   Ae2.errorUnit = "[arcsec]";
@@ -243,7 +319,7 @@ void SimplePolarMeasurement::init() {
 
   Be2.name = "Be2";
   Be2.value = 0.0;
-  Be2.uncertainty = 0.214;
+  Be2.uncertainty = kSensorBe2Sigma;
   Be2.distribution = this->distributions.at(0);
   Be2.distributions = this->distributions;
   Be2.errorUnit = "[arcsec]";
@@ -261,7 +337,7 @@ void SimplePolarMeasurement::init() {
   UncertaintyComponent cOfE;
 
   cOfE.name = "coefficient of thermal expansion";
-  cOfE.value = 11.8;
+  cOfE.value = kThermalExpansionValue;
   cOfE.uncertainty = 2;
   cOfE.distribution = this->distributions.at(0);
   cOfE.distributions = this->distributions;
@@ -276,7 +352,7 @@ void SimplePolarMeasurement::init() {
   UncertaintyComponent mt;
 
   mt.name = "material temperature";
-  mt.value = 20;
+  mt.value = kMaterialTemperatureValue;
   mt.uncertainty = 1;
   mt.distribution = this->distributions.at(0);
   mt.distributions = this->distributions;
@@ -294,8 +370,8 @@ void SimplePolarMeasurement::init() {
   UncertaintyComponent t;
 
   t.name = "temperature";
-  t.value = 20.0;
-  t.uncertainty = 0.5;
+  t.value = kTemperatureValue;
+  t.uncertainty = kTemperatureUncertainty;
   t.distribution = this->distributions.at(0);
   t.distributions = this->distributions;
   t.errorUnit = "[celsius]";
@@ -309,8 +385,8 @@ void SimplePolarMeasurement::init() {
   UncertaintyComponent vtg;
 
   vtg.name = "vertical temperature gradient";
-  vtg.value = 0.4;
-  vtg.uncertainty = 0.1;
+  vtg.value = kVerticalTemperatureGradientValue;
+  vtg.uncertainty = kVerticalTemperatureGradientUncertainty;
   vtg.distribution = this->distributions.at(0);
   vtg.distributions = this->distributions;
   vtg.errorUnit = "[celsius/m]";
@@ -325,8 +401,8 @@ void SimplePolarMeasurement::init() {
   UncertaintyComponent htg;
 
   htg.name = "horizontal temperature gradient";
-  htg.value = 0.1;
-  htg.uncertainty = 0.1;
+  htg.value = kHorizontalTemperatureGradientValue;
+  htg.uncertainty = kHorizontalTemperatureGradientUncertainty;
   htg.distribution = this->distributions.at(0);
   htg.distributions = this->distributions;
   htg.errorUnit = "[celsius/m]";
@@ -340,8 +416,8 @@ void SimplePolarMeasurement::init() {
   UncertaintyComponent p;
 
   p.name = "pressure";
-  p.value = 101325.0;
-  p.uncertainty = 10.0;
+  p.value = kPressureValue;
+  p.uncertainty = kPressureUncertainty;
   p.distribution = this->distributions.at(0);
   p.distributions = this->distributions;
   p.errorUnit = "[pascal]";
@@ -355,8 +431,8 @@ void SimplePolarMeasurement::init() {
   UncertaintyComponent hpg;
 
   hpg.name = "vertical pressure gradient";
-  hpg.value = -0.8;
-  hpg.uncertainty = 0.1;
+  hpg.value = kVerticalPressureGradientValue;
+  hpg.uncertainty = kVerticalPressureGradientUncertainty;
   hpg.distribution = this->distributions.at(0);
   hpg.distributions = this->distributions;
   hpg.errorUnit = "[pascal/m]";
@@ -370,7 +446,7 @@ void SimplePolarMeasurement::init() {
   UncertaintyComponent h;
 
   h.name = "humidity";
-  h.value = 50.0;
+  h.value = kHumidityValue;
   h.uncertainty = 1.0;
   h.distribution = this->distributions.at(0);
   h.distributions = this->distributions;
@@ -389,7 +465,7 @@ void SimplePolarMeasurement::init() {
 
   a.name = "delta_azimuth";
   a.value = 0.0;
-  a.uncertainty = 0.0001;
+  a.uncertainty = kHumanDeltaAzimuthUncertainty;
   a.distribution = this->distributions.at(0);
   a.distributions = this->distributions;
   a.errorUnit = "[milliGrad]";
@@ -403,7 +479,7 @@ void SimplePolarMeasurement::init() {
 
   z.name = "delta_zenith";
   z.value = 0.0;
-  z.uncertainty = 0.0001;
+  z.uncertainty = kHumanDeltaZenithUncertainty;
   z.distribution = this->distributions.at(0);
   z.distributions = this->distributions;
   z.errorUnit = "[milliGrad]";
@@ -417,7 +493,7 @@ void SimplePolarMeasurement::init() {
 
   d.name = "delta_distance";
   d.value = 0.0;
-  d.uncertainty = 0.0001;
+  d.uncertainty = kHumanDeltaDistanceUncertainty;
   d.distribution = this->distributions.at(0);
   d.distributions = this->distributions;
   d.errorUnit = "[mm]";
@@ -427,7 +503,8 @@ void SimplePolarMeasurement::init() {
   this->humanInfluence.insert_or_assign("delta_distance", d);
 
   // set double parameters
-  this->doubleParameters.insert_or_assign("wavelength [micrometer]", 0.633);
+  this->doubleParameters.insert_or_assign("wavelength [micrometer]",
+                                          kDefaultWavelength);
 
   // set string parameters
   this->stringParameters.emplace("use sensor errors", "no");
@@ -442,12 +519,12 @@ void SimplePolarMeasurement::init() {
 
 double erfFunc(double x) {
   // constants
-  double a1 = 0.254829592;
-  double a2 = -0.284496736;
-  double a3 = 1.421413741;
-  double a4 = -1.453152027;
-  double a5 = 1.061405429;
-  double p = 0.3275911;
+  double a1 = kErfA1;
+  double a2 = kErfA2;
+  double a3 = kErfA3;
+  double a4 = kErfA4;
+  double a5 = kErfA5;
+  double p = kErfP;
 
   // Save the sign of x
   int sign = 1;
@@ -465,10 +542,10 @@ double erfFunc(double x) {
 double densityNormal(const double& x, const double& expectation,
                      const double& uncertainty, const double& lowerLimit,
                      const double& upperLimit) {
-  double e = -0.5 * (((x - expectation) / (uncertainty)) *
-                     ((x - expectation) / (uncertainty)));
+  double e = -kHalf * (((x - expectation) / (uncertainty)) *
+                       ((x - expectation) / (uncertainty)));
 
-  double result = (1.0 / (uncertainty * sqrt(2.0 * M_PI))) * std::exp(e);
+  double result = (1.0 / (uncertainty * sqrt(kTwo * M_PI))) * std::exp(e);
 
   return result;
 }
@@ -476,8 +553,8 @@ double densityNormal(const double& x, const double& expectation,
 double distributionNormal(const double& x, const double& expectation,
                           const double& uncertainty, const double& lowerLimit,
                           const double& upperLimit) {
-  return 0.5 * (1.0 + erfFunc((x - expectation) /
-                              (sqrt(2.0 * uncertainty * uncertainty))));
+  return kHalf * (1.0 + erfFunc((x - expectation) /
+                                (sqrt(kTwo * uncertainty * uncertainty))));
 }
 
 double densityUniform(const double& x, const double& expectation,
@@ -704,53 +781,53 @@ bool SimplePolarMeasurement::distortionBySensor(Reading* r) {
   double lambda =
       distortComponent(oi::value(
           this->sConfig.uncertainties.sensorUncertainties, "lambda")) /
-      1000.0;
+      kMicrometresPerMillimetre;
   double mu = distortComponent(
       oi::value(this->sConfig.uncertainties.sensorUncertainties, "mu"));
   double ex = distortComponent(oi::value(
                   this->sConfig.uncertainties.sensorUncertainties, "ex")) /
-              1000.0;
+              kMicrometresPerMillimetre;
   double by = distortComponent(oi::value(
                   this->sConfig.uncertainties.sensorUncertainties, "by")) /
-              1000.0;
+              kMicrometresPerMillimetre;
   double bz = distortComponent(oi::value(
                   this->sConfig.uncertainties.sensorUncertainties, "bz")) /
-              1000.0;
+              kMicrometresPerMillimetre;
   double alpha =
       distortComponent(
           oi::value(this->sConfig.uncertainties.sensorUncertainties, "alpha")) *
-      (M_PI / 648000.0);
+      (M_PI / kArcsecPerHalfTurn);
   double gamma =
       distortComponent(
           oi::value(this->sConfig.uncertainties.sensorUncertainties, "gamma")) *
-      (M_PI / 648000.0);
+      (M_PI / kArcsecPerHalfTurn);
   double Aa1 = distortComponent(oi::value(
                    this->sConfig.uncertainties.sensorUncertainties, "Aa1")) *
-               (M_PI / 648000.0);
+               (M_PI / kArcsecPerHalfTurn);
   double Ba1 = distortComponent(oi::value(
                    this->sConfig.uncertainties.sensorUncertainties, "Ba1")) *
-               (M_PI / 648000.0);
+               (M_PI / kArcsecPerHalfTurn);
   double Aa2 = distortComponent(oi::value(
                    this->sConfig.uncertainties.sensorUncertainties, "Aa2")) *
-               (M_PI / 648000.0);
+               (M_PI / kArcsecPerHalfTurn);
   double Ba2 = distortComponent(oi::value(
                    this->sConfig.uncertainties.sensorUncertainties, "Ba2")) *
-               (M_PI / 648000.0);
+               (M_PI / kArcsecPerHalfTurn);
   double Ae0 = distortComponent(oi::value(
                    this->sConfig.uncertainties.sensorUncertainties, "Ae0")) *
-               (M_PI / 648000.0);
+               (M_PI / kArcsecPerHalfTurn);
   double Ae1 = distortComponent(oi::value(
                    this->sConfig.uncertainties.sensorUncertainties, "Ae1")) *
-               (M_PI / 648000.0);
+               (M_PI / kArcsecPerHalfTurn);
   double Be1 = distortComponent(oi::value(
                    this->sConfig.uncertainties.sensorUncertainties, "Be1")) *
-               (M_PI / 648000.0);
+               (M_PI / kArcsecPerHalfTurn);
   double Ae2 = distortComponent(oi::value(
                    this->sConfig.uncertainties.sensorUncertainties, "Ae2")) *
-               (M_PI / 648000.0);
+               (M_PI / kArcsecPerHalfTurn);
   double Be2 = distortComponent(oi::value(
                    this->sConfig.uncertainties.sensorUncertainties, "Be2")) *
-               (M_PI / 648000.0);
+               (M_PI / kArcsecPerHalfTurn);
 
   double az = r->getPolarReading().azimuth;
   double ze = r->getPolarReading().zenith;
@@ -789,7 +866,7 @@ bool SimplePolarMeasurement::distortionBySensor(Reading* r) {
 
   OiMat Rz_Azimuth = OiMat::getRotationMatrix(az, zAxis);
   OiMat Rx_alpha = OiMat::getRotationMatrix(alpha, xAxis);
-  OiMat Ry_zenith = OiMat::getRotationMatrix(ze - (M_PI / 2.0), yAxis);
+  OiMat Ry_zenith = OiMat::getRotationMatrix(ze - (M_PI / kTwo), yAxis);
   OiMat Rx_minusAlpha = OiMat::getRotationMatrix(-1.0 * alpha, xAxis);
   OiMat Rz_gamma = OiMat::getRotationMatrix(gamma, zAxis);
 
@@ -892,17 +969,17 @@ bool SimplePolarMeasurement::distortionByHuman(Reading* r) {
   double deltaAzimuth =
       distortComponent(oi::value(this->sConfig.uncertainties.humanUncertainties,
                                  "delta_azimuth")) /
-      1000;
-  deltaAzimuth = deltaAzimuth * M_PI / 180;
+      kMilliPerUnit;
+  deltaAzimuth = deltaAzimuth * M_PI / kDegreesPerHalfTurn;
   double deltaZenith =
       distortComponent(oi::value(this->sConfig.uncertainties.humanUncertainties,
                                  "delta_zenith")) /
-      1000;
-  deltaZenith = deltaZenith * M_PI / 180;
+      kMilliPerUnit;
+  deltaZenith = deltaZenith * M_PI / kDegreesPerHalfTurn;
   double deltaDistance =
       distortComponent(oi::value(this->sConfig.uncertainties.humanUncertainties,
                                  "delta_distance")) /
-      1000;
+      kMilliPerUnit;
 
   ReadingPolar rPolar;
 
@@ -939,9 +1016,9 @@ bool SimplePolarMeasurement::distortionByObject(Reading* r,
                   "materialTemperature"));
   }
 
-  double scale =
-      1 + ((materialTemperature - ref_materialTemperature) *
-           (coefficientOfExpansion - ref_coefficientOfExpansion) / 1000000);
+  double scale = 1 + ((materialTemperature - ref_materialTemperature) *
+                      (coefficientOfExpansion - ref_coefficientOfExpansion) /
+                      kPartsPerMillion);
 
   OiVec xyz = Reading::toCartesian(r->getPolarReading().azimuth,
                                    r->getPolarReading().zenith,
@@ -962,7 +1039,7 @@ bool SimplePolarMeasurement::distortionByObject(Reading* r,
 }
 
 void SimplePolarMeasurement::checkDistribution(UncertaintyData& d) {
-  double chi95 = 16.919;
+  double chi95 = kChi2Limit95;
   double chi2Normal = 0.0;
   double chi2Uniform = 0.0;
 
@@ -970,7 +1047,7 @@ void SimplePolarMeasurement::checkDistribution(UncertaintyData& d) {
   double n = static_cast<double>(tmpList.size());
   std::sort(tmpList.begin(), tmpList.end());
 
-  double classification = (d.maxValue - d.minValue) / 10;
+  double classification = (d.maxValue - d.minValue) / kHistogramClasses;
   double startClass = tmpList.front();
   double endClass = tmpList.front() + classification;
   double hi = 0.0;
@@ -1025,31 +1102,35 @@ double SimplePolarMeasurement::edlenRefractionCalculation(double temperature,
                                                           double pressure,
                                                           double humidity,
                                                           double wavelength) {
-  double A1 = -13.928169;
-  double A2 = 34.7078238;
+  double A1 = -kEdlenA1;
+  double A2 = kEdlenA2;
 
-  double T = temperature + 273.15;
-  double Phi = T / 273.16;
-  double Y = A1 * (1 - pow(Phi, -15)) + A2 * (1 - pow(Phi, -1.25));
+  double T = temperature + kKelvinOffset;
+  double Phi = T / kWaterTriplePoint;
+  double Y = A1 * (1 - pow(Phi, -kEdlenExponent1)) +
+             A2 * (1 - pow(Phi, -kEdlenExponent2));
 
-  double Psv = 611.657 * exp(Y);
-  double pv = humidity / 100 * Psv;
+  double Psv = kSaturationPressureAtTriplePoint * exp(Y);
+  double pv = humidity / kPercentPerUnit * Psv;
 
-  double A = 8342.54;
-  double B = 2406147;
-  double C = 15998;
-  double D = 96095.43;
-  double E = 0.601;
-  double F = 0.00972;
-  double G = 0.003661;
+  double A = kEdlenA;
+  double B = kEdlenB;
+  double C = kEdlenC;
+  double D = kEdlenD;
+  double E = kEdlenE;
+  double F = kEdlenF;
+  double G = kEdlenG;
 
   double S = 1 / (wavelength * wavelength);
 
-  double Ns = 1 + pow(10, -8) * (A + B / (130 - S) + C / (38.9 - S));
-  double X = (1 + pow(10, -8) * (E - F * temperature)) / (1 + G * temperature);
+  double Ns =
+      1 + pow(10, -kEdlenScale) * (A + B / (kEdlenB2 - S) + C / (kEdlenC2 - S));
+  double X = (1 + pow(10, -kEdlenScale) * (E - F * temperature)) /
+             (1 + G * temperature);
 
   double Ntp = 1 + pressure * (Ns - 1.0) * X / D;
 
-  return Ntp - pow(-10, -10) * ((292.75) / (temperature + 273.15)) *
-                   (3.7345 - 0.0401 * S) * pv;
+  return Ntp - pow(-10, -kEdlenTermPower) *
+                   (kEdlenT0 / (temperature + kKelvinOffset)) *
+                   (kEdlenH0 - kEdlenH1 * S) * pv;
 }

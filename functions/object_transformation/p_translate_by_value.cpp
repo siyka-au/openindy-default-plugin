@@ -4,6 +4,10 @@
 
 #include "containers.h"
 
+namespace {
+constexpr double kMillimetresPerMetre = 1000.0;
+}  // namespace
+
 /*!
  * \brief TranslateByValue::init
  */
@@ -105,10 +109,10 @@ bool TranslateByValue::setUpResult(Point& point) {
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
     offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   } else {
     offset = oi::value(this->doubleParameters, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   }
 
   // get normalized vector
@@ -147,10 +151,10 @@ bool TranslateByValue::setUpResult(Line& line) {
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
     offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   } else {
     offset = oi::value(this->doubleParameters, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   }
 
   // get normalized vector
@@ -189,10 +193,10 @@ bool TranslateByValue::setUpResult(Plane& plane) {
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
     offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   } else {
     offset = oi::value(this->doubleParameters, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   }
 
   // get normalized vector
@@ -231,10 +235,10 @@ bool TranslateByValue::setUpResult(Sphere& sphere) {
   double offset = 0.0;
   if (this->scalarInputParams.doubleParameter.contains("offset [mm]")) {
     offset = oi::value(this->scalarInputParams.doubleParameter, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   } else {
     offset = oi::value(this->doubleParameters, "offset [mm]");
-    offset = offset / 1000.0;
+    offset = offset / kMillimetresPerMetre;
   }
 
   // get normalized vector

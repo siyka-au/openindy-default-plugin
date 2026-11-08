@@ -4,6 +4,11 @@
 
 #include <format>
 
+namespace {
+constexpr double kParallelDotLimit =
+    0.0001;  // |dot(line, normal)| below which line and plane are parallel
+}  // namespace
+
 /*!
  * \brief IntersectLinePlane::init
  */
@@ -108,7 +113,7 @@ bool IntersectLinePlane::isIntersection(const oi::Guarded<Line>& line,
   double dot = 0.0;
   OiVec::dot(dot, line->getDirection().getVector(),
              plane->getDirection().getVector());
-  if (dot > 0.0001 || dot < -0.0001) {
+  if (dot > kParallelDotLimit || dot < -kParallelDotLimit) {
     return true;
   }
   return false;

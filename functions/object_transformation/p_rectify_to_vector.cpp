@@ -4,6 +4,10 @@
 
 #include "containers.h"
 
+namespace {
+constexpr double kHalf = 0.5;
+}  // namespace
+
 /*!
  * \brief RectifyToVector::init
  */
@@ -216,7 +220,7 @@ bool RectifyToVector::setUpResult(Geometry& geometry) {
   angle = std::abs(std::acos(angle));
 
   // invert the normal vector if the angle is greater than 90°
-  if (angle > PI / 2.0) {
+  if (angle > PI * kHalf) {
     r = -1.0 * r;
   }
 

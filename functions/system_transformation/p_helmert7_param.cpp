@@ -6,6 +6,20 @@
 
 #include "containers.h"
 
+namespace {
+constexpr double kDefaultReferenceTemperature = 20.0;  // [celsius]
+constexpr double kBetaCheckLimit =
+    0.01;  // tolerance of the rotation-angle branch check
+constexpr double kCoordinatesPerPoint = 3.0;
+constexpr int kHelmert7Size = 7;  // unknowns of the 7-parameter transformation
+constexpr int kHelmert6Size = 6;  // unknowns of the 6-parameter transformation
+constexpr int kTy7 = 5;  // index of the y translation in the 7-parameter vector
+constexpr int kTz7 = 6;  // index of the z translation in the 7-parameter vector
+constexpr int kTz6 = 5;  // index of the z translation in the 6-parameter vector
+constexpr double kConvergenceLimit = 0.000001;
+constexpr int kMaxIterations = 100;
+}  // namespace
+
 /*!
  * \brief Helmert7Param::init
  */
@@ -40,8 +54,10 @@ void Helmert7Param::init() {
   this->stringParameters.emplace("use temperature", "no");
 
   // temperatures
-  this->doubleParameters.insert_or_assign("reference", 20.0);
-  this->doubleParameters.insert_or_assign("actual", 20.0);
+  this->doubleParameters.insert_or_assign("reference",
+                                          kDefaultReferenceTemperature);
+  this->doubleParameters.insert_or_assign("actual",
+                                          kDefaultReferenceTemperature);
 
   // controll reference temeprature
   this->stringParameters.emplace("use reference temperature", "yes");
@@ -119,7 +135,8 @@ void Helmert7Param::getScaleType() {
           if (oi::value(this->scalarInputParams.stringParameter,
                         "use reference temperature")
                   .compare("no") == 0) {
-            this->scalarInputParams.doubleParameter["reference"] = 20.0;
+            this->scalarInputParams.doubleParameter["reference"] =
+                kDefaultReferenceTemperature;
           }
           this->scaleType = ScaleTypes::tempScale;
           return;
@@ -364,7 +381,7 @@ void Helmert7Param::fillTrafoParam(OiMat r, vector<OiVec> locC,
   rot.setAt(2, qAtan2(-r.getAt(1, 0), r.getAt(0, 0)));  // gamma
   if (std::fabs(std::cos(rot.getAt(1)) * std::cos(rot.getAt(2))) -
           std::fabs(r.getAt(0, 0)) >
-      0.01) {
+      kBetaCheckLimit) {
     rot.setAt(1, PI - rot.getAt(1));
   }
   // tp.setRotation(rot.getAt(0), rot.getAt(1), rot.getAt(2));
@@ -411,8 +428,9 @@ void Helmert7Param::fillTrafoParam(OiMat r, vector<OiVec> locC,
   }
 
   Statistic stats;
-  stats.setStdev(
-      sqrt(sumVV / (3.0 * static_cast<double>(this->locSystem.size()) - 7.0)));
+  stats.setStdev(sqrt(sumVV / (kCoordinatesPerPoint *
+                                   static_cast<double>(this->locSystem.size()) -
+                               kHelmert7Size)));
   tp.setStatistic(stats);
   // tp.generateHomogenMatrix();
 }
@@ -427,14 +445,14 @@ bool Helmert7Param::adjust_7p(TrafoParam& tp) {
   bool result = false;
 
   // approximation
-  OiVec x0(7);
+  OiVec x0(kHelmert7Size);
   x0.setAt(0, tp.getRotation().getAt(0));
   x0.setAt(1, tp.getRotation().getAt(1));
   x0.setAt(2, tp.getRotation().getAt(2));
   x0.setAt(3, tp.getScale().getAt(0));
   x0.setAt(4, tp.getTranslation().getAt(0));
-  x0.setAt(5, tp.getTranslation().getAt(1));
-  x0.setAt(6, tp.getTranslation().getAt(2));
+  x0.setAt(kTy7, tp.getTranslation().getAt(1));
+  x0.setAt(kTz7, tp.getTranslation().getAt(2));
 
   // observations
   OiVec l = this->fillLVector();
@@ -477,16 +495,18 @@ bool Helmert7Param::adjust_7p(TrafoParam& tp) {
     iterations++;
 
     // termination criterion
-    if (!(stop.getAt(0) > (0.000001) || iterations < 100)) {
+    if (!(stop.getAt(0) > kConvergenceLimit || iterations < kMaxIterations)) {
       break;
     }
   }
 
-  // if(iterations < 100){ //adjustment successful
+  // if(iterations < kMaxIterations){ //adjustment successful
   OiVec v = a * x - l_diff;
   OiVec vtv = v.t() * v;
-  double s0_post = sqrt(
-      vtv.getAt(0) / (3.0 * static_cast<double>(this->locSystem.size()) - 7.0));
+  double s0_post =
+      sqrt(vtv.getAt(0) /
+           (kCoordinatesPerPoint * static_cast<double>(this->locSystem.size()) -
+            kHelmert7Size));
   OiMat sxx = s0_post * s0_post * qxx;
   // tp.getStatistic()->stdev = s0_post;
   result = true;
@@ -503,7 +523,7 @@ bool Helmert7Param::adjust_7p(TrafoParam& tp) {
  * \return
  */
 OiMat Helmert7Param::fillAMatrix(OiVec x0) {
-  OiMat a(locSystem.size() * 3, 7);
+  OiMat a(locSystem.size() * 3, kHelmert7Size);
   for (int row = 0; std::cmp_less(row, locSystem.size() * 3); row++) {
     if ((row + 1) % 3 == 1) {  // observation of x
       a.setAt(row, 0, 0);
@@ -514,8 +534,8 @@ OiMat Helmert7Param::fillAMatrix(OiVec x0) {
                   locSystem.at(row / 3).getAt(1) * x0.getAt(2) -
                   locSystem.at(row / 3).getAt(2) * x0.getAt(1));
       a.setAt(row, 4, 1);
-      a.setAt(row, 5, 0);
-      a.setAt(row, 6, 0);
+      a.setAt(row, kTy7, 0);
+      a.setAt(row, kTz7, 0);
     } else if ((row + 1) % 3 == 2) {  // observation of y
       a.setAt(row, 0, locSystem.at(row / 3).getAt(2) * x0.getAt(3));
       a.setAt(row, 1, 0);
@@ -525,8 +545,8 @@ OiMat Helmert7Param::fillAMatrix(OiVec x0) {
                   locSystem.at(row / 3).getAt(0) * x0.getAt(2) +
                   locSystem.at(row / 3).getAt(2) * x0.getAt(0));
       a.setAt(row, 4, 0);
-      a.setAt(row, 5, 1);
-      a.setAt(row, 6, 0);
+      a.setAt(row, kTy7, 1);
+      a.setAt(row, kTz7, 0);
     } else if ((row + 1) % 3 == 0) {  // observation of z
       a.setAt(row, 0, -locSystem.at(row / 3).getAt(1) * x0.getAt(3));
       a.setAt(row, 1, locSystem.at(row / 3).getAt(0) * x0.getAt(3));
@@ -536,8 +556,8 @@ OiMat Helmert7Param::fillAMatrix(OiVec x0) {
                   locSystem.at(row / 3).getAt(0) * x0.getAt(1) -
                   locSystem.at(row / 3).getAt(1) * x0.getAt(0));
       a.setAt(row, 4, 0);
-      a.setAt(row, 5, 0);
-      a.setAt(row, 6, 1);
+      a.setAt(row, kTy7, 0);
+      a.setAt(row, kTz7, 1);
     }
   }
   return a;
@@ -584,14 +604,14 @@ OiVec Helmert7Param::fillL0Vector(OiVec x0) {
           x0.getAt(3) * this->locSystem.at(row / 3).getAt(1) -
               x0.getAt(3) * x0.getAt(2) * this->locSystem.at(row / 3).getAt(0) +
               x0.getAt(3) * x0.getAt(0) * this->locSystem.at(row / 3).getAt(2) +
-              x0.getAt(5));
+              x0.getAt(kTy7));
     } else if ((row + 1) % 3 == 0) {  // observation of z
       l0.setAt(
           row,
           x0.getAt(3) * this->locSystem.at(row / 3).getAt(2) +
               x0.getAt(3) * x0.getAt(1) * this->locSystem.at(row / 3).getAt(0) -
               x0.getAt(3) * x0.getAt(0) * this->locSystem.at(row / 3).getAt(1) +
-              x0.getAt(6));
+              x0.getAt(kTz7));
     }
   }
   return l0;
@@ -625,7 +645,9 @@ bool Helmert7Param::calc_6p(TrafoParam& tp) {
 
   Statistic statistic;
   statistic.setStdev(
-      sqrt(sumVV / (3.0 * static_cast<double>(this->locSystem.size()) - 6.0)));
+      sqrt(sumVV /
+           (kCoordinatesPerPoint * static_cast<double>(this->locSystem.size()) -
+            kHelmert6Size)));
   tp.setStatistic(statistic);
 
   // get new rotation and translation between pseudo-loc system and ref system
@@ -633,13 +655,13 @@ bool Helmert7Param::calc_6p(TrafoParam& tp) {
   OiVec tmpTranslation = this->p6_approxTranslation(tmpRotation);
 
   // approximation
-  OiVec x0(6);
+  OiVec x0(kHelmert6Size);
   x0.setAt(0, tmpRotation.getAt(0));
   x0.setAt(1, tmpRotation.getAt(1));
   x0.setAt(2, tmpRotation.getAt(2));
   x0.setAt(3, tmpTranslation.getAt(0));
   x0.setAt(4, tmpTranslation.getAt(1));
-  x0.setAt(5, tmpTranslation.getAt(2));
+  x0.setAt(kTz6, tmpTranslation.getAt(2));
 
   // observations
   OiVec l = this->p6_fillLVector();
@@ -676,8 +698,9 @@ bool Helmert7Param::calc_6p(TrafoParam& tp) {
 
   OiVec v = a * x - l_diff;
   OiVec vtv = v.t() * v;
-  double s0_post = sqrt(vtv.getAt(0) /
-                        (3 * static_cast<double>(this->locSystem.size()) - 6));
+  double s0_post =
+      sqrt(vtv.getAt(0) /
+           (3 * static_cast<double>(this->locSystem.size()) - kHelmert6Size));
   OiMat sxx = s0_post * s0_post * qxx;
 
   // tp.getStatistic()->stdev = s0_post;
@@ -695,7 +718,7 @@ bool Helmert7Param::calc_6p(TrafoParam& tp) {
 
   this->p6_translation.setAt(0, this->p6_translation.getAt(0) + x0.getAt(3));
   this->p6_translation.setAt(1, this->p6_translation.getAt(1) + x0.getAt(4));
-  this->p6_translation.setAt(2, this->p6_translation.getAt(2) + x0.getAt(5));
+  this->p6_translation.setAt(2, this->p6_translation.getAt(2) + x0.getAt(kTz6));
 
   this->p6_rotation.setAt(0, this->p6_rotation.getAt(0) + x0.getAt(0));
   this->p6_rotation.setAt(1, this->p6_rotation.getAt(1) + x0.getAt(1));
@@ -718,7 +741,7 @@ bool Helmert7Param::calc_6p(TrafoParam& tp) {
  * \return
  */
 OiMat Helmert7Param::p6_fillAMatrix(OiVec x0) {
-  OiMat a(locSystem.size() * 3, 6);
+  OiMat a(locSystem.size() * 3, kHelmert6Size);
 
   // loc system is transformed with approx values of translation and rotation,
   // so this should be approxed enough for the pre transformation. That´s why I
@@ -730,21 +753,21 @@ OiMat Helmert7Param::p6_fillAMatrix(OiVec x0) {
       a.setAt(row, 2, locSystem.at(row / 3).getAt(1));
       a.setAt(row, 3, 1.0);
       a.setAt(row, 4, 0.0);
-      a.setAt(row, 5, 0.0);
+      a.setAt(row, kTz6, 0.0);
     } else if ((row + 1) % 3 == 2) {  // y
       a.setAt(row, 0, locSystem.at(row / 3).getAt(2));
       a.setAt(row, 1, 0.0);
       a.setAt(row, 2, -locSystem.at(row / 3).getAt(0));
       a.setAt(row, 3, 0.0);
       a.setAt(row, 4, 1.0);
-      a.setAt(row, 5, 0.0);
+      a.setAt(row, kTz6, 0.0);
     } else if ((row + 1) % 3 == 0) {  // z
       a.setAt(row, 0, -locSystem.at(row / 3).getAt(1));
       a.setAt(row, 1, locSystem.at(row / 3).getAt(0));
       a.setAt(row, 2, 0.0);
       a.setAt(row, 3, 0.0);
       a.setAt(row, 4, 0.0);
-      a.setAt(row, 5, 1.0);
+      a.setAt(row, kTz6, 1.0);
     }
   }
   return a;
@@ -931,7 +954,7 @@ OiVec Helmert7Param::p6_getRotationAngles(OiMat r) {
   rot.setAt(2, qAtan2(-r.getAt(1, 0), r.getAt(0, 0)));  // gamma
   if (std::fabs(std::cos(rot.getAt(1)) * std::cos(rot.getAt(2))) -
           std::fabs(r.getAt(0, 0)) >
-      0.01) {
+      kBetaCheckLimit) {
     rot.setAt(1, PI - rot.getAt(1));
   }
   rot.add(1.0);
