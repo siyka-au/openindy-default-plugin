@@ -42,16 +42,19 @@ set(OI_APP_LOCAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../openindy" CACHE PATH
     "Local OpenIndy app checkout to auto-deploy this plugin into after each build")
 
 # --- plugin metadata ---
-# mirrors the compiler/OS strings OiMetaData::getCompiler()/getOperatingSys()
-# (openindy/controller/oi_meta_data.cpp) report, since PluginCopier::checkPluginMetaData
-# compares them literally against this file's contents at import time
+# "compiler" and "operatingSystem" are informational; the loader checks the
+# toolchain string instead (openindy-core/include/plugin/toolchain.h). The
+# compiler words match OI_TOOLCHAIN_COMPILER there and
+# OiMetaData::getCompiler() in the app: gcc, clang, mingw, msvc.
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(OI_PLUGIN_COMPILER "clang 64bit")
+if(MINGW)
+    set(OI_PLUGIN_COMPILER "mingw")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(OI_PLUGIN_COMPILER "clang")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(OI_PLUGIN_COMPILER "minGW")
+    set(OI_PLUGIN_COMPILER "gcc")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(OI_PLUGIN_COMPILER "MVSC 64bit")
+    set(OI_PLUGIN_COMPILER "msvc")
 else()
     set(OI_PLUGIN_COMPILER "")
 endif()
