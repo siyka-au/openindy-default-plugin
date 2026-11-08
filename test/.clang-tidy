@@ -1,0 +1,11 @@
+# Test sources: same checks as the parent, minus the ones that are noise in tests.
+InheritParentConfig: true
+# avoid-magic-numbers: expected values in assertions are legitimately literal.
+# owning-memory: tests build element graphs with raw `new` handed to the core API's
+#   owning raw-pointer contract (and delete them again), which is what they exercise.
+# macro-usage: the Qt Test comparison helpers (COMPARE_DOUBLE, _OI_VEC) need the
+#   call site's line number / expression text.
+Checks: >
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-macro-usage
