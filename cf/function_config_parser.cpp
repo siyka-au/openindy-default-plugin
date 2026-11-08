@@ -14,7 +14,7 @@ std::string text(const QJsonValue& value) {
 }
 }  // namespace
 
-const char* jsonData =
+constexpr const char* jsonData =
 #include <utility>
 
 #include "cf_config.res"

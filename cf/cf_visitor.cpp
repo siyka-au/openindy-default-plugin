@@ -117,7 +117,7 @@ void CFVisitor::post(QPointer<Node> n, int index, int level) {
     ConfiguredFunction* cf = dynamic_cast<ConfiguredFunction*>(
         static_cast<oi::Function*>(fd.function));  // inner ConfiguredFunction
     if (cf) {
-      cf->global_inputElements = ctx.global_inputElements;
+      cf->setGlobalInputElements(ctx.global_inputElements);
       // maybe later there is a need for "global.global"
       // cf->global_feature = ctx.global_feature;
     }

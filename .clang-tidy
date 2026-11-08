@@ -12,11 +12,8 @@ Checks: >
   modernize-make-unique,
   modernize-make-shared,
   misc-throw-by-value-catch-by-reference,
-  -cppcoreguidelines-avoid-magic-numbers,
-  -cppcoreguidelines-non-private-member-variables-in-classes,
-  -cppcoreguidelines-avoid-non-const-global-variables
-# magic-numbers / non-private-members / non-const-globals: too noisy for the
-#   legacy code; revisit once the rest is clean.
+  -cppcoreguidelines-avoid-magic-numbers
+# magic-numbers: being worked through file by file.
 WarningsAsErrors: ''
 # Only this repo's own sources are reported (not core, Qt or Conan headers); CI checks the
 # repos out under their repo names, so the anchor holds there too.

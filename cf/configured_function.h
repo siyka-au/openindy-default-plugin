@@ -3,6 +3,7 @@
 #include <QObject>
 #include <map>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "configured_function_config.h"
@@ -41,10 +42,15 @@ class ConfiguredFunction : public SpecialFunction {
   std::string prettyPrint();
 
  public:
-  std::map<int, std::vector<InputElement>> global_inputElements;
-  oi::Guarded<FeatureWrapper> global_feature;
+  // inputs inherited from the enclosing configured function
+  void setGlobalInputElements(
+      std::map<int, std::vector<InputElement>> elements) {
+    global_inputElements = std::move(elements);
+  }
 
  private:
+  std::map<int, std::vector<InputElement>> global_inputElements;
+  oi::Guarded<FeatureWrapper> global_feature;
   ConfiguredFunctionConfig config;
   // all necessary funktions: owned here, viewed through `functions`
   std::vector<std::unique_ptr<Function>> ownedFunctions;
