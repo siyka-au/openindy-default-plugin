@@ -58,7 +58,7 @@
 #define DEBUG_TRAFOPARAM(feature)                                              \
   qDebug() << qSetRealNumberPrecision(10)                                      \
            << "r [radian]=" << _OI_VEC(feature.getRotation())                  \
-           << ", r [degree]=" << _OI_VEC((feature.getRotation() * RHO_DEGREE)) \
+           << ", r [degree]=" << _OI_VEC((feature.getRotation() * kRhoDegree)) \
            << ", t=" << _OI_VEC(feature.getTranslation())                      \
            << ", s=" << _OI_VEC(feature.getScale())                            \
            << ", stdev=" << feature.getStatistic().getStdev();

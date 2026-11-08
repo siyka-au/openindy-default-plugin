@@ -382,7 +382,7 @@ void Helmert7Param::fillTrafoParam(OiMat r, vector<OiVec> locC,
   if (std::fabs(std::cos(rot.getAt(1)) * std::cos(rot.getAt(2))) -
           std::fabs(r.getAt(0, 0)) >
       kBetaCheckLimit) {
-    rot.setAt(1, PI - rot.getAt(1));
+    rot.setAt(1, kPi - rot.getAt(1));
   }
   // tp.setRotation(rot.getAt(0), rot.getAt(1), rot.getAt(2));
   // fill transformation matrix
@@ -955,7 +955,7 @@ OiVec Helmert7Param::p6_getRotationAngles(OiMat r) {
   if (std::fabs(std::cos(rot.getAt(1)) * std::cos(rot.getAt(2))) -
           std::fabs(r.getAt(0, 0)) >
       kBetaCheckLimit) {
-    rot.setAt(1, PI - rot.getAt(1));
+    rot.setAt(1, kPi - rot.getAt(1));
   }
   rot.add(1.0);
 

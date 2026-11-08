@@ -44,7 +44,7 @@ set(OI_APP_LOCAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../openindy" CACHE PATH
 # --- plugin metadata ---
 # "compiler" and "operatingSystem" are informational; the loader checks the
 # toolchain string instead (openindy-core/include/plugin/toolchain.h). The
-# compiler words match OI_TOOLCHAIN_COMPILER there and
+# compiler words match oi::kToolchainCompiler there and
 # OiMetaData::getCompiler() in the app: gcc, clang, mingw, msvc.
 
 if(MINGW)

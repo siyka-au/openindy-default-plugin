@@ -760,7 +760,7 @@ OiVec ExtendedTemperatureCompensation::getRotationAngles(OiMat r) {
   if (std::fabs(std::cos(rot.getAt(1)) * std::cos(rot.getAt(2))) -
           std::fabs(r.getAt(0, 0)) >
       0.01) {
-    rot.setAt(1, PI - rot.getAt(1));
+    rot.setAt(1, kPi - rot.getAt(1));
   }
   rot.add(1.0);
 

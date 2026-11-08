@@ -220,7 +220,7 @@ bool RectifyToVector::setUpResult(Geometry& geometry) {
   angle = std::abs(std::acos(angle));
 
   // invert the normal vector if the angle is greater than 90°
-  if (angle > PI * kHalf) {
+  if (angle > kPi * kHalf) {
     r = -1.0 * r;
   }
 
