@@ -1,5 +1,5 @@
-#ifndef P_BESTFITSPHERE_H
-#define P_BESTFITSPHERE_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_SPHERE_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_SPHERE_H_
 #include <QObject>
 #include <QPointer>
 #include <string>
@@ -40,4 +40,4 @@ class BestFitSphere : public FitFunction, public Producer<Sphere> {
            const std::vector<oi::Guarded<Point> >& allUsablePoints);
 };
 
-#endif  // P_BESTFITSPHERE_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_SPHERE_H_

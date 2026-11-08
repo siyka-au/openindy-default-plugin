@@ -1,5 +1,5 @@
-#ifndef P_FACTORY_H
-#define P_FACTORY_H
+#ifndef OI_DEFAULT_PLUGIN_P_FACTORY_H_
+#define OI_DEFAULT_PLUGIN_P_FACTORY_H_
 #include <memory>
 #include <string>
 #include <vector>
@@ -86,4 +86,4 @@ class OiTemplatePlugin : public Plugin {
       const std::string& name);
 };
 
-#endif  // P_FACTORY_H
+#endif  // OI_DEFAULT_PLUGIN_P_FACTORY_H_

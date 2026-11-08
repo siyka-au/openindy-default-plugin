@@ -1,5 +1,5 @@
-#ifndef CONFIGUREDFUNCTION_H
-#define CONFIGUREDFUNCTION_H
+#ifndef OI_DEFAULT_PLUGIN_CF_CONFIGURED_FUNCTION_H_
+#define OI_DEFAULT_PLUGIN_CF_CONFIGURED_FUNCTION_H_
 #include <QObject>
 #include <map>
 #include <memory>
@@ -51,4 +51,4 @@ class ConfiguredFunction : public SpecialFunction {
   std::vector<oi::Guarded<Function>> functions;
 };
 
-#endif  // CONFIGUREDFUNCTION_H
+#endif  // OI_DEFAULT_PLUGIN_CF_CONFIGURED_FUNCTION_H_

@@ -1,5 +1,5 @@
-#ifndef P_AVERAGEFROMPOINTS_H
-#define P_AVERAGEFROMPOINTS_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_AVERAGE_FROM_POINTS_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_AVERAGE_FROM_POINTS_H_
 
 #include <QObject>
 #include <QPointer>
@@ -55,4 +55,4 @@ class AverageFromPoints : public ConstructFunction, public Producer<Point> {
   bool setUpResult(Point& point);
 };
 
-#endif  // P_AVERAGEFROMPOINTS_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_AVERAGE_FROM_POINTS_H_

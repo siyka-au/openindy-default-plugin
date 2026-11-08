@@ -1,5 +1,5 @@
-#ifndef P_LINEFROMPLANENORMAL_H
-#define P_LINEFROMPLANENORMAL_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_LINE_FROM_PLANE_NORMAL_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_LINE_FROM_PLANE_NORMAL_H_
 
 #include <QObject>
 #include <QPointer>
@@ -47,4 +47,4 @@ class LineFromPlaneNormal : public ConstructFunction, public Producer<Line> {
   bool setUpResult(Line& line);
 };
 
-#endif  // P_LINEFROMPLANENORMAL_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_LINE_FROM_PLANE_NORMAL_H_

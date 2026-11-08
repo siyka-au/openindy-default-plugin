@@ -1,5 +1,5 @@
-#ifndef P_BESTFITPLANE_H
-#define P_BESTFITPLANE_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_PLANE_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_PLANE_H_
 
 #include <QObject>
 #include <QPointer>
@@ -38,4 +38,4 @@ class BestFitPlane : public FitFunction,
   bool setUpResult(Plane& plane);
 };
 
-#endif  // P_BESTFITPLANE_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_PLANE_H_

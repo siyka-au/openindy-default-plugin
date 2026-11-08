@@ -1,5 +1,5 @@
-#ifndef P_PLANEFROMPLANE_H
-#define P_PLANEFROMPLANE_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_PLANE_FROM_PLANE_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_PLANE_FROM_PLANE_H_
 
 #include <QObject>
 #include <QPointer>
@@ -35,4 +35,4 @@ class PlaneFromPlane : public ConstructFunction, public Producer<Plane> {
   bool setUpResult(Plane& plane);
 };
 
-#endif  // P_PLANEFROMPLANE_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_PLANE_FROM_PLANE_H_

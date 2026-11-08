@@ -1,5 +1,5 @@
-#ifndef DISTANCEBETWEENTWOPOINTS_H
-#define DISTANCEBETWEENTWOPOINTS_H
+#ifndef OI_DEFAULT_PLUGIN_CF_DISTANCE_BETWEEN_TWO_POINTS_H_
+#define OI_DEFAULT_PLUGIN_CF_DISTANCE_BETWEEN_TWO_POINTS_H_
 
 #include "construct_function.h"
 
@@ -13,4 +13,4 @@ class DistanceBetweenTwoPoints : public ConstructFunction,
   std::expected<ScalarEntityDistance, std::string> exec() override;
 };
 
-#endif  // DISTANCEBETWEENTWOPOINTS_H
+#endif  // OI_DEFAULT_PLUGIN_CF_DISTANCE_BETWEEN_TWO_POINTS_H_

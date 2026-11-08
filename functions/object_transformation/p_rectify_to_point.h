@@ -1,5 +1,5 @@
-#ifndef P_RECTIFYTOPOINT_H
-#define P_RECTIFYTOPOINT_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_RECTIFY_TO_POINT_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_RECTIFY_TO_POINT_H_
 
 #include <QObject>
 #include <QPointer>
@@ -42,4 +42,4 @@ class RectifyToPoint : public ObjectTransformation,
   bool setUpResult(Geometry& geometry);
 };
 
-#endif  // P_RECTIFYTOPOINT_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_RECTIFY_TO_POINT_H_

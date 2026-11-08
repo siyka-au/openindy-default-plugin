@@ -1,5 +1,5 @@
-#ifndef P_CHANGERADIUS_H
-#define P_CHANGERADIUS_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_CHANGE_RADIUS_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_CHANGE_RADIUS_H_
 
 #include <QObject>
 #include <QPointer>
@@ -42,4 +42,4 @@ class ChangeRadius : public ObjectTransformation,
   bool setUpResult(Cylinder& cylinder);
 };
 
-#endif  // P_CHANGERADIUS_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_CHANGE_RADIUS_H_

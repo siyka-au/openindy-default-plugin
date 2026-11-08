@@ -1,5 +1,5 @@
-#ifndef P_BESTFTICIRCLEINPLANE_H
-#define P_BESTFTICIRCLEINPLANE_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_CIRCLE_IN_PLANE_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_CIRCLE_IN_PLANE_H_
 
 #include <QObject>
 #include <QPointer>
@@ -39,4 +39,4 @@ class BestFitCircleInPlane : public FitFunction,
   bool setUpResult(Circle& circle);
 };
 
-#endif  // P_BESTFTICIRCLEINPLANE_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_CIRCLE_IN_PLANE_H_

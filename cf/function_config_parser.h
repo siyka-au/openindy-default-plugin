@@ -1,5 +1,5 @@
-#ifndef FUNCTIONCONFIGPARSER_H
-#define FUNCTIONCONFIGPARSER_H
+#ifndef OI_DEFAULT_PLUGIN_CF_FUNCTION_CONFIG_PARSER_H_
+#define OI_DEFAULT_PLUGIN_CF_FUNCTION_CONFIG_PARSER_H_
 #include <QtCore>
 #include <map>
 #include <string>
@@ -42,4 +42,4 @@ class FunctionConfigParser {
   std::vector<ConfiguredFunctionConfig> readConfigFromJson(QJsonObject json);
 };
 
-#endif  // FUNCTIONCONFIGPARSER_H
+#endif  // OI_DEFAULT_PLUGIN_CF_FUNCTION_CONFIG_PARSER_H_

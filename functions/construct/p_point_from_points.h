@@ -1,5 +1,5 @@
-#ifndef P_POINTFROMPOINTS_H
-#define P_POINTFROMPOINTS_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_POINT_FROM_POINTS_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_POINT_FROM_POINTS_H_
 
 #include <QObject>
 #include <QPointer>
@@ -37,4 +37,4 @@ class PointFromPoints : public ConstructFunction, public Producer<Point> {
   bool setUpResult(Point& point);
 };
 
-#endif  // P_POINTFROMPOINTS_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_POINT_FROM_POINTS_H_

@@ -1,5 +1,5 @@
-#ifndef P_BESTFITCIRCLE_H
-#define P_BESTFITCIRCLE_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_CIRCLE_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_CIRCLE_H_
 
 #include <span>
 #include <vector>
@@ -36,4 +36,4 @@ class BestFitCircle : public FitFunction, public Producer<Circle> {
                              double cz);
 };
 
-#endif  // P_BESTFITCIRCLE_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_CIRCLE_H_

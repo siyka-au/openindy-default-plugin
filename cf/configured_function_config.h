@@ -1,5 +1,5 @@
-#ifndef CONFIGUREDFUNCTIONCONFIG_H
-#define CONFIGUREDFUNCTIONCONFIG_H
+#ifndef OI_DEFAULT_PLUGIN_CF_CONFIGURED_FUNCTION_CONFIG_H_
+#define OI_DEFAULT_PLUGIN_CF_CONFIGURED_FUNCTION_CONFIG_H_
 #include <QtCore>
 #include <map>
 #include <vector>
@@ -50,4 +50,4 @@ class ConfiguredFunctionConfig {
   QPointer<Node> parameter;
 };
 
-#endif  // CONFIGUREDFUNCTIONCONFIG_H
+#endif  // OI_DEFAULT_PLUGIN_CF_CONFIGURED_FUNCTION_CONFIG_H_

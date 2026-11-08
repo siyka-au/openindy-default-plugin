@@ -1,5 +1,5 @@
-#ifndef P_OIEXCHANGEPTS_H
-#define P_OIEXCHANGEPTS_H
+#ifndef OI_DEFAULT_PLUGIN_EXCHANGE_P_OI_EXCHANGE_PTS_H_
+#define OI_DEFAULT_PLUGIN_EXCHANGE_P_OI_EXCHANGE_PTS_H_
 
 #include <QtCore>
 
@@ -17,4 +17,4 @@ class OiExchangePts : public OiExchangeDefinedFormat {
   std::vector<std::string> getSupportedFileExtensions() const;
 };
 
-#endif  // P_OIEXCHANGEPTS_H
+#endif  // OI_DEFAULT_PLUGIN_EXCHANGE_P_OI_EXCHANGE_PTS_H_

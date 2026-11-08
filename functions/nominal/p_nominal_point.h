@@ -1,5 +1,5 @@
-#ifndef P_NOMINALPOINT_H
-#define P_NOMINALPOINT_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_NOMINAL_P_NOMINAL_POINT_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_NOMINAL_P_NOMINAL_POINT_H_
 
 #include <QObject>
 #include <QPointer>
@@ -38,4 +38,4 @@ class NominalPoint : public ConstructFunction, public Producer<Point> {
   std::expected<Point, std::string> exec() override;
 };
 
-#endif  // P_NOMINALPOINT_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_NOMINAL_P_NOMINAL_POINT_H_

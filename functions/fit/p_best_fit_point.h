@@ -1,5 +1,5 @@
-#ifndef P_BESTFITPOINT_H
-#define P_BESTFITPOINT_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_POINT_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_POINT_H_
 
 #include <QObject>
 #include <QPointer>
@@ -47,4 +47,4 @@ class BestFitPoint : public FitFunction, public Producer<Point> {
   const std::string value_yes;
 };
 
-#endif  // P_BESTFITPOINT_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_POINT_H_

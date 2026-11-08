@@ -1,3 +1,6 @@
+#ifndef OI_DEFAULT_PLUGIN_TEST_INCLUDE_TEST_DEFINES_H_
+#define OI_DEFAULT_PLUGIN_TEST_INCLUDE_TEST_DEFINES_H_
+
 #include <format>
 // compare double with threshold
 #define COMPARE_DOUBLE(actual, expected, threshold) \
@@ -59,3 +62,5 @@
            << ", t=" << _OI_VEC(feature.getTranslation())                      \
            << ", s=" << _OI_VEC(feature.getScale())                            \
            << ", stdev=" << feature.getStatistic().getStdev();
+
+#endif  // OI_DEFAULT_PLUGIN_TEST_INCLUDE_TEST_DEFINES_H_

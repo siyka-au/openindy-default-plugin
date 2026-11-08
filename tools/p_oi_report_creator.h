@@ -1,5 +1,5 @@
-#ifndef P_OIREPORTCREATOR_H
-#define P_OIREPORTCREATOR_H
+#ifndef OI_DEFAULT_PLUGIN_TOOLS_P_OI_REPORT_CREATOR_H_
+#define OI_DEFAULT_PLUGIN_TOOLS_P_OI_REPORT_CREATOR_H_
 
 #include "oi_request_response.h"
 #include "pi_oitool.h"
@@ -13,4 +13,4 @@ class OiReportCreator : public OiTool {
   void watchWindowKeyPressed(Qt::Key);
 };
 
-#endif  // P_OIREPORTCREATOR_H
+#endif  // OI_DEFAULT_PLUGIN_TOOLS_P_OI_REPORT_CREATOR_H_

@@ -1,5 +1,5 @@
-#ifndef P_BESTFITCYLINDER_H
-#define P_BESTFITCYLINDER_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_CYLINDER_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_CYLINDER_H_
 
 #include <QObject>
 #include <QPointer>
@@ -47,4 +47,4 @@ class BestFitCylinderAppxDummyPoint : public BestFitCylinder {
   void init() override;
 };
 
-#endif  // P_BESTFITCYLINDER_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_CYLINDER_H_

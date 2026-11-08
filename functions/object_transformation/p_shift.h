@@ -1,5 +1,5 @@
-#ifndef P_SHIFTPLANE_H
-#define P_SHIFTPLANE_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_SHIFT_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_SHIFT_H_
 #include <string>
 
 #include "object_transformation.h"
@@ -34,4 +34,4 @@ class Shift : public ObjectTransformation,
   bool setUpResult(Circle& circle);
 };
 
-#endif  // P_SHIFTPLANE_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_SHIFT_H_

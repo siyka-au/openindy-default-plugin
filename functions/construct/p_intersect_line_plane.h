@@ -1,5 +1,5 @@
-#ifndef P_INTERSECTLINEPLANE_H
-#define P_INTERSECTLINEPLANE_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_INTERSECT_LINE_PLANE_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_INTERSECT_LINE_PLANE_H_
 
 #include <QObject>
 #include <QPointer>
@@ -37,4 +37,4 @@ class IntersectLinePlane : public ConstructFunction, public Producer<Point> {
                       const oi::Guarded<Plane>& plane);
 };
 
-#endif  // P_INTERSECTLINEPLANE_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_INTERSECT_LINE_PLANE_H_

@@ -1,5 +1,5 @@
-#ifndef P_REGISTER_H
-#define P_REGISTER_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_REGISTER_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_REGISTER_H_
 
 #include <QObject>
 #include <QPointer>
@@ -43,4 +43,4 @@ class Register : public ObjectTransformation,
   bool setUpResult(Circle& circle);
 };
 
-#endif  // P_REGISTER_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_OBJECT_TRANSFORMATION_P_REGISTER_H_

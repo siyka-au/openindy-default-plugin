@@ -1,5 +1,5 @@
-#ifndef P_PSEUDOTRACKER_H
-#define P_PSEUDOTRACKER_H
+#ifndef OI_DEFAULT_PLUGIN_SENSORS_LASER_TRACKER_PSEUDO_TRACKER_P_PSEUDO_TRACKER_H_
+#define OI_DEFAULT_PLUGIN_SENSORS_LASER_TRACKER_PSEUDO_TRACKER_P_PSEUDO_TRACKER_H_
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
@@ -124,4 +124,4 @@ class PseudoTracker : public LaserTracker {
   int measureTime{};  // [ms]
 };
 
-#endif  // P_PSEUDOTRACKER_H
+#endif  // OI_DEFAULT_PLUGIN_SENSORS_LASER_TRACKER_PSEUDO_TRACKER_P_PSEUDO_TRACKER_H_

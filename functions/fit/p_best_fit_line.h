@@ -1,5 +1,5 @@
-#ifndef P_BESTFTILINE_H
-#define P_BESTFTILINE_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_LINE_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_LINE_H_
 
 #include <QObject>
 #include <QPointer>
@@ -39,4 +39,4 @@ class BestFitLine : public FitFunction,
   bool setUpResult(Line& line);
 };
 
-#endif  // P_BESTFTILINE_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_FIT_P_BEST_FIT_LINE_H_

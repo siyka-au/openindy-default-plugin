@@ -1,5 +1,5 @@
-#ifndef CFVISITOR_H
-#define CFVISITOR_H
+#ifndef OI_DEFAULT_PLUGIN_CF_CF_VISITOR_H_
+#define OI_DEFAULT_PLUGIN_CF_CF_VISITOR_H_
 
 #include <QtCore>
 
@@ -26,4 +26,4 @@ class CFVisitor : public NodeVisitor {
   QStack<CFFunctionData> data;
 };
 
-#endif  // CFVISITOR_H
+#endif  // OI_DEFAULT_PLUGIN_CF_CF_VISITOR_H_

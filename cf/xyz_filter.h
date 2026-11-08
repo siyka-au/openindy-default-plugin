@@ -1,5 +1,5 @@
-#ifndef XYZFILTER_H
-#define XYZFILTER_H
+#ifndef OI_DEFAULT_PLUGIN_CF_XYZ_FILTER_H_
+#define OI_DEFAULT_PLUGIN_CF_XYZ_FILTER_H_
 
 #include <QObject>
 
@@ -26,4 +26,4 @@ class XYZFilter : public ConstructFunction, public Transform<Point> {
   bool removeZ;
 };
 
-#endif  // XYZFILTER_H
+#endif  // OI_DEFAULT_PLUGIN_CF_XYZ_FILTER_H_

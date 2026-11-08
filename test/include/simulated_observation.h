@@ -1,5 +1,5 @@
-#ifndef SIMULATEDOBSERVATION_H
-#define SIMULATEDOBSERVATION_H
+#ifndef OI_DEFAULT_PLUGIN_TEST_INCLUDE_SIMULATED_OBSERVATION_H_
+#define OI_DEFAULT_PLUGIN_TEST_INCLUDE_SIMULATED_OBSERVATION_H_
 
 #include <cmath>
 
@@ -102,4 +102,4 @@ inline std::unique_ptr<Observation> simulateObservation(
   return observation;
 }
 
-#endif  // SIMULATEDOBSERVATION_H
+#endif  // OI_DEFAULT_PLUGIN_TEST_INCLUDE_SIMULATED_OBSERVATION_H_

@@ -1,5 +1,5 @@
-#ifndef CFCPARAMETER_H
-#define CFCPARAMETER_H
+#ifndef OI_DEFAULT_PLUGIN_CF_CFC_PARAMETER_H_
+#define OI_DEFAULT_PLUGIN_CF_CFC_PARAMETER_H_
 #include <QtCore>
 #include <vector>
 
@@ -28,4 +28,4 @@ class CFCParameter : public Node {
   std::vector<QPointer<Node> > subnodes;
 };
 
-#endif  // CFCPARAMETER_H
+#endif  // OI_DEFAULT_PLUGIN_CF_CFC_PARAMETER_H_

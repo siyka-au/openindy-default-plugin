@@ -1,5 +1,5 @@
-#ifndef TREEUTIL_H
-#define TREEUTIL_H
+#ifndef OI_DEFAULT_PLUGIN_TREE_UTIL_H_
+#define OI_DEFAULT_PLUGIN_TREE_UTIL_H_
 #include <QDebug>
 #include <QObject>
 #include <QPointer>
@@ -80,4 +80,4 @@ class TreeUtil {
   }
 };
 
-#endif  // TREEUTIL_H
+#endif  // OI_DEFAULT_PLUGIN_TREE_UTIL_H_

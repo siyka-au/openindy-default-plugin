@@ -1,5 +1,5 @@
-#ifndef CFCONTEXT_H
-#define CFCONTEXT_H
+#ifndef OI_DEFAULT_PLUGIN_CF_CF_CONTEXT_H_
+#define OI_DEFAULT_PLUGIN_CF_CF_CONTEXT_H_
 #include <QPointer>
 #include <map>
 #include <memory>
@@ -55,4 +55,4 @@ class CFContext {
   std::vector<std::unique_ptr<Feature>> generatedFeatures;
 };
 
-#endif  // CFCONTEXT_H
+#endif  // OI_DEFAULT_PLUGIN_CF_CF_CONTEXT_H_

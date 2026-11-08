@@ -1,5 +1,5 @@
-#ifndef P_INTERSECTLINELINE_H
-#define P_INTERSECTLINELINE_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_INTERSECT_LINE_LINE_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_INTERSECT_LINE_LINE_H_
 
 #include <QObject>
 #include <QPointer>
@@ -40,4 +40,4 @@ class IntersectLineLine : public ConstructFunction, public Producer<Point> {
   IntersectionTypes getIntersectionType();
 };
 
-#endif  // P_INTERSECTLINELINE_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_INTERSECT_LINE_LINE_H_

@@ -1,5 +1,5 @@
-#ifndef SIMPLEPOLARMEASUREMENT_H
-#define SIMPLEPOLARMEASUREMENT_H
+#ifndef OI_DEFAULT_PLUGIN_SIMULATIONS_SIMPLE_POLAR_MEASUREMENT_SIMPLE_POLAR_MEASUREMENT_H_
+#define OI_DEFAULT_PLUGIN_SIMULATIONS_SIMPLE_POLAR_MEASUREMENT_SIMPLE_POLAR_MEASUREMENT_H_
 #include <random>
 #include <vector>
 
@@ -73,4 +73,4 @@ class SimplePolarMeasurement : public SimulationModel {
                                     double humidity, double wavelength);
 };
 
-#endif  // SIMPLEPOLARMEASUREMENT_H
+#endif  // OI_DEFAULT_PLUGIN_SIMULATIONS_SIMPLE_POLAR_MEASUREMENT_SIMPLE_POLAR_MEASUREMENT_H_

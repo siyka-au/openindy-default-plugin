@@ -1,5 +1,5 @@
-#ifndef P_POINTBETWEENTWOPOINTS_H
-#define P_POINTBETWEENTWOPOINTS_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_POINT_BETWEEN_TWO_POINTS_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_POINT_BETWEEN_TWO_POINTS_H_
 
 #include <QObject>
 #include <QPointer>
@@ -35,4 +35,4 @@ class PointBetweenTwoPoints : public ConstructFunction, public Producer<Point> {
   bool setUpResult(Point& point);
 };
 
-#endif  // P_POINTBETWEENTWOPOINTS_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_POINT_BETWEEN_TWO_POINTS_H_

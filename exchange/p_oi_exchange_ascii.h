@@ -1,5 +1,5 @@
-#ifndef P_OIEXCHANGEASCII_H
-#define P_OIEXCHANGEASCII_H
+#ifndef OI_DEFAULT_PLUGIN_EXCHANGE_P_OI_EXCHANGE_ASCII_H_
+#define OI_DEFAULT_PLUGIN_EXCHANGE_P_OI_EXCHANGE_ASCII_H_
 #include <exception>
 #include <map>
 #include <vector>
@@ -46,4 +46,4 @@ class OiExchangeAscii : public ExchangeSimpleAscii {
       const std::string& line) const;
 };
 
-#endif  // P_OIEXCHANGEASCII_H
+#endif  // OI_DEFAULT_PLUGIN_EXCHANGE_P_OI_EXCHANGE_ASCII_H_

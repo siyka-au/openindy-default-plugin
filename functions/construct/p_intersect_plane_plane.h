@@ -1,5 +1,5 @@
-#ifndef P_INTERSECTPLANEPLANE_H
-#define P_INTERSECTPLANEPLANE_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_INTERSECT_PLANE_PLANE_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_INTERSECT_PLANE_PLANE_H_
 
 #include <QObject>
 #include <QPointer>
@@ -39,4 +39,4 @@ class IntersectPlanePlane : public ConstructFunction, public Producer<Line> {
                        const OiVec& n3, const OiVec& d);
 };
 
-#endif  // P_INTERSECTPLANEPLANE_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_CONSTRUCT_P_INTERSECT_PLANE_PLANE_H_

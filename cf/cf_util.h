@@ -1,5 +1,5 @@
-#ifndef CFUTIL_H
-#define CFUTIL_H
+#ifndef OI_DEFAULT_PLUGIN_CF_CF_UTIL_H_
+#define OI_DEFAULT_PLUGIN_CF_CF_UTIL_H_
 
 #include <string>
 
@@ -14,4 +14,4 @@ class CFUtil {
   static FeatureTypes featureTypesForName(std::string name);
 };
 
-#endif
+#endif  // OI_DEFAULT_PLUGIN_CF_CF_UTIL_H_

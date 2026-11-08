@@ -1,5 +1,5 @@
-#ifndef P_HELMERT7PARAM_H
-#define P_HELMERT7PARAM_H
+#ifndef OI_DEFAULT_PLUGIN_FUNCTIONS_SYSTEM_TRANSFORMATION_P_HELMERT7_PARAM_H_
+#define OI_DEFAULT_PLUGIN_FUNCTIONS_SYSTEM_TRANSFORMATION_P_HELMERT7_PARAM_H_
 
 #include <QDateTime>
 #include <QDebug>
@@ -89,4 +89,4 @@ class Helmert7Param : public SystemTransformation, public Producer<TrafoParam> {
   OiMat p6_getScaleMatrix(OiVec s);
 };
 
-#endif  // P_HELMERT7PARAM_H
+#endif  // OI_DEFAULT_PLUGIN_FUNCTIONS_SYSTEM_TRANSFORMATION_P_HELMERT7_PARAM_H_

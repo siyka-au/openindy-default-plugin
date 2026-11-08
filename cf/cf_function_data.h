@@ -1,5 +1,5 @@
-#ifndef CFFUNCTIONDATA_H
-#define CFFUNCTIONDATA_H
+#ifndef OI_DEFAULT_PLUGIN_CF_CF_FUNCTION_DATA_H_
+#define OI_DEFAULT_PLUGIN_CF_CF_FUNCTION_DATA_H_
 
 #include <string>
 
@@ -21,4 +21,4 @@ class CFFunctionData {
   oi::Guarded<FeatureWrapper> feature;
 };
 
-#endif  // CFFUNCTIONDATA_H
+#endif  // OI_DEFAULT_PLUGIN_CF_CF_FUNCTION_DATA_H_
