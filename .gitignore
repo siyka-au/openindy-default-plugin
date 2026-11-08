@@ -29,7 +29,7 @@ Makefile
 *.Debug
 *.Release
 build/*_resource.rc
-metaInfo.json
+meta_info.json
 .qtcreator/
 
 

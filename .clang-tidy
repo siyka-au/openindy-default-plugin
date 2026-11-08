@@ -22,7 +22,7 @@ Checks: >
   -cppcoreguidelines-avoid-non-const-global-variables
 # owning-memory: disabled for now. The plugin interface hands out raw owning pointers
 #   (factories, Function/Sensor creation); enable once core's unique_ptr migration lands.
-# macro-to-enum: OI_PLUGIN_ABI_VERSION must stay a #define (CMake parses it out of pluginabi.h).
+# macro-to-enum: OI_PLUGIN_ABI_VERSION must stay a #define (CMake parses it out of plugin_abi.h).
 # macro-usage: Q_OBJECT (plugin tests, Qt used internally) and OI_DECLARE_PLUGIN* are unavoidable.
 # magic-numbers / non-private-members / non-const-globals: too noisy for the
 #   legacy code; revisit once the rest is clean.

@@ -29,13 +29,13 @@ else()
 endif()
 FetchContent_MakeAvailable(OpenIndyCore)
 
-# OpenIndyCore publishes this from include/plugin/pluginabi.h. A core too old
+# OpenIndyCore publishes this from include/plugin/plugin_abi.h. A core too old
 # to define it cannot be checked for ABI compatibility at all, so fail loudly
 # here rather than shipping a plugin whose metadata claims nothing.
 if(NOT DEFINED OI_PLUGIN_ABI_VERSION OR OI_PLUGIN_ABI_VERSION STREQUAL "")
     message(FATAL_ERROR
         "OpenIndyCore did not publish OI_PLUGIN_ABI_VERSION. "
-        "Update openindy-core to a revision that declares it in include/plugin/pluginabi.h.")
+        "Update openindy-core to a revision that declares it in include/plugin/plugin_abi.h.")
 endif()
 
 set(OI_APP_LOCAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../openindy" CACHE PATH
@@ -43,7 +43,7 @@ set(OI_APP_LOCAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../openindy" CACHE PATH
 
 # --- plugin metadata ---
 # mirrors the compiler/OS strings OiMetaData::getCompiler()/getOperatingSys()
-# (openindy/controller/oimetadata.cpp) report, since PluginCopier::checkPluginMetaData
+# (openindy/controller/oi_meta_data.cpp) report, since PluginCopier::checkPluginMetaData
 # compares them literally against this file's contents at import time
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -70,105 +70,105 @@ set(COMPILER "${OI_PLUGIN_COMPILER}")
 set(OS "${OI_PLUGIN_OS}")
 
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/metaInfo.json.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/metaInfo.json"
+    "${CMAKE_CURRENT_SOURCE_DIR}/meta_info.json.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/meta_info.json"
     @ONLY
 )
 
 # The metadata is compiled into the library as a string and handed out by the
 # oi_plugin_metadata_json() entry point (OI_DECLARE_PLUGIN_WITH_METADATA), so
 # the host can read it once the library is loaded.
-file(READ "${CMAKE_CURRENT_BINARY_DIR}/metaInfo.json" OI_PLUGIN_METADATA_JSON)
+file(READ "${CMAKE_CURRENT_BINARY_DIR}/meta_info.json" OI_PLUGIN_METADATA_JSON)
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/metaInfo.h.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/metaInfo.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/meta_info.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/meta_info.h"
     @ONLY
 )
 
 # --- plugin library ---
 
 add_library(OpenIndyDefaultPlugin SHARED
-    functions/nominal/p_nominalpoint.cpp
-    functions/construct/p_intersectlineline.cpp
-    functions/construct/p_intersectlineplane.cpp
-    functions/construct/p_intersectplaneplane.cpp
-    functions/construct/p_planefromplane.cpp
-    functions/construct/p_linefromplanenormal.cpp
-    functions/construct/p_pointfromplaneorigin.cpp
-    functions/construct/p_averagefrompoints.cpp
-    functions/construct/p_pointbetweentwopoints.cpp
-    functions/construct/p_pointfrompoints.cpp
-    functions/fit/p_bestfitcircle.cpp
-    functions/fit/p_bestfitline.cpp
-    functions/fit/p_bestfitplane.cpp
-    functions/fit/p_bestfitpoint.cpp
-    functions/fit/p_bestfitcylinder.cpp
-    functions/fit/p_bestfitcircleinplane.cpp
-    functions/fit/p_bestfitsphere.cpp
-    functions/objectTransformation/p_changeradius.cpp
-    functions/objectTransformation/p_register.cpp
-    functions/objectTransformation/p_translatebyvalue.cpp
-    functions/objectTransformation/p_rectifytopoint.cpp
-    functions/objectTransformation/p_rectifytovector.cpp
-    functions/objectTransformation/p_shift.cpp
-    functions/systemTransformation/p_helmert7Param.cpp
-    functions/systemTransformation/p_helmert6param.cpp
-    exchange/p_oiexchangeascii.cpp
-    sensors/common/trackererrormodel.cpp
-    sensors/laserTracker/pseudoTracker/p_pseudotracker.cpp
-    simulations/simplePolarMeasurement/simplepolarmeasurement.cpp
-    cf/cfutil.cpp
-    cf/cffunctiondata.cpp
-    cf/configuredfunction.cpp
-    cf/functionconfigparser.cpp
-    cf/distancebetweentwopoints.cpp
-    cf/configuredfunctionconfig.cpp
-    cf/cfcontext.cpp
-    cf/cfcparameter.cpp
-    cf/xyzfilter.cpp
-    cf/cfvisitor.cpp
+    functions/nominal/p_nominal_point.cpp
+    functions/construct/p_intersect_line_line.cpp
+    functions/construct/p_intersect_line_plane.cpp
+    functions/construct/p_intersect_plane_plane.cpp
+    functions/construct/p_plane_from_plane.cpp
+    functions/construct/p_line_from_plane_normal.cpp
+    functions/construct/p_point_from_plane_origin.cpp
+    functions/construct/p_average_from_points.cpp
+    functions/construct/p_point_between_two_points.cpp
+    functions/construct/p_point_from_points.cpp
+    functions/fit/p_best_fit_circle.cpp
+    functions/fit/p_best_fit_line.cpp
+    functions/fit/p_best_fit_plane.cpp
+    functions/fit/p_best_fit_point.cpp
+    functions/fit/p_best_fit_cylinder.cpp
+    functions/fit/p_best_fit_circle_in_plane.cpp
+    functions/fit/p_best_fit_sphere.cpp
+    functions/object_transformation/p_change_radius.cpp
+    functions/object_transformation/p_register.cpp
+    functions/object_transformation/p_translate_by_value.cpp
+    functions/object_transformation/p_rectify_to_point.cpp
+    functions/object_transformation/p_rectify_to_vector.cpp
+    functions/object_transformation/p_shift.cpp
+    functions/system_transformation/p_helmert7_param.cpp
+    functions/system_transformation/p_helmert6_param.cpp
+    exchange/p_oi_exchange_ascii.cpp
+    sensors/common/tracker_error_model.cpp
+    sensors/laser_tracker/pseudo_tracker/p_pseudo_tracker.cpp
+    simulations/simple_polar_measurement/simple_polar_measurement.cpp
+    cf/cf_util.cpp
+    cf/cf_function_data.cpp
+    cf/configured_function.cpp
+    cf/function_config_parser.cpp
+    cf/distance_between_two_points.cpp
+    cf/configured_function_config.cpp
+    cf/cf_context.cpp
+    cf/cfc_parameter.cpp
+    cf/xyz_filter.cpp
+    cf/cf_visitor.cpp
     p_factory.cpp
 
-    functions/nominal/p_nominalpoint.h
-    functions/construct/p_intersectlineline.h
-    functions/construct/p_intersectlineplane.h
-    functions/construct/p_intersectplaneplane.h
-    functions/construct/p_planefromplane.h
-    functions/construct/p_linefromplanenormal.h
-    functions/construct/p_pointfromplaneorigin.h
-    functions/construct/p_averagefrompoints.h
-    functions/construct/p_pointbetweentwopoints.h
-    functions/construct/p_pointfrompoints.h
-    functions/fit/p_bestfitcircle.h
-    functions/fit/p_bestfitline.h
-    functions/fit/p_bestfitplane.h
-    functions/fit/p_bestfitpoint.h
-    functions/fit/p_bestfitcylinder.h
-    functions/fit/p_bestfitcircleinplane.h
-    functions/fit/p_bestfitsphere.h
-    functions/objectTransformation/p_changeradius.h
-    functions/objectTransformation/p_register.h
-    functions/objectTransformation/p_translatebyvalue.h
-    functions/objectTransformation/p_rectifytopoint.h
-    functions/objectTransformation/p_rectifytovector.h
-    functions/objectTransformation/p_shift.h
-    functions/systemTransformation/p_helmert7Param.h
-    functions/systemTransformation/p_helmert6param.h
-    exchange/p_oiexchangeascii.h
-    sensors/laserTracker/pseudoTracker/p_pseudotracker.h
-    simulations/simplePolarMeasurement/simplepolarmeasurement.h
-    cf/cfutil.h
-    cf/cffunctiondata.h
-    cf/configuredfunction.h
-    cf/functionconfigparser.h
-    cf/distancebetweentwopoints.h
-    cf/configuredfunctionconfig.h
-    cf/cfcontext.h
-    cf/cfcparameter.h
-    cf/xyzfilter.h
-    cf/cfvisitor.h
+    functions/nominal/p_nominal_point.h
+    functions/construct/p_intersect_line_line.h
+    functions/construct/p_intersect_line_plane.h
+    functions/construct/p_intersect_plane_plane.h
+    functions/construct/p_plane_from_plane.h
+    functions/construct/p_line_from_plane_normal.h
+    functions/construct/p_point_from_plane_origin.h
+    functions/construct/p_average_from_points.h
+    functions/construct/p_point_between_two_points.h
+    functions/construct/p_point_from_points.h
+    functions/fit/p_best_fit_circle.h
+    functions/fit/p_best_fit_line.h
+    functions/fit/p_best_fit_plane.h
+    functions/fit/p_best_fit_point.h
+    functions/fit/p_best_fit_cylinder.h
+    functions/fit/p_best_fit_circle_in_plane.h
+    functions/fit/p_best_fit_sphere.h
+    functions/object_transformation/p_change_radius.h
+    functions/object_transformation/p_register.h
+    functions/object_transformation/p_translate_by_value.h
+    functions/object_transformation/p_rectify_to_point.h
+    functions/object_transformation/p_rectify_to_vector.h
+    functions/object_transformation/p_shift.h
+    functions/system_transformation/p_helmert7_param.h
+    functions/system_transformation/p_helmert6_param.h
+    exchange/p_oi_exchange_ascii.h
+    sensors/laser_tracker/pseudo_tracker/p_pseudo_tracker.h
+    simulations/simple_polar_measurement/simple_polar_measurement.h
+    cf/cf_util.h
+    cf/cf_function_data.h
+    cf/configured_function.h
+    cf/function_config_parser.h
+    cf/distance_between_two_points.h
+    cf/configured_function_config.h
+    cf/cf_context.h
+    cf/cfc_parameter.h
+    cf/xyz_filter.h
+    cf/cf_visitor.h
     p_factory.h
-    treeutil.h
+    tree_util.h
 )
 
 set_target_properties(OpenIndyDefaultPlugin PROPERTIES
@@ -184,14 +184,14 @@ target_include_directories(OpenIndyDefaultPlugin
     PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR}/generated
         ${CMAKE_CURRENT_SOURCE_DIR}
-        simulations/simplePolarMeasurement
+        simulations/simple_polar_measurement
         sensors/common
-        sensors/laserTracker/pseudoTracker
+        sensors/laser_tracker/pseudo_tracker
         functions/nominal
         functions/construct
         functions/fit
-        functions/objectTransformation
-        functions/systemTransformation
+        functions/object_transformation
+        functions/system_transformation
         exchange
         cf
 )
@@ -232,21 +232,21 @@ add_executable(tst_function test/function/tst_function.cpp)
 target_include_directories(tst_function PRIVATE
     test/include
     ${CMAKE_CURRENT_SOURCE_DIR}
-    simulations/simplePolarMeasurement
+    simulations/simple_polar_measurement
     sensors/common
-    sensors/laserTracker/pseudoTracker
+    sensors/laser_tracker/pseudo_tracker
     functions/nominal
     functions/construct
     functions/fit
-    functions/objectTransformation
-    functions/systemTransformation
+    functions/object_transformation
+    functions/system_transformation
     exchange
     cf
 )
 target_link_libraries(tst_function PRIVATE Qt6::Test OpenIndyDefaultPlugin OpenIndyCore)
 add_test(NAME function COMMAND tst_function)
 
-add_executable(tst_loadplugin test/loadplugin/tst_loadplugin.cpp)
+add_executable(tst_loadplugin test/load_plugin/tst_load_plugin.cpp)
 target_include_directories(tst_loadplugin PRIVATE test/include)
 target_link_libraries(tst_loadplugin PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 target_compile_definitions(tst_loadplugin PRIVATE
@@ -262,81 +262,81 @@ endif()
 add_test(NAME loadplugin COMMAND tst_loadplugin)
 add_dependencies(tst_loadplugin OpenIndyDefaultPlugin)
 
-add_executable(tst_oiexchangeascii test/oiexchangeascii/tst_oiexchangeascii.cpp exchange/p_oiexchangeascii.cpp)
+add_executable(tst_oiexchangeascii test/oi_exchange_ascii/tst_oi_exchange_ascii.cpp exchange/p_oi_exchange_ascii.cpp)
 target_include_directories(tst_oiexchangeascii PRIVATE test/include exchange)
 target_link_libraries(tst_oiexchangeascii PRIVATE Qt6::Test OpenIndyCore)
 add_test(NAME oiexchangeascii COMMAND tst_oiexchangeascii)
 
 add_executable(tst_trackererrormodel
-    test/trackererrormodel/tst_trackererrormodel.cpp
-    sensors/common/trackererrormodel.cpp
+    test/tracker_error_model/tst_tracker_error_model.cpp
+    sensors/common/tracker_error_model.cpp
 )
 target_include_directories(tst_trackererrormodel PRIVATE test/include sensors/common)
 target_link_libraries(tst_trackererrormodel PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME trackererrormodel COMMAND tst_trackererrormodel)
 
 add_executable(tst_simulatedscene
-    test/trackererrormodel/tst_simulatedscene.cpp
-    sensors/common/trackererrormodel.cpp
-    functions/fit/p_bestfitplane.cpp
+    test/tracker_error_model/tst_simulated_scene.cpp
+    sensors/common/tracker_error_model.cpp
+    functions/fit/p_best_fit_plane.cpp
 )
 target_include_directories(tst_simulatedscene PRIVATE test/include sensors/common functions/fit)
 target_link_libraries(tst_simulatedscene PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME simulatedscene COMMAND tst_simulatedscene)
 
 add_executable(tst_calibratedconstellation
-    test/calibratedconstellation/tst_calibratedconstellation.cpp
-    sensors/common/trackererrormodel.cpp
+    test/calibrated_constellation/tst_calibrated_constellation.cpp
+    sensors/common/tracker_error_model.cpp
 )
 target_include_directories(tst_calibratedconstellation PRIVATE
     test/include
     sensors/common
-    functions/systemTransformation
+    functions/system_transformation
 )
 target_link_libraries(tst_calibratedconstellation PRIVATE Qt6::Test OpenIndyDefaultPlugin OpenIndyCore OpenIndyMath)
 add_test(NAME calibratedconstellation COMMAND tst_calibratedconstellation)
 
 add_executable(tst_collectionbinding
-    test/pointcollection/tst_collectionbinding.cpp
-    functions/fit/p_bestfitplane.cpp
-    functions/construct/p_averagefrompoints.cpp
+    test/point_collection/tst_collection_binding.cpp
+    functions/fit/p_best_fit_plane.cpp
+    functions/construct/p_average_from_points.cpp
 )
 target_include_directories(tst_collectionbinding PRIVATE test/include functions/construct functions/fit)
 target_link_libraries(tst_collectionbinding PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME collectionbinding COMMAND tst_collectionbinding)
 
 add_executable(tst_derivedfeatures
-    test/derivedfeatures/tst_derivedfeatures.cpp
-    functions/construct/p_linefromplanenormal.cpp
-    functions/construct/p_pointfromplaneorigin.cpp
-    functions/construct/p_averagefrompoints.cpp
+    test/derived_features/tst_derived_features.cpp
+    functions/construct/p_line_from_plane_normal.cpp
+    functions/construct/p_point_from_plane_origin.cpp
+    functions/construct/p_average_from_points.cpp
 )
 target_include_directories(tst_derivedfeatures PRIVATE test/include functions/construct)
 target_link_libraries(tst_derivedfeatures PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME derivedfeatures COMMAND tst_derivedfeatures)
 
 add_executable(tst_ownedplaneaccessors
-    test/ownedplaneaccessors/tst_ownedplaneaccessors.cpp
-    functions/construct/p_linefromplanenormal.cpp
-    functions/construct/p_pointfromplaneorigin.cpp
+    test/owned_plane_accessors/tst_owned_plane_accessors.cpp
+    functions/construct/p_line_from_plane_normal.cpp
+    functions/construct/p_point_from_plane_origin.cpp
 )
 target_include_directories(tst_ownedplaneaccessors PRIVATE test/include functions/construct)
 target_link_libraries(tst_ownedplaneaccessors PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME ownedplaneaccessors COMMAND tst_ownedplaneaccessors)
 
 add_executable(tst_measuredfit
-    test/measuredfit/tst_measuredfit.cpp
-    functions/fit/p_bestfitplane.cpp
-    functions/fit/p_bestfitcylinder.cpp
+    test/measured_fit/tst_measured_fit.cpp
+    functions/fit/p_best_fit_plane.cpp
+    functions/fit/p_best_fit_cylinder.cpp
 )
 target_include_directories(tst_measuredfit PRIVATE test/include functions/fit)
 target_link_libraries(tst_measuredfit PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
 add_test(NAME measuredfit COMMAND tst_measuredfit)
 
 add_executable(tst_pipelinefilter
-    test/pipelinefilter/tst_pipelinefilter.cpp
-    functions/fit/p_bestfitplane.cpp
-    functions/fit/p_bestfitpoint.cpp
+    test/pipeline_filter/tst_pipeline_filter.cpp
+    functions/fit/p_best_fit_plane.cpp
+    functions/fit/p_best_fit_point.cpp
 )
 target_include_directories(tst_pipelinefilter PRIVATE test/include functions/fit)
 target_link_libraries(tst_pipelinefilter PRIVATE Qt6::Test OpenIndyCore OpenIndyMath)
