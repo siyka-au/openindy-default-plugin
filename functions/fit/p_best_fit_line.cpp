@@ -7,8 +7,9 @@
 #include <vector>
 
 namespace {
-constexpr double kLineFittedParameters =
-    2.0;  // degrees of freedom removed by the line fit
+// A 3D line has 4 parameters and two effective errors per point (the two
+// coordinates perpendicular to the line), so the redundancy is 2n - 4.
+constexpr int kLineFittedParameters = 4;
 }  // namespace
 
 void BestFitLine::init() {
@@ -163,8 +164,17 @@ bool BestFitLine::setUpResult(Line& line) {
 
   // set statistic
   this->statistic.setIsValid(true);
-  this->statistic.setStdev(std::sqrt(
-      vtv / (static_cast<double>(inputPoints.size()) - kLineFittedParameters)));
+  const int numPoints = static_cast<int>(inputPoints.size());
+  double stdv = 0.0;
+  if (2 * numPoints > kLineFittedParameters) {
+    stdv = std::sqrt(vtv / (2 * numPoints - kLineFittedParameters));
+  } else {
+    this->sendMessage(
+        "The standard deviation of the line is undefined without redundant "
+        "points (more than 2 are needed); it is reported as 0",
+        MessageTypes::eWarningMessage);
+  }
+  this->statistic.setStdev(stdv);
   line.setStatistic(this->statistic);
 
   return true;

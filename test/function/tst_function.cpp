@@ -2687,7 +2687,8 @@ void FunctionTest::testBestFitLine_residuals() {
   COMPARE_DOUBLE(feature->getDirection().getVector().getAt(2), (0.000002),
                  0.000001);
 
-  COMPARE_DOUBLE(feature->getStatistic().getStdev(), 0.0069, 0.001);
+  // divisor 2n - 4 = 4 (was n - 2 = 2, which was too large by sqrt(2))
+  COMPARE_DOUBLE(feature->getStatistic().getStdev(), 0.00488, 0.0002);
 
   COMPARE_DOUBLE(
       oi::value(function->getStatistic().getDisplayResidual(1000).corrections,
