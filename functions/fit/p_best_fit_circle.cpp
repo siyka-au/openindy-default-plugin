@@ -12,10 +12,8 @@ constexpr double kInitialMaxAbsDu = 1.0E308;
 constexpr double kConvergenceLimit = 1.0E-8;
 constexpr int kUnknowns =
     8;  // circle unknowns plus the offset of the helper plane
-constexpr int kUnknownPlaneOffset = 7;  // column of the helper plane offset
-constexpr int kConstrainedSize = 10;    // kUnknowns plus the two constraints
-constexpr int kFittedParameters =
-    6;  // degrees of freedom removed by the circle fit
+constexpr int kUnknownPlaneOffset = 7;     // column of the helper plane offset
+constexpr int kConstrainedSize = 10;       // kUnknowns plus the two constraints
 constexpr double kSquareDerivative = 2.0;  // d(x^2)/dx
 }  // namespace
 
@@ -277,9 +275,24 @@ bool BestFitCircle::setUpResult(Circle& circle) {
   myStats.setS0APriori(1.0);
   double vv = NAN;
   OiVec::dot(vv, v, v);
-  myStats.setS0APosteriori((obsCount - kFittedParameters) > 0
-                               ? sqrt(vv / (obsCount - kFittedParameters))
-                               : 1.0);
+  // Two independent condition equations per point (on the sphere about the
+  // centre, in the plane) and six parameters: the redundancy is 2n - 6, and
+  // v holds the 3n corrections of the coordinates. vv / (2n - 6) is then an
+  // unbiased estimate of the per-coordinate variance (unit weights), so it is
+  // both the stdev and the a posteriori variance factor.
+  const int redundancy = oi::fit::kCircleEquationsPerPoint * obsCount -
+                         oi::fit::kSpatialCircleParameters;
+  if (redundancy > 0) {
+    const double sigma = std::sqrt(vv / redundancy);
+    myStats.setS0APosteriori(sigma);
+    myStats.setStdev(sigma);
+  } else {
+    myStats.setS0APosteriori(1.0);
+    this->sendMessage(
+        "The standard deviation of the circle is undefined without redundant "
+        "points (more than 3 are needed); it is reported as 0",
+        MessageTypes::eWarningMessage);
+  }
 
   Position circlePosition;
   OiVec xyz(3);

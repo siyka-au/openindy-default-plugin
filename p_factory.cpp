@@ -50,6 +50,7 @@ std::vector<std::unique_ptr<Function>> OiTemplatePlugin::createFunctions() {
   resultSet.push_back(std::make_unique<Register>());
   resultSet.push_back(std::make_unique<BestFitSphere>());
   resultSet.push_back(std::make_unique<BestFitCircleInPlane>());
+  resultSet.push_back(std::make_unique<BestFitCircleInPlaneAlgebraic>());
   resultSet.push_back(std::make_unique<RectifyToPoint>());
   resultSet.push_back(std::make_unique<RectifyToVector>());
   resultSet.push_back(std::make_unique<Shift>());
@@ -179,6 +180,8 @@ std::unique_ptr<Function> OiTemplatePlugin::createFunction(
     result = std::make_unique<BestFitCircle>();
   } else if (name.compare("BestFitCircleInPlane") == 0) {
     result = std::make_unique<BestFitCircleInPlane>();
+  } else if (name.compare("BestFitCircleInPlaneAlgebraic") == 0) {
+    result = std::make_unique<BestFitCircleInPlaneAlgebraic>();
   } else if (name.compare("BestFitSphere") == 0) {
     result = std::make_unique<BestFitSphere>();
   } else if (name.compare("RectifyToPoint") == 0) {

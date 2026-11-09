@@ -14,7 +14,8 @@ void BestFitCircleInPlane::init() {
   this->metaData.description = std::format(
       "{} {} {} {}", "This function calculates an adjusted circle.",
       "The points are registered into a best fit plane first and "
-      "afterward a 2D circle is approximated inside the plane.",
+      "afterward the 2D circle that minimises the squared radial "
+      "(orthogonal) distances is fitted inside the plane.",
       "You can input as many points as you want which are then used to "
       "find the best fit circle.",
       "There will be no plane feature/calculations vissible, the "
@@ -44,6 +45,21 @@ void BestFitCircleInPlane::init() {
 
   // set spplicable for
   this->applicableFor.push_back(FeatureTypes::eCircleFeature);
+}
+
+/*!
+ * \brief BestFitCircleInPlaneAlgebraic::init
+ */
+void BestFitCircleInPlaneAlgebraic::init() {
+  BestFitCircleInPlane::init();
+  this->metaData.name = "BestFitCircleInPlaneAlgebraic";
+  this->metaData.description = std::format(
+      "{} {} {}", "This function calculates an adjusted circle.",
+      "The points are registered into a best fit plane first and "
+      "afterward the algebraic (Kasa) circle is fitted inside the plane: "
+      "a linear least-squares fit of x^2 + y^2 + a x + b y + c = 0.",
+      "It is fast but biased on short arcs; BestFitCircleInPlane is the "
+      "geometric fit.");
 }
 
 /*!
@@ -112,5 +128,6 @@ bool BestFitCircleInPlane::setUpResult(Circle& circle) {
     }
   }
 
-  return bestFitCircleInPlane(this, circle, points, usablePoints);
+  return bestFitCircleInPlane(this, circle, points, usablePoints,
+                              this->geometricFit);
 }
