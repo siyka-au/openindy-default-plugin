@@ -2943,7 +2943,8 @@ void FunctionTest::testBestFitSphere_residuals() {
 
   DEBUG_SPHERE(feature);
 
-  COMPARE_DOUBLE(feature->getStatistic().getStdev(), 0.0017, 0.001);
+  // n - 4 redundancy: sqrt(3) larger than the former (3n - 12) value 0.0017
+  COMPARE_DOUBLE(feature->getStatistic().getStdev(), 0.00298, 0.0001);
 
   COMPARE_DOUBLE(
       oi::value(function->getStatistic().getDisplayResidual(1000).corrections,

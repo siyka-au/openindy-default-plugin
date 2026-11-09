@@ -214,13 +214,10 @@ bool RectifyToVector::setUpResult(Geometry& geometry) {
   OiVec r = geometry.getDirection().getVector();
   r.normalize();
 
-  // calculate the angle between both directions
-  double angle = 0.0;
-  OiVec::dot(angle, r_reference, r);
-  angle = std::abs(std::acos(angle));
-
-  // invert the normal vector if the angle is greater than 90°
-  if (angle > kPi * kHalf) {
+  // invert the normal vector if the angle to the reference is greater than
+  // 90 degrees (only the sign of the dot product matters, see
+  // fit::opposesDirection)
+  if (fit::opposesDirection(r_reference, r)) {
     r = -1.0 * r;
   }
 

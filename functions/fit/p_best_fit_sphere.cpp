@@ -10,9 +10,8 @@ constexpr double kHalf = 0.5;
 constexpr double kConvergenceLimit =
     0.000001;  // squared correction below which the iteration stops
 constexpr int kMaxIterations =
-    101;  // the loop gives up at this iteration count
-constexpr int kSphereFittedParameters =
-    12;  // see the degrees-of-freedom check below
+    101;                            // the loop gives up at this iteration count
+constexpr int kSphereUnknowns = 4;  // centre (3) + radius
 }  // namespace
 
 /*!
@@ -316,16 +315,22 @@ bool BestFitSphere::fit(
     this->addDisplayResidual(allUsablePoint->getId(), dr.length() - r);
   }
 
-  // calculate standard deviation
+  // calculate standard deviation: verb holds the 3n coordinate corrections,
+  // and the adjustment has n conditions (one per point on the sphere) for
+  // kSphereUnknowns unknowns, so the redundancy is n - 4 (not 3n - 12).
   double stdv = 0.0;
-  if (verb.getSize() > kSphereFittedParameters) {
+  const int numPoints = static_cast<int>(inputPoints.size());
+  if (numPoints > kSphereUnknowns) {
     double sum_vv = 0.0;
     for (int i = 0; i < verb.getSize(); i++) {
       sum_vv += verb.getAt(i) * verb.getAt(i);
     }
-    stdv = std::sqrt(sum_vv / (verb.getSize() - kSphereFittedParameters));
+    stdv = std::sqrt(sum_vv / (numPoints - kSphereUnknowns));
   } else {
-    stdv = 0.0;
+    this->sendMessage(
+        "The standard deviation of the sphere is undefined without redundant "
+        "points (more than 4 are needed); it is reported as 0",
+        MessageTypes::eWarningMessage);
   }
 
   // set statistic

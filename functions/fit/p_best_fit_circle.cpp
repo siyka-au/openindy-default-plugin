@@ -301,20 +301,22 @@ bool BestFitCircle::setUpResult(Circle& circle) {
   circle.setCircle(circlePosition, circleDirection, circleRadius);
 
   myStats.setV(v);
-  for (int i = 0; i < obsCount; i++) {
-    Residual r;
-    r.elementId = inputPoints.at(i)->getId();
-    r.corrections.insert_or_assign("vx", v.getAt(i * 3));
-    r.corrections.insert_or_assign("vx", v.getAt(3 * i + 1));
-    r.corrections.insert_or_assign("vx", v.getAt(3 * i + 2));
-    r.dimension = DimensionType::eMetric;
-    myStats.addDisplayResidual(r);
-  }
   myStats.setQxx(Qxx);
 
   myStats.setIsValid(true);
   circle.setStatistic(myStats);
   this->statistic = circle.getStatistic();
+
+  // per-point display residuals go to the function's own statistic: the copy
+  // above (like every Statistic copy) drops them, so they must be added to
+  // this->statistic afterwards, as the other fit functions do
+  for (int i = 0; i < obsCount; i++) {
+    const double vx = v.getAt(3 * i);
+    const double vy = v.getAt(3 * i + 1);
+    const double vz = v.getAt(3 * i + 2);
+    this->addDisplayResidual(inputPoints.at(i)->getId(), vx, vy, vz,
+                             std::sqrt(vx * vx + vy * vy + vz * vz));
+  }
 
   return true;
 }

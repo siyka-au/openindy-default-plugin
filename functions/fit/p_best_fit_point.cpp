@@ -156,9 +156,18 @@ bool BestFitPoint::setUpResult(Point& point) {
 
   // calculate standard deviation
   double stdev = 0.0;
-  OiVec::dot(stdev, corr, corr);
-  stdev =
-      std::sqrt(stdev / (static_cast<double>(inputObservations.size()) - 1.0));
+  if (inputObservations.size() > 1) {
+    OiVec::dot(stdev, corr, corr);
+    stdev = std::sqrt(stdev /
+                      (static_cast<double>(inputObservations.size()) - 1.0));
+  } else {
+    // n - 1 = 0 would give NaN
+    this->sendMessage(
+        std::format("The standard deviation of the point {} is undefined with "
+                    "one observation; it is reported as 0",
+                    point.getFeatureName()),
+        MessageTypes::eWarningMessage);
+  }
 
   // set result
   Position position;
